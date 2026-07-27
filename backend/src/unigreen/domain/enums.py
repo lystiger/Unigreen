@@ -56,3 +56,8 @@ class StaffRole(StrEnum):
     SALES_MANAGER = "sales_manager"
     CONTENT_EDITOR = "content_editor"
     ADMINISTRATOR = "administrator"
+
+
+class StaffStatus(StrEnum):
+    ACTIVE = "active"
+    DISABLED = "disabled"

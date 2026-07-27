@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     readiness_timeout_seconds: float = Field(default=2.0, gt=0, le=10)
     storage_root: Path = Path("/app/storage")
     public_media_base_url: str = "http://localhost:8000/api/v1/public/media"
+    staff_session_cookie_name: str = "ug_staff_session"
+    csrf_cookie_name: str = "ug_csrf"
+    staff_session_hours: int = Field(default=12, ge=1, le=168)
+    login_attempt_limit: int = Field(default=5, ge=1, le=100)
+    login_attempt_window_seconds: int = Field(default=900, ge=60, le=86400)
 
 
 @lru_cache
