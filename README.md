@@ -42,6 +42,18 @@ cd backend
 uv run python scripts/export_openapi.py ../contracts/openapi.json
 ```
 
+Create the first administrator after migrations:
+
+```bash
+docker compose run --rm migrate unigreen-create-admin \
+  --email admin@example.com \
+  --password 'replace-with-a-strong-secret'
+```
+
+Staff authentication uses a revocable opaque `HttpOnly` session cookie.
+Cookie-authenticated mutations must echo the `ug_csrf` cookie value in the
+`X-CSRF-Token` header.
+
 For frontend-only development (requires Node 22):
 
 ```bash

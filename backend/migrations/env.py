@@ -7,6 +7,7 @@ from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from unigreen import models as models
 from unigreen.config import get_settings
 from unigreen.db import Base
 
