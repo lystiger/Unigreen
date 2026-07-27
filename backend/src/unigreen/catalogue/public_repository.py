@@ -29,6 +29,7 @@ def _public_product_options() -> tuple[Any, ...]:
         .selectinload(ProductCategoryLink.category)
         .selectinload(ProductCategory.translations),
         selectinload(Product.specifications).selectinload(ProductSpecification.translations),
+        selectinload(Product.media),
     )
 
 

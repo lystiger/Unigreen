@@ -114,6 +114,12 @@ class Product(Base):
         lazy="selectin",
         order_by="ProductSpecification.sort_order",
     )
+    media: Mapped[list[ProductMedia]] = relationship(
+        back_populates="product",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="ProductMedia.sort_order",
+    )
 
 
 class ProductTranslation(Base):
@@ -186,3 +192,6 @@ class ProductSpecificationTranslation(Base):
     display_value_override: Mapped[str | None] = mapped_column(String(500))
 
     specification: Mapped[ProductSpecification] = relationship(back_populates="translations")
+
+
+from unigreen.media.models import ProductMedia  # noqa: E402

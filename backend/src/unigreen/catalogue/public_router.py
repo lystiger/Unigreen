@@ -15,6 +15,7 @@ from unigreen.catalogue.public_schemas import (
     PublicProductSort,
 )
 from unigreen.catalogue.public_service import PublicCatalogueService
+from unigreen.config import Settings, get_settings
 from unigreen.db import get_session
 from unigreen.domain.enums import Locale
 
@@ -23,8 +24,12 @@ router = APIRouter(prefix="/api/v1/public", tags=["public catalogue"])
 
 def get_public_catalogue_service(
     session: Annotated[AsyncSession, Depends(get_session)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> PublicCatalogueService:
-    return PublicCatalogueService(PublicCatalogueRepository(session))
+    return PublicCatalogueService(
+        PublicCatalogueRepository(session),
+        settings.public_media_base_url,
+    )
 
 
 def _cache_public(response: Response) -> None:

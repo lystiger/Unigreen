@@ -23,6 +23,7 @@ from unigreen.catalogue.public_repository import (
 from unigreen.catalogue.public_schemas import PublicProductQuery, PublicProductSort
 from unigreen.catalogue.public_service import PublicCatalogueService
 from unigreen.domain.enums import Locale, PublicationStatus
+from unigreen.media.models import ProductMedia
 
 
 def category(
@@ -161,8 +162,56 @@ async def test_public_catalogue_localizes_and_hides_invalid_category_links() -> 
 
 @pytest.mark.asyncio
 async def test_public_product_detail_localizes_specs_and_uses_display_override() -> None:
+    item = product([category()])
+    media_id = uuid4()
+    item.media = [
+        ProductMedia(
+            id=media_id,
+            product_id=item.id,
+            storage_key="private/original.png",
+            checksum_sha256="0" * 64,
+            original_filename="private.png",
+            detected_mime_type="image/png",
+            size_bytes=100,
+            width=480,
+            height=240,
+            alt_vi="Ảnh sản phẩm",
+            alt_en="Product image",
+            sort_order=0,
+            is_primary=True,
+            variants={
+                "w480": {
+                    "storage_key": "public/w480.webp",
+                    "width": 480,
+                    "height": 240,
+                    "size_bytes": 50,
+                }
+            },
+            source_reference="internal approval record",
+            approval_status="approved",
+        ),
+        ProductMedia(
+            id=uuid4(),
+            product_id=item.id,
+            storage_key="private/pending.png",
+            checksum_sha256="1" * 64,
+            original_filename="pending.png",
+            detected_mime_type="image/png",
+            size_bytes=100,
+            width=480,
+            height=240,
+            alt_vi="Chờ duyệt",
+            alt_en="Pending",
+            sort_order=1,
+            is_primary=False,
+            variants={},
+            source_reference=None,
+            approval_status="pending",
+        ),
+    ]
     service = PublicCatalogueService(
-        FakePublicCatalogueRepository(products=[product([category()])])  # type: ignore[arg-type]
+        FakePublicCatalogueRepository(products=[item]),  # type: ignore[arg-type]
+        "https://cdn.example.test/api/v1/public/media",
     )
 
     detail = await service.product("bathroom-tissue", Locale.VI)
@@ -175,6 +224,22 @@ async def test_public_product_detail_localizes_specs_and_uses_display_override()
         "unit": "g/m²",
         "is_highlighted": True,
     }
+    assert [media.model_dump() for media in detail.media] == [
+        {
+            "alt_text": "Ảnh sản phẩm",
+            "is_primary": True,
+            "variants": [
+                {
+                    "width": 480,
+                    "height": 240,
+                    "url": (f"https://cdn.example.test/api/v1/public/media/{media_id}/w480"),
+                }
+            ],
+        }
+    ]
+    assert detail.primary_media == detail.media[0]
+    assert "checksum" not in detail.model_dump_json()
+    assert "source_reference" not in detail.model_dump_json()
 
 
 @pytest.mark.asyncio

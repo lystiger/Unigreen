@@ -13,4 +13,5 @@ from unigreen.catalogue.models import (
     ProductSpecificationTranslation as ProductSpecificationTranslation,
 )
 from unigreen.catalogue.models import ProductTranslation as ProductTranslation
+from unigreen.media.models import ProductMedia as ProductMedia
 from unigreen.staff.models import StaffUser as StaffUser

@@ -37,6 +37,14 @@ services:
       redis:
         condition: service_healthy
 
+  storage-init:
+    build:
+      context: ./backend
+    user: root
+    command: ["chown", "-R", "unigreen:unigreen", "/app/storage"]
+    volumes:
+      - unigreen-storage:/app/storage
+
   backend:
     build:
       context: ./backend
@@ -48,6 +56,8 @@ services:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+      storage-init:
+        condition: service_completed_successfully
     volumes:
       - unigreen-storage:/app/storage
     healthcheck:
@@ -93,6 +103,8 @@ services:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+      storage-init:
+        condition: service_completed_successfully
     volumes:
       - unigreen-storage:/app/storage
 

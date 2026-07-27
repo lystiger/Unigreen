@@ -232,6 +232,7 @@ async def publish_product(
             product_id,
             actor_id=context.user.id,
             request_id=request.state.request_id,
+            has_primary_media=await service.repository.has_approved_primary_media(product_id),
         )
     )
 
