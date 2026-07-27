@@ -248,6 +248,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Categories */
+        get: operations["categories_api_v1_public_categories_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Products */
+        get: operations["products_api_v1_public_products_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/products/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Product */
+        get: operations["product_api_v1_public_products__slug__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -375,6 +426,17 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** PaginationMetadata */
+        PaginationMetadata: {
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+            /** Total Pages */
+            total_pages: number;
+        };
         /**
          * Permission
          * @enum {string}
@@ -471,6 +533,85 @@ export interface components {
             category_ids?: string[] | null;
             /** Translations */
             translations?: components["schemas"]["ProductTranslationInput"][] | null;
+        };
+        /** PublicCategoryResponse */
+        PublicCategoryResponse: {
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Meta Title */
+            meta_title: string | null;
+            /** Meta Description */
+            meta_description: string | null;
+        };
+        /** PublicProductDetail */
+        PublicProductDetail: {
+            /** Sku */
+            sku: string;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Summary */
+            summary: string;
+            /** Oem Available */
+            oem_available: boolean;
+            /** Featured */
+            featured: boolean;
+            /** Categories */
+            categories: components["schemas"]["PublicCategoryResponse"][];
+            /** Description */
+            description: string | null;
+            /** Meta Title */
+            meta_title: string | null;
+            /** Meta Description */
+            meta_description: string | null;
+            /** Specifications */
+            specifications: components["schemas"]["PublicSpecificationResponse"][];
+        };
+        /** PublicProductPage */
+        PublicProductPage: {
+            /** Items */
+            items: components["schemas"]["PublicProductSummary"][];
+            pagination: components["schemas"]["PaginationMetadata"];
+        };
+        /**
+         * PublicProductSort
+         * @enum {string}
+         */
+        PublicProductSort: "featured" | "name" | "newest";
+        /** PublicProductSummary */
+        PublicProductSummary: {
+            /** Sku */
+            sku: string;
+            /** Slug */
+            slug: string;
+            /** Name */
+            name: string;
+            /** Summary */
+            summary: string;
+            /** Oem Available */
+            oem_available: boolean;
+            /** Featured */
+            featured: boolean;
+            /** Categories */
+            categories: components["schemas"]["PublicCategoryResponse"][];
+        };
+        /** PublicSpecificationResponse */
+        PublicSpecificationResponse: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Value */
+            value: string;
+            /** Unit */
+            unit: string | null;
+            /** Is Highlighted */
+            is_highlighted: boolean;
         };
         /**
          * PublicationStatus
@@ -1583,6 +1724,116 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    categories_api_v1_public_categories_get: {
+        parameters: {
+            query: {
+                locale: components["schemas"]["Locale"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicCategoryResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    products_api_v1_public_products_get: {
+        parameters: {
+            query: {
+                locale: components["schemas"]["Locale"];
+                category?: string | null;
+                q?: string | null;
+                featured?: boolean | null;
+                page?: number;
+                page_size?: number;
+                sort?: components["schemas"]["PublicProductSort"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProductPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    product_api_v1_public_products__slug__get: {
+        parameters: {
+            query: {
+                locale: components["schemas"]["Locale"];
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicProductDetail"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
