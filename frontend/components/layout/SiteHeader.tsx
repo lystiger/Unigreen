@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import type { Locale } from "@/lib/catalogue";
+import { cataloguePath } from "@/lib/routes";
+import type { Locale } from "@/lib/types";
 import { telHref } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
 import { swapLocaleInPath } from "@/lib/i18n";
@@ -19,12 +20,7 @@ export function SiteHeader({ locale, copy, hotline }: SiteHeaderProps) {
   const pathname = usePathname();
   const otherLocale: Locale = locale === "vi" ? "en" : "vi";
 
-  const links = [
-    { href: `/${locale}/products`, label: copy.products },
-    { href: `/${locale}/oem`, label: copy.oem },
-    { href: `/${locale}/capability`, label: copy.capability },
-    { href: `/${locale}/contact`, label: copy.contact },
-  ];
+  const links = [{ href: cataloguePath(locale), label: copy.products }];
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
@@ -106,12 +102,16 @@ export function SiteHeader({ locale, copy, hotline }: SiteHeaderProps) {
                 {copy.inquiry}
               </Link>
               <div className="flex items-center justify-between">
-                <a
-                  href={telHref(hotline)}
-                  className="font-mono text-data text-ink-muted"
-                >
-                  {copy.callUs}: {hotline}
-                </a>
+                {hotline ? (
+                  <a
+                    href={telHref(hotline)}
+                    className="font-mono text-data text-ink-muted"
+                  >
+                    {copy.callUs}: {hotline}
+                  </a>
+                ) : (
+                  <span />
+                )}
                 <Link
                   href={swapLocaleInPath(pathname, otherLocale)}
                   hrefLang={otherLocale}

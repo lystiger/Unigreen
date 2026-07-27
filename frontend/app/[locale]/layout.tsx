@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { HTML_LANG, LOCALES, getDictionary, isLocale } from "@/lib/i18n";
 
 const beVietnam = Be_Vietnam_Pro({
@@ -77,17 +78,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           {dictionary.nav.skipToContent}
         </a>
 
-        <SiteHeader
-          locale={locale}
-          copy={dictionary.nav}
-          hotline={dictionary.footer.hotline}
-        />
+        <QueryProvider>
+          <SiteHeader
+            locale={locale}
+            copy={dictionary.nav}
+            hotline={dictionary.footer.hotline}
+          />
 
-        <main id="main" className="flex-1">
-          {children}
-        </main>
+          <main id="main" className="flex-1">
+            {children}
+          </main>
 
-        <SiteFooter locale={locale} copy={dictionary.footer} nav={dictionary.nav} />
+          <SiteFooter locale={locale} copy={dictionary.footer} nav={dictionary.nav} />
+        </QueryProvider>
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { Locale } from "@/lib/catalogue";
+import { cataloguePath } from "@/lib/routes";
+import type { Locale } from "@/lib/types";
 import { telHref } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -10,12 +11,7 @@ interface SiteFooterProps {
 }
 
 export function SiteFooter({ locale, copy, nav }: SiteFooterProps) {
-  const links = [
-    { href: `/${locale}/products`, label: nav.products },
-    { href: `/${locale}/oem`, label: nav.oem },
-    { href: `/${locale}/capability`, label: nav.capability },
-    { href: `/${locale}/contact`, label: nav.contact },
-  ];
+  const links = [{ href: cataloguePath(locale), label: nav.products }];
 
   return (
     <footer className="border-t border-line bg-paper-raised py-12">
@@ -25,9 +21,11 @@ export function SiteFooter({ locale, copy, nav }: SiteFooterProps) {
             Uni<span className="text-brand-green">-Green</span>
           </p>
           <p className="mt-3 text-body text-ink">{copy.company}</p>
-          <address className="mt-2 max-w-sm text-body not-italic text-ink-muted">
-            {copy.address}
-          </address>
+          {copy.address ? (
+            <address className="mt-2 max-w-sm text-body not-italic text-ink-muted">
+              {copy.address}
+            </address>
+          ) : null}
         </div>
 
         <nav aria-label={nav.products}>
@@ -46,18 +44,22 @@ export function SiteFooter({ locale, copy, nav }: SiteFooterProps) {
         </nav>
 
         <div className="flex flex-col gap-2">
-          <a
-            href={telHref(copy.hotline)}
-            className="font-mono text-data text-ink transition-colors hover:text-brand-green"
-          >
-            {copy.hotline}
-          </a>
-          <a
-            href={`https://${copy.web}`}
-            className="font-mono text-data text-ink-muted transition-colors hover:text-brand-green"
-          >
-            {copy.web}
-          </a>
+          {copy.hotline ? (
+            <a
+              href={telHref(copy.hotline)}
+              className="font-mono text-data text-ink transition-colors hover:text-brand-green"
+            >
+              {copy.hotline}
+            </a>
+          ) : null}
+          {copy.web ? (
+            <a
+              href={`https://${copy.web}`}
+              className="font-mono text-data text-ink-muted transition-colors hover:text-brand-green"
+            >
+              {copy.web}
+            </a>
+          ) : null}
         </div>
       </div>
 

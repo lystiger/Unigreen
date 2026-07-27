@@ -1,5 +1,5 @@
 import { ButtonLink } from "@/components/ui/Button";
-import type { Locale } from "@/lib/catalogue";
+import type { Locale } from "@/lib/types";
 import type { Dictionary } from "@/lib/i18n";
 import { telHref } from "@/lib/format";
 
@@ -24,15 +24,17 @@ export function InquiryBand({ locale, copy, hotline }: InquiryBandProps) {
           <ButtonLink href={`/${locale}/inquiry`} variant="secondary" size="lg">
             {copy.cta}
           </ButtonLink>
-          <p className="text-body text-brand-tint">
-            {copy.orCall}{" "}
-            <a
-              href={telHref(hotline)}
-              className="font-mono text-data text-white underline-offset-4 hover:underline"
-            >
-              {hotline}
-            </a>
-          </p>
+          {hotline ? (
+            <p className="text-body text-brand-tint">
+              {copy.orCall}{" "}
+              <a
+                href={telHref(hotline)}
+                className="font-mono text-data text-white underline-offset-4 hover:underline"
+              >
+                {hotline}
+              </a>
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

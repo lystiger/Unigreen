@@ -1,19 +1,15 @@
 import { ButtonLink } from "@/components/ui/Button";
-import type { Locale, Product } from "@/lib/catalogue";
+import type { PublicProduct } from "@/lib/api/types";
 import type { Dictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 
 interface ProductGridProps {
-  readonly products: readonly Product[];
+  readonly products: readonly PublicProduct[];
   readonly locale: Locale;
   readonly copy: Dictionary["products"];
 }
 
-/**
- * Shared by the landing page, the catalogue and search results. The empty
- * state is part of the component rather than each caller so that an empty
- * catalogue never renders a bare grid.
- */
 export function ProductGrid({ products, locale, copy }: ProductGridProps) {
   if (products.length === 0) {
     return (
@@ -32,9 +28,9 @@ export function ProductGrid({ products, locale, copy }: ProductGridProps) {
   }
 
   return (
-    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {products.map((product) => (
-        <li key={product.id}>
+        <li key={product.sku}>
           <ProductCard product={product} locale={locale} copy={copy} />
         </li>
       ))}

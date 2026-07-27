@@ -1,4 +1,4 @@
-import type { Locale } from "./catalogue";
+import type { Locale } from "./types";
 
 export const LOCALES: readonly Locale[] = ["vi", "en"];
 export const DEFAULT_LOCALE: Locale = "vi";
@@ -113,7 +113,7 @@ const vi: Dictionary = {
     oem: "Gia công OEM",
     capability: "Năng lực",
     contact: "Liên hệ",
-    inquiry: "Yêu cầu báo giá",
+    inquiry: "Liên hệ — sắp ra mắt",
     openMenu: "Mở menu",
     closeMenu: "Đóng menu",
     switchLocale: "Chuyển sang tiếng Anh",
@@ -127,13 +127,13 @@ const vi: Dictionary = {
     cta: "Về trang chủ",
   },
   hero: {
-    eyebrow: "Nhà máy giấy tissue · Hưng Yên",
-    headline: "Giấy vệ sinh cuộn lớn,",
-    headlineAccent: "không lõi.",
-    lead: "Bột giấy nguyên sinh nhập khẩu, công nghệ Nhật Bản, sản xuất theo TCCS 620:2020. Nhận gia công nhãn riêng từ 400 thùng.",
-    primaryCta: "Yêu cầu báo giá",
-    secondaryCta: "Xem quy cách sản phẩm",
-    packAlt: "Lốc giấy vệ sinh Uni-Green",
+    eyebrow: "Danh mục sản phẩm song ngữ",
+    headline: "Sản phẩm giấy tissue,",
+    headlineAccent: "thông tin đã xác minh.",
+    lead: "Khám phá danh mục đã được đội ngũ Uni-Green kiểm duyệt bằng tiếng Việt và tiếng Anh.",
+    primaryCta: "Liên hệ — sắp ra mắt",
+    secondaryCta: "Xem danh mục",
+    packAlt: "Thông tin sản phẩm được kiểm duyệt trước khi xuất bản.",
   },
   specStrip: {
     basisWeight: "Định lượng",
@@ -148,8 +148,8 @@ const vi: Dictionary = {
     title: "Sản phẩm đang sản xuất",
     viewAll: "Xem toàn bộ danh mục",
     emptyTitle: "Chưa có sản phẩm nào",
-    emptyBody: "Danh mục đang được cập nhật. Gửi yêu cầu để nhận bảng quy cách đầy đủ.",
-    emptyCta: "Gửi yêu cầu",
+    emptyBody: "Danh mục đang được cập nhật với nội dung đã được phê duyệt.",
+    emptyCta: "Xem thông tin",
     moq: "Tối thiểu",
     cartons: "thùng",
     coreless: "Không lõi",
@@ -165,19 +165,19 @@ const vi: Dictionary = {
   oem: {
     eyebrow: "Nhãn riêng",
     title: "Gia công theo thương hiệu của bạn",
-    lead: "Chúng tôi cung cấp cuộn giấy màng trơn không in, hoặc sản xuất trọn gói theo thiết kế bao bì của bạn.",
+    lead: "Thông tin dịch vụ OEM sẽ được công bố sau khi hoàn tất kiểm duyệt.",
     steps: [
       {
         title: "Gửi yêu cầu quy cách",
-        body: "Định lượng, số lớp, chiều dài cuộn, số cuộn mỗi lốc và sản lượng dự kiến.",
+        body: "Quy trình tiếp nhận thông số sẽ được xác nhận trước khi công bố.",
       },
       {
         title: "Nhận mẫu và báo giá",
-        body: "Mẫu vật lý gửi trong 7 ngày làm việc. Báo giá kèm điều kiện giao hàng.",
+        body: "Quy trình mẫu và báo giá sẽ được xác nhận trước khi công bố.",
       },
       {
         title: "Duyệt in và sản xuất",
-        body: "Duyệt file dieline, in màng, chạy đơn. Tối thiểu 400 thùng mỗi mã.",
+        body: "Quy trình duyệt và sản xuất sẽ được xác nhận trước khi công bố.",
       },
     ],
     cta: "Trao đổi về đơn OEM",
@@ -185,26 +185,21 @@ const vi: Dictionary = {
   capability: {
     eyebrow: "Năng lực",
     title: "Chứng nhận và tiêu chuẩn",
-    lead: "Sản xuất tại Công ty TNHH Uni Sơn Hà, khu đô thị Nam Định Điền, phường Lam Sơn, thành phố Hưng Yên.",
-    certifications: [
-      { code: "ISO 9001:2015", label: "Hệ thống quản lý chất lượng" },
-      { code: "ISO 14001:2015", label: "Hệ thống quản lý môi trường" },
-      { code: "TCCS 620:2020", label: "Tiêu chuẩn cơ sở" },
-      { code: "OBA free", label: "Không chất tăng trắng quang học" },
-    ],
+    lead: "Thông tin năng lực sẽ được công bố sau khi hoàn tất kiểm duyệt.",
+    certifications: [],
   },
   inquiry: {
-    title: "Cần báo giá cho đơn hàng cụ thể?",
-    body: "Chọn sản phẩm, nhập sản lượng và địa điểm giao hàng. Chúng tôi phản hồi trong một ngày làm việc.",
-    cta: "Tạo yêu cầu báo giá",
-    orCall: "hoặc gọi",
+    title: "Cần trao đổi về sản phẩm?",
+    body: "Luồng yêu cầu báo giá sẽ được bổ sung trong Sprint 2.",
+    cta: "Xem thông tin sắp ra mắt",
+    orCall: "",
   },
   footer: {
-    company: "Công ty TNHH Uni Sơn Hà",
-    address: "Số 80 Lương Ngọc Quyến, KĐT Nam Định Điền, phường Lam Sơn, TP Hưng Yên",
-    hotline: "0966 986 558",
-    web: "unisonha.com",
-    rights: "Bản quyền thuộc Công ty TNHH Uni Sơn Hà.",
+    company: "Danh mục sản phẩm Uni-Green",
+    address: "",
+    hotline: "",
+    web: "",
+    rights: "Thông tin công khai chỉ gồm nội dung đã được phê duyệt.",
   },
 };
 
@@ -214,7 +209,7 @@ const en: Dictionary = {
     oem: "OEM",
     capability: "Capability",
     contact: "Contact",
-    inquiry: "Request quotation",
+    inquiry: "Contact — coming soon",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     switchLocale: "Switch to Vietnamese",
@@ -228,13 +223,13 @@ const en: Dictionary = {
     cta: "Back to home",
   },
   hero: {
-    eyebrow: "Tissue paper mill · Hung Yen, Vietnam",
-    headline: "Coreless bathroom tissue,",
-    headlineAccent: "made to spec.",
-    lead: "Imported virgin pulp, Japanese converting technology, produced to TCCS 620:2020. Private label from 400 cartons.",
-    primaryCta: "Request quotation",
-    secondaryCta: "View specifications",
-    packAlt: "Uni-Green bathroom tissue pack",
+    eyebrow: "Bilingual product catalogue",
+    headline: "Tissue products,",
+    headlineAccent: "with verified information.",
+    lead: "Explore catalogue content reviewed by the Uni-Green team in Vietnamese and English.",
+    primaryCta: "Contact — coming soon",
+    secondaryCta: "View catalogue",
+    packAlt: "Product information is reviewed before publication.",
   },
   specStrip: {
     basisWeight: "Basis weight",
@@ -249,9 +244,8 @@ const en: Dictionary = {
     title: "Current production range",
     viewAll: "View full catalogue",
     emptyTitle: "No products listed",
-    emptyBody:
-      "The catalogue is being updated. Send an inquiry to receive the full specification sheet.",
-    emptyCta: "Send inquiry",
+    emptyBody: "The catalogue is being updated with approved content.",
+    emptyCta: "View information",
     moq: "MOQ",
     cartons: "ctn",
     coreless: "Coreless",
@@ -267,19 +261,19 @@ const en: Dictionary = {
   oem: {
     eyebrow: "Private label",
     title: "Manufactured under your brand",
-    lead: "We supply unprinted rolls in plain film, or run the complete pack to your own artwork.",
+    lead: "OEM service information will be published after review.",
     steps: [
       {
         title: "Send your specification",
-        body: "Basis weight, plies, roll length, rolls per pack and expected annual volume.",
+        body: "The specification intake process will be confirmed before publication.",
       },
       {
         title: "Receive samples and pricing",
-        body: "Physical samples within 7 working days. Quotation includes delivery terms.",
+        body: "The sampling and quotation process will be confirmed before publication.",
       },
       {
         title: "Approve artwork and run",
-        body: "Dieline approval, film printing, production. Minimum 400 cartons per SKU.",
+        body: "The approval and production process will be confirmed before publication.",
       },
     ],
     cta: "Discuss an OEM order",
@@ -287,26 +281,21 @@ const en: Dictionary = {
   capability: {
     eyebrow: "Capability",
     title: "Certifications and standards",
-    lead: "Manufactured by Uni Son Ha Co. Ltd, Nam Dinh Dien urban area, Lam Son ward, Hung Yen city.",
-    certifications: [
-      { code: "ISO 9001:2015", label: "Quality management system" },
-      { code: "ISO 14001:2015", label: "Environmental management system" },
-      { code: "TCCS 620:2020", label: "Manufacturer standard" },
-      { code: "OBA free", label: "No optical brightening agents" },
-    ],
+    lead: "Capability information will be published after review.",
+    certifications: [],
   },
   inquiry: {
-    title: "Need pricing for a specific order?",
-    body: "Select products, enter volumes and delivery location. We respond within one working day.",
-    cta: "Build a quotation request",
-    orCall: "or call",
+    title: "Want to discuss a product?",
+    body: "The quotation-request workflow is planned for Sprint 2.",
+    cta: "View what is coming",
+    orCall: "",
   },
   footer: {
-    company: "Uni Son Ha Co. Ltd",
-    address: "80 Luong Ngoc Quyen, Nam Dinh Dien, Lam Son ward, Hung Yen city, Vietnam",
-    hotline: "+84 966 986 558",
-    web: "unisonha.com",
-    rights: "Copyright Uni Son Ha Co. Ltd.",
+    company: "Uni-Green product catalogue",
+    address: "",
+    hotline: "",
+    web: "",
+    rights: "Public information contains approved content only.",
   },
 };
 
