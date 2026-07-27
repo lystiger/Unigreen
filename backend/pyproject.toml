@@ -25,6 +25,7 @@ dependencies = [
 
 [project.scripts]
 unigreen-create-admin = "unigreen.staff.cli:main"
+unigreen-import-catalogue = "unigreen.catalogue.importer:main"
 
 [dependency-groups]
 dev = [

@@ -52,6 +52,23 @@ docker compose run --rm migrate unigreen-create-admin \
   --password 'replace-with-a-strong-secret'
 ```
 
+Validate a controlled catalogue manifest, then import it atomically as
+staff-only drafts:
+
+```bash
+docker compose run --rm migrate unigreen-import-catalogue \
+  --input examples/catalogue-draft-import.json \
+  --check
+docker compose run --rm migrate unigreen-import-catalogue \
+  --input examples/catalogue-draft-import.json
+```
+
+The importer always creates `draft` records and has no publication or media
+path. The committed example is intentionally empty because no approved product
+content sheet or approved pack shots are present. Populate a separate manifest
+only from reviewed business data, record its approval reference, import it,
+then use the staff workspace to attach approved media and publish.
+
 Staff authentication uses a revocable opaque `HttpOnly` session cookie.
 Cookie-authenticated mutations must echo the `ug_csrf` cookie value in the
 `X-CSRF-Token` header.
