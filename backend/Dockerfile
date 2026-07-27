@@ -11,11 +11,12 @@ WORKDIR /app
 
 COPY --from=ghcr.io/astral-sh/uv:0.8.3 /uv /uvx /bin/
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --no-install-project
 
 COPY alembic.ini ./
 COPY migrations ./migrations
 COPY src ./src
+RUN uv sync --frozen --no-dev
 
 RUN chown -R unigreen:unigreen /app
 USER unigreen
