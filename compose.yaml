@@ -58,6 +58,19 @@ services:
       timeout: 3s
       retries: 5
 
+  web:
+    build:
+      context: ./frontend
+    environment:
+      UNIGREEN_API_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
   worker:
     build:
       context: ./backend
