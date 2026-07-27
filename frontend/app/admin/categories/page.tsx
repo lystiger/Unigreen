@@ -79,7 +79,7 @@ export default function AdminCategoriesPage() {
 
   return (
     <>
-      <p className="font-mono text-eyebrow uppercase tracking-widest text-brand-green">
+      <p className="font-mono text-eyebrow tracking-widest text-brand-green">
         Catalogue
       </p>
       <h1 className="mt-2 text-h1 font-semibold">Categories</h1>
@@ -106,7 +106,7 @@ export default function AdminCategoriesPage() {
           <CategoryField name="name_en" label="English name" />
           <button
             type="submit"
-            className="self-end rounded-control bg-brand-green px-4 py-2 font-medium text-white"
+            className="min-h-11 self-end rounded-control bg-brand-green px-4 py-2 font-medium text-white"
           >
             Add draft
           </button>

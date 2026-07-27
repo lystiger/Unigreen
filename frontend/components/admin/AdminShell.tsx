@@ -52,7 +52,7 @@ export function AdminShell({ children }: { readonly children: ReactNode }) {
             <span className="text-data text-ink-muted">{staff.data.email}</span>
             <button
               type="button"
-              className="rounded-control border border-line-strong px-3 py-2"
+              className="min-h-11 rounded-control border border-line-strong px-3 py-2"
               onClick={async () => {
                 await apiRequest<void>("/api/v1/auth/logout", { method: "POST" });
                 router.replace("/admin/login");

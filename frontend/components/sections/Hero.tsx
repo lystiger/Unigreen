@@ -35,7 +35,7 @@ export function Hero({ locale, copy }: HeroProps) {
       </div>
 
       <div className="rounded-card border border-line bg-brand-tint p-10 lg:p-14">
-        <p className="font-mono text-eyebrow uppercase tracking-widest text-brand-dark">
+        <p className="font-mono text-eyebrow tracking-widest text-brand-dark">
           Uni-Green
         </p>
         <p className="mt-5 text-h2 font-semibold text-ink">{copy.packAlt}</p>

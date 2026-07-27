@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { BasketBadge } from "@/components/basket/BasketBadge";
+import { LocaleCode } from "@/components/ui/LocaleCode";
 import { cataloguePath } from "@/lib/routes";
 import type { Locale } from "@/lib/types";
 import { telHref } from "@/lib/format";
@@ -13,9 +15,10 @@ interface SiteHeaderProps {
   readonly locale: Locale;
   readonly copy: Dictionary["nav"];
   readonly hotline: string;
+  readonly basketCopy: Dictionary["basket"];
 }
 
-export function SiteHeader({ locale, copy, hotline }: SiteHeaderProps) {
+export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const otherLocale: Locale = locale === "vi" ? "en" : "vi";
@@ -47,33 +50,39 @@ export function SiteHeader({ locale, copy, hotline }: SiteHeaderProps) {
           </ul>
         </nav>
 
-        <div className="hidden items-center gap-4 lg:flex">
-          <Link
-            href={swapLocaleInPath(pathname, otherLocale)}
-            hrefLang={otherLocale}
-            aria-label={copy.switchLocale}
-            className="font-mono text-eyebrow uppercase tracking-widest text-ink-muted transition-colors hover:text-ink"
-          >
-            {otherLocale}
-          </Link>
-          <Link
-            href={`/${locale}/inquiry`}
-            className="rounded-control bg-brand-green px-4 py-2 text-body font-medium text-white transition-colors hover:bg-brand-dark"
-          >
-            {copy.inquiry}
-          </Link>
-        </div>
+        {/* One badge at every breakpoint. Rendering a desktop copy and a
+            mobile copy would put two identically-labelled buttons in the
+            accessibility tree, which a screen reader reads out twice however
+            they are hidden visually. */}
+        <div className="flex items-center gap-2 lg:gap-4">
+          <BasketBadge copy={basketCopy} />
 
-        <button
-          type="button"
-          onClick={() => setIsOpen((open) => !open)}
-          aria-expanded={isOpen}
-          aria-controls="site-menu"
-          aria-label={isOpen ? copy.closeMenu : copy.openMenu}
-          className="rounded-control border border-line px-3 py-2 font-mono text-eyebrow uppercase tracking-widest text-ink lg:hidden"
-        >
-          {isOpen ? copy.closeMenu : copy.openMenu}
-        </button>
+          <div className="hidden items-center gap-4 lg:flex">
+            <LocaleCode
+              href={swapLocaleInPath(pathname, otherLocale)}
+              locale={otherLocale}
+              label={copy.switchLocale}
+              className="text-ink-muted transition-colors hover:text-ink"
+            />
+            <Link
+              href={`/${locale}/inquiry`}
+              className="inline-flex min-h-11 items-center rounded-control bg-brand-green px-4 py-2 text-body font-medium text-white transition-colors hover:bg-brand-dark"
+            >
+              {copy.inquiry}
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsOpen((open) => !open)}
+            aria-expanded={isOpen}
+            aria-controls="site-menu"
+            aria-label={isOpen ? copy.closeMenu : copy.openMenu}
+            className="min-h-11 rounded-control border border-line px-3 py-2 font-mono text-eyebrow tracking-widest text-ink lg:hidden"
+          >
+            {isOpen ? copy.closeMenu : copy.openMenu}
+          </button>
+        </div>
       </div>
 
       {isOpen ? (
@@ -85,7 +94,7 @@ export function SiteHeader({ locale, copy, hotline }: SiteHeaderProps) {
                   <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-control px-2 py-3 text-lead text-ink"
+                    className="flex min-h-11 items-center rounded-control px-2 py-3 text-lead text-ink"
                   >
                     {link.label}
                   </Link>
@@ -97,7 +106,7 @@ export function SiteHeader({ locale, copy, hotline }: SiteHeaderProps) {
               <Link
                 href={`/${locale}/inquiry`}
                 onClick={() => setIsOpen(false)}
-                className="rounded-control bg-brand-green px-4 py-3 text-center text-body font-medium text-white"
+                className="flex min-h-11 items-center justify-center rounded-control bg-brand-green px-4 py-3 text-center text-body font-medium text-white"
               >
                 {copy.inquiry}
               </Link>
@@ -112,15 +121,13 @@ export function SiteHeader({ locale, copy, hotline }: SiteHeaderProps) {
                 ) : (
                   <span />
                 )}
-                <Link
+                <LocaleCode
                   href={swapLocaleInPath(pathname, otherLocale)}
-                  hrefLang={otherLocale}
-                  aria-label={copy.switchLocale}
+                  locale={otherLocale}
+                  label={copy.switchLocale}
                   onClick={() => setIsOpen(false)}
-                  className="font-mono text-eyebrow uppercase tracking-widest text-ink-muted"
-                >
-                  {otherLocale}
-                </Link>
+                  className="text-ink-muted"
+                />
               </div>
             </div>
           </nav>

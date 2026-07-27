@@ -30,7 +30,7 @@ export function ApiErrorState({
       <button
         type="button"
         onClick={onRetry}
-        className="mt-5 rounded-control bg-brand-green px-4 py-2 font-medium text-white"
+        className="min-h-11 mt-5 rounded-control bg-brand-green px-4 py-2 font-medium text-white"
       >
         {retryLabel}
       </button>

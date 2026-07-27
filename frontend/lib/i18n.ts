@@ -92,6 +92,66 @@ export interface Dictionary {
       readonly label: string;
     }[];
   };
+  readonly catalogue: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly search: string;
+    readonly allCategories: string;
+    readonly category: string;
+    readonly sort: string;
+    readonly featured: string;
+    readonly name: string;
+    readonly newest: string;
+    readonly previous: string;
+    readonly next: string;
+    readonly page: string;
+    readonly unavailable: string;
+    readonly retry: string;
+    /** Announced in the live region; `{count}` is substituted. */
+    readonly resultCount: string;
+    readonly resultCountFiltered: string;
+    readonly noResults: string;
+  };
+  readonly productDetail: {
+    readonly back: string;
+    readonly specifications: string;
+    readonly oem: string;
+    readonly inquiry: string;
+    readonly gallery: string;
+    readonly unavailable: string;
+    readonly retry: string;
+  };
+  readonly basket: {
+    readonly title: string;
+    readonly open: string;
+    readonly close: string;
+    readonly badgeLabel: string;
+    /** `{count}` is substituted. */
+    readonly lineCount: string;
+    readonly emptyTitle: string;
+    readonly emptyBody: string;
+    readonly emptyCta: string;
+    readonly quantity: string;
+    readonly unit: string;
+    readonly unitCartons: string;
+    readonly unitContainers: string;
+    readonly note: string;
+    readonly notePlaceholder: string;
+    readonly add: string;
+    readonly added: string;
+    readonly increased: string;
+    readonly remove: string;
+    readonly removed: string;
+    readonly capReached: string;
+    readonly storageFull: string;
+    readonly unavailable: string;
+    readonly unavailableHint: string;
+    readonly stale: string;
+    readonly revalidating: string;
+    readonly requestQuotation: string;
+    readonly viewBasket: string;
+    readonly continueShopping: string;
+  };
   readonly inquiry: {
     readonly title: string;
     readonly body: string;
@@ -188,6 +248,65 @@ const vi: Dictionary = {
     lead: "Thông tin năng lực sẽ được công bố sau khi hoàn tất kiểm duyệt.",
     certifications: [],
   },
+  catalogue: {
+    eyebrow: "Danh mục đã xuất bản",
+    title: "Sản phẩm",
+    search: "Tìm theo tên, mô tả hoặc SKU",
+    allCategories: "Tất cả danh mục",
+    category: "Danh mục",
+    sort: "Sắp xếp",
+    featured: "Nổi bật",
+    name: "Tên sản phẩm",
+    newest: "Mới nhất",
+    previous: "Trang trước",
+    next: "Trang sau",
+    page: "Trang",
+    unavailable: "Không thể tải danh mục",
+    retry: "Thử lại",
+    resultCount: "{count} sản phẩm",
+    resultCountFiltered: "{count} sản phẩm phù hợp với bộ lọc",
+    noResults: "Không có sản phẩm phù hợp với bộ lọc",
+  },
+  productDetail: {
+    back: "Trở lại danh mục",
+    specifications: "Thông số kỹ thuật",
+    oem: "Có thể gia công OEM",
+    inquiry: "Yêu cầu báo giá — sắp ra mắt",
+    gallery: "Hình ảnh sản phẩm",
+    unavailable: "Không thể tải sản phẩm",
+    retry: "Thử lại",
+  },
+  basket: {
+    title: "Giỏ yêu cầu",
+    open: "Mở giỏ yêu cầu",
+    close: "Đóng giỏ yêu cầu",
+    badgeLabel: "Giỏ yêu cầu",
+    lineCount: "{count} dòng sản phẩm",
+    emptyTitle: "Giỏ yêu cầu đang trống",
+    emptyBody:
+      "Thêm sản phẩm từ danh mục để yêu cầu báo giá cho cả đơn hàng, thay vì từng mã một.",
+    emptyCta: "Xem danh mục",
+    quantity: "Số lượng",
+    unit: "Đơn vị",
+    unitCartons: "Thùng",
+    unitContainers: "Container 40HC",
+    note: "Ghi chú",
+    notePlaceholder: "Yêu cầu riêng cho dòng này",
+    add: "Thêm vào giỏ",
+    added: "Đã thêm vào giỏ yêu cầu",
+    increased: "Đã tăng số lượng của sản phẩm có sẵn trong giỏ",
+    remove: "Xoá khỏi giỏ",
+    removed: "Đã xoá khỏi giỏ yêu cầu",
+    capReached: "Giỏ yêu cầu chỉ chứa tối đa 40 dòng sản phẩm.",
+    storageFull: "Không lưu được giỏ yêu cầu trên trình duyệt này.",
+    unavailable: "Không còn được bán",
+    unavailableHint: "Sản phẩm này đã ngừng xuất bản và sẽ không được gửi kèm yêu cầu.",
+    stale: "Không kiểm tra được thông tin mới nhất. Số liệu hiển thị có thể đã cũ.",
+    revalidating: "Đang kiểm tra danh mục…",
+    requestQuotation: "Yêu cầu báo giá",
+    viewBasket: "Xem giỏ yêu cầu",
+    continueShopping: "Tiếp tục xem sản phẩm",
+  },
   inquiry: {
     title: "Cần trao đổi về sản phẩm?",
     body: "Luồng yêu cầu báo giá sẽ được bổ sung trong Sprint 2.",
@@ -283,6 +402,67 @@ const en: Dictionary = {
     title: "Certifications and standards",
     lead: "Capability information will be published after review.",
     certifications: [],
+  },
+  catalogue: {
+    eyebrow: "Published catalogue",
+    title: "Products",
+    search: "Search by name, summary or SKU",
+    allCategories: "All categories",
+    category: "Category",
+    sort: "Sort",
+    featured: "Featured",
+    name: "Product name",
+    newest: "Newest",
+    previous: "Previous",
+    next: "Next",
+    page: "Page",
+    unavailable: "Catalogue unavailable",
+    retry: "Retry",
+    resultCount: "{count} products",
+    resultCountFiltered: "{count} products match your filters",
+    noResults: "No products match your filters",
+  },
+  productDetail: {
+    back: "Back to catalogue",
+    specifications: "Technical specifications",
+    oem: "OEM manufacturing available",
+    inquiry: "Request quotation — coming soon",
+    gallery: "Product images",
+    unavailable: "Product unavailable",
+    retry: "Retry",
+  },
+  basket: {
+    title: "Inquiry basket",
+    open: "Open inquiry basket",
+    close: "Close inquiry basket",
+    badgeLabel: "Inquiry basket",
+    lineCount: "{count} line items",
+    emptyTitle: "Your inquiry basket is empty",
+    emptyBody:
+      "Add products from the catalogue to request pricing on a full order rather than one SKU at a time.",
+    emptyCta: "Browse the catalogue",
+    quantity: "Quantity",
+    unit: "Unit",
+    unitCartons: "Cartons",
+    unitContainers: "40HC containers",
+    note: "Note",
+    notePlaceholder: "Anything specific to this line",
+    add: "Add to basket",
+    added: "Added to your inquiry basket",
+    increased: "Increased the quantity of an item already in your basket",
+    remove: "Remove from basket",
+    removed: "Removed from your inquiry basket",
+    capReached: "The inquiry basket holds at most 40 line items.",
+    storageFull: "This browser could not save your inquiry basket.",
+    unavailable: "No longer available",
+    unavailableHint:
+      "This product has been unpublished and will not be sent with your inquiry.",
+    stale:
+      "Could not check the catalogue for updates. Figures shown may be out of date.",
+    revalidating: "Checking the catalogue\u2026",
+    requestQuotation: "Request quotation",
+    viewBasket: "View inquiry basket",
+    continueShopping: "Continue browsing",
   },
   inquiry: {
     title: "Want to discuss a product?",
