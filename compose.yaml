@@ -1,0 +1,83 @@
+name: unigreen
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: unigreen
+      POSTGRES_USER: unigreen
+      POSTGRES_PASSWORD: unigreen
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unigreen -d unigreen"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - unigreen-db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - unigreen-redis:/data
+
+  migrate:
+    build:
+      context: ./backend
+    command: ["alembic", "upgrade", "head"]
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: ./backend
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')",
+        ]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  worker:
+    build:
+      context: ./backend
+    command:
+      [
+        "dramatiq",
+        "unigreen.worker.tasks",
+        "--processes",
+        "1",
+        "--threads",
+        "4",
+      ]
+    env_file: .env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+volumes:
+  unigreen-db:
+  unigreen-redis:
+
