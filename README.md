@@ -56,18 +56,23 @@ Validate a controlled catalogue manifest, then import it atomically as
 staff-only drafts:
 
 ```bash
-docker compose run --rm migrate unigreen-import-catalogue \
-  --input examples/catalogue-draft-import.json \
+docker compose run --rm \
+  --volume "$PWD/backend/examples:/imports:ro" \
+  migrate unigreen-import-catalogue \
+  --input /imports/catalogue-draft-import.json \
   --check
-docker compose run --rm migrate unigreen-import-catalogue \
-  --input examples/catalogue-draft-import.json
+docker compose run --rm \
+  --volume "$PWD/backend/examples:/imports:ro" \
+  migrate unigreen-import-catalogue \
+  --input /imports/catalogue-draft-import.json
 ```
 
 The importer always creates `draft` records and has no publication or media
 path. The committed example is intentionally empty because no approved product
 content sheet or approved pack shots are present. Populate a separate manifest
-only from reviewed business data, record its approval reference, import it,
-then use the staff workspace to attach approved media and publish.
+only from reviewed business data, mount its containing directory read-only in
+place of `backend/examples`, record its approval reference, import it, then use
+the staff workspace to attach approved media and publish.
 
 Staff authentication uses a revocable opaque `HttpOnly` session cookie.
 Cookie-authenticated mutations must echo the `ug_csrf` cookie value in the
