@@ -50,6 +50,10 @@ class ProductCategory(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+    product_links: Mapped[list[ProductCategoryLink]] = relationship(
+        back_populates="category",
+        lazy="selectin",
+    )
 
 
 class ProductCategoryTranslation(Base):
@@ -143,6 +147,7 @@ class ProductCategoryLink(Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
     product: Mapped[Product] = relationship(back_populates="category_links")
+    category: Mapped[ProductCategory] = relationship(back_populates="product_links")
 
 
 class ProductSpecification(Base):

@@ -8,6 +8,7 @@ from unigreen import __version__
 from unigreen.api.errors import ApiError, api_error_handler, validation_error_handler
 from unigreen.api.middleware import RequestIdMiddleware
 from unigreen.auth.router import router as auth_router
+from unigreen.catalogue.public_router import router as public_catalogue_router
 from unigreen.catalogue.router import router as catalogue_router
 from unigreen.config import get_settings
 from unigreen.health import router as health_router
@@ -42,6 +43,7 @@ def create_app() -> FastAPI:
     application.include_router(health_router)
     application.include_router(auth_router)
     application.include_router(catalogue_router)
+    application.include_router(public_catalogue_router)
     return application
 
 
