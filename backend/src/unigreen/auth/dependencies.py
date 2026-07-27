@@ -74,3 +74,20 @@ def require_permission(
         return context
 
     return dependency
+
+
+def require_mutation_permission(
+    permission: Permission,
+) -> Callable[..., Awaitable[AuthContext]]:
+    async def dependency(
+        context: Annotated[AuthContext, Depends(require_csrf)],
+    ) -> AuthContext:
+        if not has_permission(context.user.role, permission):
+            raise ApiError(
+                status_code=403,
+                code="PERMISSION_DENIED",
+                message="You do not have permission to perform this action.",
+            )
+        return context
+
+    return dependency

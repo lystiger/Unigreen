@@ -1,0 +1,1 @@
+"""Bilingual product catalogue."""
