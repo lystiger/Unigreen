@@ -14,6 +14,7 @@ from unigreen.catalogue.models import (
     ProductCategoryLink,
     ProductSpecification,
 )
+from unigreen.media.models import ProductMedia
 
 
 class CatalogueRepository:
@@ -75,6 +76,18 @@ class CatalogueRepository:
             select(ProductCategory.id).where(ProductCategory.id.in_(category_ids))
         )
         return len(set(result)) == len(set(category_ids))
+
+    async def has_approved_primary_media(self, product_id: UUID) -> bool:
+        return (
+            await self.session.scalar(
+                select(ProductMedia.id).where(
+                    ProductMedia.product_id == product_id,
+                    ProductMedia.is_primary.is_(True),
+                    ProductMedia.approval_status == "approved",
+                )
+            )
+            is not None
+        )
 
     def add(self, entity: object) -> None:
         self.session.add(entity)

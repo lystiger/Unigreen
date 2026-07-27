@@ -13,6 +13,7 @@ from unigreen.catalogue.router import router as catalogue_router
 from unigreen.config import get_settings
 from unigreen.health import router as health_router
 from unigreen.logging import configure_logging
+from unigreen.media.router import router as media_router
 
 
 def create_app() -> FastAPI:
@@ -44,6 +45,7 @@ def create_app() -> FastAPI:
     application.include_router(auth_router)
     application.include_router(catalogue_router)
     application.include_router(public_catalogue_router)
+    application.include_router(media_router)
     return application
 
 

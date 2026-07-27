@@ -21,16 +21,6 @@ class PublicCategoryResponse(BaseModel):
     meta_description: str | None
 
 
-class PublicProductSummary(BaseModel):
-    sku: str
-    slug: str
-    name: str
-    summary: str
-    oem_available: bool
-    featured: bool
-    categories: list[PublicCategoryResponse]
-
-
 class PublicSpecificationResponse(BaseModel):
     key: str
     label: str
@@ -39,11 +29,35 @@ class PublicSpecificationResponse(BaseModel):
     is_highlighted: bool
 
 
+class PublicMediaVariantResponse(BaseModel):
+    width: int
+    height: int
+    url: str
+
+
+class PublicMediaResponse(BaseModel):
+    alt_text: str
+    is_primary: bool
+    variants: list[PublicMediaVariantResponse]
+
+
+class PublicProductSummary(BaseModel):
+    sku: str
+    slug: str
+    name: str
+    summary: str
+    oem_available: bool
+    featured: bool
+    categories: list[PublicCategoryResponse]
+    primary_media: PublicMediaResponse | None
+
+
 class PublicProductDetail(PublicProductSummary):
     description: str | None
     meta_title: str | None
     meta_description: str | None
     specifications: list[PublicSpecificationResponse]
+    media: list[PublicMediaResponse]
 
 
 class PaginationMetadata(BaseModel):

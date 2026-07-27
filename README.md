@@ -24,6 +24,8 @@ The API is available at <http://localhost:8000>, with:
 Product originals and generated variants use the `unigreen-storage` volume.
 Only storage keys are persisted; `UNIGREEN_STORAGE_ROOT` selects the mounted
 filesystem adapter root and can later be replaced by an S3-compatible adapter.
+The one-shot `storage-init` service gives the non-root backend and worker
+processes access to that volume before either service starts.
 
 For backend-only development:
 

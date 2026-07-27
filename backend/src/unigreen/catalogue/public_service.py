@@ -8,6 +8,8 @@ from unigreen.catalogue.public_repository import PublicCatalogueRepository
 from unigreen.catalogue.public_schemas import (
     PaginationMetadata,
     PublicCategoryResponse,
+    PublicMediaResponse,
+    PublicMediaVariantResponse,
     PublicProductDetail,
     PublicProductPage,
     PublicProductQuery,
@@ -15,11 +17,17 @@ from unigreen.catalogue.public_schemas import (
     PublicSpecificationResponse,
 )
 from unigreen.domain.enums import Locale, PublicationStatus
+from unigreen.media.models import ProductMedia
 
 
 class PublicCatalogueService:
-    def __init__(self, repository: PublicCatalogueRepository) -> None:
+    def __init__(
+        self,
+        repository: PublicCatalogueRepository,
+        public_media_base_url: str = "/api/v1/public/media",
+    ) -> None:
         self.repository = repository
+        self.public_media_base_url = public_media_base_url.rstrip("/")
 
     async def categories(self, locale: Locale) -> list[PublicCategoryResponse]:
         categories = await self.repository.list_categories(locale.value)
@@ -74,6 +82,11 @@ class PublicCatalogueService:
             meta_title=translation.meta_title,
             meta_description=translation.meta_description,
             specifications=specifications,
+            media=[
+                self._media_response(item, locale)
+                for item in product.media
+                if item.approval_status == "approved"
+            ],
         )
 
     def _product_summary(self, product: Product, locale: Locale) -> PublicProductSummary:
@@ -92,6 +105,30 @@ class PublicCatalogueService:
             oem_available=product.oem_available,
             featured=product.featured,
             categories=categories,
+            primary_media=next(
+                (
+                    self._media_response(item, locale)
+                    for item in product.media
+                    if item.approval_status == "approved" and item.is_primary
+                ),
+                None,
+            ),
+        )
+
+    def _media_response(self, media: ProductMedia, locale: Locale) -> PublicMediaResponse:
+        return PublicMediaResponse(
+            alt_text=media.alt_vi if locale == Locale.VI else media.alt_en,
+            is_primary=media.is_primary,
+            variants=[
+                PublicMediaVariantResponse(
+                    width=int(metadata["width"]),
+                    height=int(metadata["height"]),
+                    url=f"{self.public_media_base_url}/{media.id}/{name}",
+                )
+                for name, metadata in sorted(
+                    media.variants.items(), key=lambda variant: int(variant[1]["width"])
+                )
+            ],
         )
 
     @staticmethod
