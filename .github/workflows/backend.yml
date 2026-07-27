@@ -1,0 +1,76 @@
+name: Backend
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "contracts/**"
+      - ".github/workflows/backend.yml"
+  push:
+    branches: [master, main]
+    paths:
+      - "backend/**"
+      - "contracts/**"
+      - ".github/workflows/backend.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --all-groups
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run mypy src tests
+      - run: uv run pytest
+      - run: uv run python scripts/export_openapi.py /tmp/openapi.json
+      - run: diff -u ../contracts/openapi.json /tmp/openapi.json
+
+  migration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: unigreen
+          POSTGRES_USER: unigreen
+          POSTGRES_PASSWORD: unigreen
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U unigreen -d unigreen"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      UNIGREEN_DATABASE_URL: postgresql+asyncpg://unigreen:unigreen@localhost:5432/unigreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --all-groups
+      - run: uv run alembic upgrade head
+      - run: uv run alembic downgrade base
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: backend
+          push: false
+          tags: unigreen-backend:test
+
