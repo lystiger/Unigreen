@@ -5,13 +5,19 @@ on:
     paths:
       - "frontend/**"
       - "contracts/**"
+      - "compose.yaml"
+      - ".env.example"
       - ".github/workflows/frontend.yml"
+      - ".github/workflows/infrastructure.yml"
   push:
     branches: [master, main]
     paths:
       - "frontend/**"
       - "contracts/**"
+      - "compose.yaml"
+      - ".env.example"
       - ".github/workflows/frontend.yml"
+      - ".github/workflows/infrastructure.yml"
 
 permissions:
   contents: read

@@ -30,5 +30,4 @@ These must be resolved before their dependent commercial stories are accepted:
 | Initial named staff and role assignments | Before launch | Roles defined; no accounts seeded |
 | Email provider and verified domain | Sprint 2 | Provider adapter required |
 | Data retention periods | Before production | Do not auto-delete |
-| Mounted volume vs S3-compatible storage | Sprint 1 | Storage interface first |
-
+| Mounted volume vs S3-compatible storage | Sprint 1 | Mounted VPS volume behind a storage interface |

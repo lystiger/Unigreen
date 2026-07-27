@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field
@@ -23,6 +24,8 @@ class Settings(BaseSettings):
         default_factory=lambda: ["http://localhost:3000", "http://localhost:3001"]
     )
     readiness_timeout_seconds: float = Field(default=2.0, gt=0, le=10)
+    storage_root: Path = Path("/app/storage")
+    public_media_base_url: str = "http://localhost:8000/api/v1/public/media"
 
 
 @lru_cache
