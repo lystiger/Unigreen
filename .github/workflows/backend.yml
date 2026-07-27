@@ -2,13 +2,6 @@ name: Backend
 
 on:
   pull_request:
-    paths:
-      - "backend/**"
-      - "contracts/**"
-      - "compose.yaml"
-      - ".env.example"
-      - ".github/workflows/backend.yml"
-      - ".github/workflows/infrastructure.yml"
   push:
     branches: [master, main]
     paths:

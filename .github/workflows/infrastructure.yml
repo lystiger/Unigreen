@@ -2,13 +2,6 @@ name: Infrastructure
 
 on:
   pull_request:
-    paths:
-      - "backend/**"
-      - "frontend/**"
-      - "contracts/**"
-      - "compose.yaml"
-      - ".env.example"
-      - ".github/workflows/**"
   push:
     branches: [main]
     paths:
