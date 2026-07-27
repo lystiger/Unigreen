@@ -21,6 +21,10 @@ The API is available at <http://localhost:8000>, with:
 - liveness: <http://localhost:8000/health/live>
 - readiness: <http://localhost:8000/health/ready>
 
+Product originals and generated variants use the `unigreen-storage` volume.
+Only storage keys are persisted; `UNIGREEN_STORAGE_ROOT` selects the mounted
+filesystem adapter root and can later be replaced by an S3-compatible adapter.
+
 For backend-only development:
 
 ```bash

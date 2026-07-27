@@ -5,13 +5,19 @@ on:
     paths:
       - "backend/**"
       - "contracts/**"
+      - "compose.yaml"
+      - ".env.example"
       - ".github/workflows/backend.yml"
+      - ".github/workflows/infrastructure.yml"
   push:
     branches: [master, main]
     paths:
       - "backend/**"
       - "contracts/**"
+      - "compose.yaml"
+      - ".env.example"
       - ".github/workflows/backend.yml"
+      - ".github/workflows/infrastructure.yml"
 
 permissions:
   contents: read
@@ -62,6 +68,7 @@ jobs:
       - run: uv sync --all-groups
       - run: uv run alembic upgrade head
       - run: uv run alembic downgrade base
+      - run: uv run alembic upgrade head
 
   image:
     runs-on: ubuntu-latest
@@ -73,4 +80,3 @@ jobs:
           context: backend
           push: false
           tags: unigreen-backend:test
-
