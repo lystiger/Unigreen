@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* tailwind.config.ts stays the single source of truth for design tokens — the
+   colours there are sampled from real Uni-Green assets. Tailwind v4 reads it
+   through the compatibility directive rather than duplicating the values in
+   an @theme block here. */
+@config "../tailwind.config.ts";
+
+/* The v3 compatibility bridge carries colours, fontSize, borderRadius and
+   maxWidth across, but NOT transitionDuration.DEFAULT. Left alone,
+   --default-transition-duration is undefined, `transition-duration` collapses
+   to its initial 0s, and every transition-* utility fires instantly. This
+   restores the 180ms the config asks for. Verified against the built CSS. */
+@theme {
+  --default-transition-duration: 180ms;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper font-sans text-body text-ink antialiased;
+  }
+
+  /* Green is the brand and primary-action colour, so it also carries focus.
+     The offset keeps the ring legible on raised and sunk surfaces alike. */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-green;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* The one horizontal rhythm every section aligns to. */
+  .shell {
+    @apply mx-auto w-full max-w-shell px-6 lg:px-8;
+  }
+}

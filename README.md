@@ -13,6 +13,8 @@ cp .env.example .env
 docker compose up --build
 ```
 
+The public site is at <http://localhost:3000> (`/` redirects to `/vi`).
+
 The API is available at <http://localhost:8000>, with:
 
 - OpenAPI UI: <http://localhost:8000/docs>
@@ -36,10 +38,20 @@ cd backend
 uv run python scripts/export_openapi.py ../contracts/openapi.json
 ```
 
+For frontend-only development (requires Node 22):
+
+```bash
+cd frontend
+npm install
+npm run dev
+npm run lint && npm run typecheck && npm test
+```
+
 ## Repository layout
 
 ```text
 backend/       FastAPI modular monolith and worker
+frontend/      Next.js public site (Vietnamese and English)
 contracts/     Published machine-readable API contracts
 docs/adr/      Architecture decision records
 .github/       Pull-request automation and templates
