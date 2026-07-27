@@ -1,17 +1,14 @@
 import { ButtonLink } from "@/components/ui/Button";
-import type { Locale, Product } from "@/lib/catalogue";
 import type { Dictionary } from "@/lib/i18n";
-import { RollDiagram } from "./RollDiagram";
+import { cataloguePath } from "@/lib/routes";
+import type { Locale } from "@/lib/types";
 
 interface HeroProps {
   readonly locale: Locale;
   readonly copy: Dictionary["hero"];
-  /** Drives the dimensioned drawing so the figures shown are always real.
-   *  Null when the catalogue is empty — the drawing is then omitted. */
-  readonly leadProduct: Product | null;
 }
 
-export function Hero({ locale, copy, leadProduct }: HeroProps) {
+export function Hero({ locale, copy }: HeroProps) {
   return (
     <section className="shell grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
       <div>
@@ -31,22 +28,18 @@ export function Hero({ locale, copy, leadProduct }: HeroProps) {
           <ButtonLink href={`/${locale}/inquiry`} variant="primary" size="lg">
             {copy.primaryCta}
           </ButtonLink>
-          <ButtonLink href={`/${locale}/products`} variant="secondary" size="lg">
+          <ButtonLink href={cataloguePath(locale)} variant="secondary" size="lg">
             {copy.secondaryCta}
           </ButtonLink>
         </div>
       </div>
 
-      {leadProduct ? (
-        <div className="flex justify-center lg:justify-end">
-          <RollDiagram
-            sheetWidthMm={leadProduct.spec.sheetWidthMm}
-            metresPerRoll={leadProduct.spec.metresPerRoll}
-            isCoreless={leadProduct.spec.coreless}
-            title={copy.packAlt}
-          />
-        </div>
-      ) : null}
+      <div className="rounded-card border border-line bg-brand-tint p-10 lg:p-14">
+        <p className="font-mono text-eyebrow uppercase tracking-widest text-brand-dark">
+          Uni-Green
+        </p>
+        <p className="mt-5 text-h2 font-semibold text-ink">{copy.packAlt}</p>
+      </div>
     </section>
   );
 }

@@ -259,6 +259,13 @@ async def test_media_lifecycle_requires_approval_and_bilingual_alt_text() -> Non
     assert original
     assert content_type == "image/png"
     assert filename == "product.png"
+    private_variant, private_variant_type = await media_service.variant(
+        catalogue_product.id,
+        media_id,
+        response.variants[0].name,
+    )
+    assert private_variant
+    assert private_variant_type == "image/webp"
 
     with pytest.raises(ApiError) as unapproved_primary:
         await media_service.update(

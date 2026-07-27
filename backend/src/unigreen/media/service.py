@@ -225,9 +225,23 @@ class MediaService:
             media.original_filename,
         )
 
+    async def variant(
+        self,
+        product_id: UUID,
+        media_id: UUID,
+        variant: str,
+    ) -> tuple[bytes, str]:
+        media = await self._media_or_404(product_id, media_id)
+        return await self._read_variant(media, variant)
+
     async def public_variant(self, media_id: UUID, variant: str) -> tuple[bytes, str]:
         media = await self.repository.get_public_variant(media_id)
-        if media is None or variant not in media.variants:
+        if media is None:
+            raise self._media_not_found()
+        return await self._read_variant(media, variant)
+
+    async def _read_variant(self, media: ProductMedia, variant: str) -> tuple[bytes, str]:
+        if variant not in media.variants:
             raise self._media_not_found()
         metadata = media.variants[variant]
         key = metadata.get("storage_key")

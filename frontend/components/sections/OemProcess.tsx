@@ -1,6 +1,6 @@
 import { ButtonLink } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import type { Locale } from "@/lib/catalogue";
+import type { Locale } from "@/lib/types";
 import type { Dictionary } from "@/lib/i18n";
 
 interface OemProcessProps {

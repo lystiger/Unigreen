@@ -157,6 +157,25 @@ async def original_media(
 
 
 @router.get(
+    "/api/v1/staff/products/{product_id}/media/{media_id}/variants/{variant}",
+    responses=openapi_error_responses(401, 403, 404),
+)
+async def staff_media_variant(
+    product_id: UUID,
+    media_id: UUID,
+    variant: str,
+    _context: ReadContext,
+    service: Annotated[MediaService, Depends(get_media_service)],
+) -> Response:
+    content, content_type = await service.variant(product_id, media_id, variant)
+    return Response(
+        content,
+        media_type=content_type,
+        headers={"Cache-Control": "private, no-store"},
+    )
+
+
+@router.get(
     "/api/v1/public/media/{media_id}/{variant}",
     responses=openapi_error_responses(404),
 )
