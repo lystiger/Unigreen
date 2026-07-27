@@ -67,8 +67,10 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - run: uv sync --all-groups
       - run: uv run alembic upgrade head
+      - run: uv run alembic check
       - run: uv run alembic downgrade base
       - run: uv run alembic upgrade head
+      - run: uv run alembic check
 
   image:
     runs-on: ubuntu-latest
