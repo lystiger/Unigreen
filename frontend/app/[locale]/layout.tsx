@@ -1,4 +1,4 @@
-import { Be_Vietnam_Pro, IBM_Plex_Mono } from "next/font/google";
+import { Be_Vietnam_Pro, Inter_Tight } from "next/font/google";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
@@ -14,11 +14,11 @@ const beVietnam = Be_Vietnam_Pro({
   variable: "--font-be-vietnam",
 });
 
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const interTight = Inter_Tight({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-plex-mono",
+  variable: "--font-inter-tight",
 });
 
 interface LocaleLayoutProps {
@@ -68,7 +68,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   return (
     <html
       lang={HTML_LANG[locale]}
-      className={`${beVietnam.variable} ${plexMono.variable}`}
+      className={`${beVietnam.variable} ${interTight.variable}`}
     >
       <body className="flex min-h-screen flex-col">
         <a
