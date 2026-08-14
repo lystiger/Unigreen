@@ -17,10 +17,13 @@
     "api:types": "openapi-typescript ../contracts/openapi.json --output lib/api/schema.d.ts"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
     "@tanstack/react-query": "^5.101.4",
     "next": "^16.2.12",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.0",
@@ -31,6 +34,7 @@
     "@types/node": "^22.15.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^5.0.0",
     "eslint": "^9.30.0",
     "eslint-config-next": "^16.2.12",

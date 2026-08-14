@@ -20,3 +20,10 @@ support.js
 .thumbnail
 github.md
 
+# JSON files
+*.json
+!contracts/openapi.json
+!backend/examples/catalogue-draft-import.json
+
+
+
