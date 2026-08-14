@@ -1,0 +1,49 @@
+import { ImageSlot } from "@/components/ui/ImageSlot";
+
+interface Tile {
+  readonly slot: string;
+  readonly className: string;
+}
+
+const TILES: readonly Tile[] = [
+  { slot: "Factory floor — wide shot", className: "aspect-[16/9] md:col-span-2" },
+  { slot: "Rewinder / converting detail", className: "aspect-[16/9]" },
+  { slot: "Jumbo roll storage", className: "aspect-[4/3]" },
+  { slot: "Packing and labelling", className: "aspect-[4/3]" },
+  { slot: "Quality check", className: "aspect-[4/3]" },
+];
+
+/** Factory photo grid — a dark break in the page. */
+export function FactoryGallery() {
+  return (
+    <section id="factory" className="bg-ink text-paper">
+      <div className="shell pb-10 pt-24 lg:pt-30">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
+          05 / Factory
+        </p>
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <h2 className="text-[clamp(32px,4vw,54px)] font-semibold leading-[1.05] tracking-[-0.03em]">
+              Where it is made
+            </h2>
+            <p className="mt-2.5 text-[20px] font-light tracking-[-0.015em] text-ink-muted">
+              Nơi sản xuất
+            </p>
+          </div>
+          <p className="max-w-[38ch] text-[15px] leading-[1.6] text-[#8FA096]">
+            Buyers are welcome to visit the site. Photography below is from the
+            Hưng Yên line.
+          </p>
+        </div>
+      </div>
+
+      <div className="shell grid grid-cols-1 gap-4 pb-24 md:grid-cols-3 lg:pb-30">
+        {TILES.map((tile) => (
+          <div key={tile.slot} className={`relative bg-[#14261C] ${tile.className}`}>
+            <ImageSlot placeholder={tile.slot} tone="dark" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}

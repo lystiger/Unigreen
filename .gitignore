@@ -13,3 +13,10 @@ build/
 .idea/
 .vscode/
 
+# Claude Design import artifacts (reference only, not part of the app)
+Uni-Green Landing.dc.html
+image-slot.js
+support.js
+.thumbnail
+github.md
+

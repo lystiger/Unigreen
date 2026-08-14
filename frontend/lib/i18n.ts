@@ -29,6 +29,7 @@ export function swapLocaleInPath(pathname: string, target: Locale): string {
 export interface Dictionary {
   readonly nav: {
     readonly products: string;
+    readonly manufacturing: string;
     readonly oem: string;
     readonly capability: string;
     readonly contact: string;
@@ -110,10 +111,11 @@ export interface Dictionary {
 const vi: Dictionary = {
   nav: {
     products: "Sản phẩm",
-    oem: "Gia công OEM",
+    manufacturing: "Sản xuất",
+    oem: "OEM",
     capability: "Năng lực",
     contact: "Liên hệ",
-    inquiry: "Liên hệ — sắp ra mắt",
+    inquiry: "Yêu cầu báo giá",
     openMenu: "Mở menu",
     closeMenu: "Đóng menu",
     switchLocale: "Chuyển sang tiếng Anh",
@@ -206,10 +208,11 @@ const vi: Dictionary = {
 const en: Dictionary = {
   nav: {
     products: "Products",
+    manufacturing: "Manufacturing",
     oem: "OEM",
     capability: "Capability",
     contact: "Contact",
-    inquiry: "Contact — coming soon",
+    inquiry: "Request quotation",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     switchLocale: "Switch to Vietnamese",

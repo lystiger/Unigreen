@@ -1,44 +1,40 @@
-import { ProductPreview } from "@/components/product/ProductPreview";
+import { FactoryGallery } from "@/components/sections/FactoryGallery";
 import { Hero } from "@/components/sections/Hero";
-import { InquiryBand } from "@/components/sections/InquiryBand";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { getDictionary, isLocale } from "@/lib/i18n";
-import { cataloguePath } from "@/lib/routes";
+import { Manufacturing } from "@/components/sections/Manufacturing";
+import { OemBand } from "@/components/sections/OemBand";
+import { PaperJourney } from "@/components/sections/PaperJourney";
+import { ProductFamilies } from "@/components/sections/ProductFamilies";
+import { QuotationForm } from "@/components/sections/QuotationForm";
+import { StandardsBar } from "@/components/sections/StandardsBar";
+import { isLocale } from "@/lib/i18n";
 import { notFound } from "next/navigation";
 
 interface HomePageProps {
   readonly params: Promise<{ locale: string }>;
 }
 
+/**
+ * Uni-Green landing, imported from `Uni-Green Landing.dc.html`. The sections
+ * carry bilingual-inline copy (English lead, Vietnamese subtitle) exactly as the
+ * design specifies, so they render identically for both locales; the locale
+ * segment still drives the header, footer and language switch.
+ */
 export default async function HomePage({ params }: HomePageProps) {
-  const { locale: rawLocale } = await params;
-  if (!isLocale(rawLocale)) {
+  const { locale } = await params;
+  if (!isLocale(locale)) {
     notFound();
   }
 
-  const locale = rawLocale;
-  const dictionary = getDictionary(locale);
   return (
     <>
-      <Hero locale={locale} copy={dictionary.hero} />
-      <section className="py-16 lg:py-24">
-        <div className="shell">
-          <SectionHeader
-            eyebrow={dictionary.products.eyebrow}
-            title={dictionary.products.title}
-            linkHref={cataloguePath(locale)}
-            linkLabel={dictionary.products.viewAll}
-          />
-          <div className="mt-12">
-            <ProductPreview locale={locale} copy={dictionary.products} />
-          </div>
-        </div>
-      </section>
-      <InquiryBand
-        locale={locale}
-        copy={dictionary.inquiry}
-        hotline={dictionary.footer.hotline}
-      />
+      <Hero />
+      <StandardsBar />
+      <PaperJourney />
+      <ProductFamilies />
+      <Manufacturing />
+      <FactoryGallery />
+      <OemBand />
+      <QuotationForm />
     </>
   );
 }

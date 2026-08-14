@@ -82,14 +82,19 @@ test.beforeEach(async ({ page }) => {
   await mockPublicApi(page);
 });
 
-test("the root redirects to a verified Vietnamese landing page", async ({ page }) => {
+test("the root redirects to the Vietnamese landing page", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/vi$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "vi-VN");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Sản phẩm giấy tissue",
+    "Made to specification",
   );
-  await expect(page.getByRole("link", { name: "Sản phẩm đã xác minh" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "What we produce" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Jumbo rolls" }),
+  ).toBeVisible();
 });
 
 test("catalogue search, category, sorting and localized detail work", async ({
