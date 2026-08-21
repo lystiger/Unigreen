@@ -7,7 +7,7 @@
 **Repository:** `https://github.com/lystiger/Unigreen`  
 **Backend owner:** Codex/backend  
 **Frontend owner:** Claude  
-**Product owner:** Nguyen Duc Anh / Uni-Green representative
+**Product owner:** Do Hung Anh / Uni-Green representative
 
 ---
 

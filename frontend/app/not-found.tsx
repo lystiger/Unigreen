@@ -19,7 +19,7 @@ export default function GlobalNotFound() {
           </p>
           <Link
             href={`/${DEFAULT_LOCALE}`}
-            className="mt-8 inline-flex rounded-control bg-brand-green px-6 py-3 text-lead font-medium text-white"
+            className="mt-8 inline-flex min-h-11 items-center rounded-control bg-brand-green px-6 py-3 text-lead font-medium text-white"
           >
             {dictionary.notFound.cta}
           </Link>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AddToBasketControl } from "@/components/basket/AddToBasketControl";
 import type { PublicProduct } from "@/lib/api/types";
 import type { Dictionary } from "@/lib/i18n";
 import { productPath } from "@/lib/routes";
@@ -8,9 +9,10 @@ interface ProductCardProps {
   readonly product: PublicProduct;
   readonly locale: Locale;
   readonly copy: Dictionary["products"];
+  readonly basketCopy: Dictionary["basket"];
 }
 
-export function ProductCard({ product, locale, copy }: ProductCardProps) {
+export function ProductCard({ product, locale, copy, basketCopy }: ProductCardProps) {
   const image =
     product.primary_media?.variants.find((item) => item.width >= 480) ??
     product.primary_media?.variants.at(-1);
@@ -20,13 +22,15 @@ export function ProductCard({ product, locale, copy }: ProductCardProps) {
       <div className="h-1 w-full bg-brand-green" aria-hidden="true" />
       <div className="flex aspect-[4/3] items-center justify-center bg-paper-sunk">
         {image && product.primary_media ? (
-          // Dynamic media hosts are controlled by the backend contract.
+          // Runtime media host; see docs/adr/0004.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image.url}
             alt={product.primary_media.alt_text}
             width={image.width}
             height={image.height}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-contain p-6"
           />
         ) : (
@@ -63,6 +67,9 @@ export function ProductCard({ product, locale, copy }: ProductCardProps) {
               {copy.oemBadge}
             </span>
           ) : null}
+        </div>
+        <div className="relative z-10 mt-4">
+          <AddToBasketControl product={product} copy={basketCopy} compact />
         </div>
       </div>
     </article>

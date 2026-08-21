@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ApiClientError, apiRequest, queryString } from "@/lib/api/client";
 import type { PublicProductPage } from "@/lib/api/types";
-import type { Dictionary } from "@/lib/i18n";
+import { getDictionary, type Dictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 import { ApiErrorState, CatalogueSkeleton } from "../ui/AsyncState";
 import { ProductGrid } from "./ProductGrid";
@@ -47,5 +47,12 @@ export function ProductPreview({
       />
     );
   }
-  return <ProductGrid products={query.data.items} locale={locale} copy={copy} />;
+  return (
+    <ProductGrid
+      products={query.data.items}
+      locale={locale}
+      copy={copy}
+      basketCopy={getDictionary(locale).basket}
+    />
+  );
 }

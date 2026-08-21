@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
         onSubmit={submit}
         className="w-full max-w-md rounded-card border border-line bg-paper-raised p-8"
       >
-        <p className="font-mono text-eyebrow uppercase tracking-widest text-brand-green">
+        <p className="font-mono text-eyebrow tracking-widest text-brand-green">
           Staff workspace
         </p>
         <h1 className="mt-3 text-h1 font-semibold text-ink">Sign in</h1>
@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={login.isPending}
-          className="mt-6 w-full rounded-control bg-brand-green px-4 py-3 font-medium text-white disabled:opacity-50"
+          className="min-h-11 mt-6 w-full rounded-control bg-brand-green px-4 py-3 font-medium text-white disabled:opacity-50"
         >
           {login.isPending ? "Signing in…" : "Sign in"}
         </button>

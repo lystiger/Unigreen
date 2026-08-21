@@ -5,30 +5,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { ApiClientError, apiRequest } from "@/lib/api/client";
 import type { PublicProductDetail } from "@/lib/api/types";
+import { AddToBasketControl } from "@/components/basket/AddToBasketControl";
+import { getDictionary } from "@/lib/i18n";
 import { cataloguePath } from "@/lib/routes";
 import type { Locale } from "@/lib/types";
 import { ApiErrorState, CatalogueSkeleton } from "../ui/AsyncState";
-
-const COPY = {
-  vi: {
-    back: "Trở lại danh mục",
-    specifications: "Thông số kỹ thuật",
-    oem: "Có thể gia công OEM",
-    inquiry: "Yêu cầu báo giá — sắp ra mắt",
-    gallery: "Hình ảnh sản phẩm",
-    unavailable: "Không thể tải sản phẩm",
-    retry: "Thử lại",
-  },
-  en: {
-    back: "Back to catalogue",
-    specifications: "Technical specifications",
-    oem: "OEM manufacturing available",
-    inquiry: "Request quotation — coming soon",
-    gallery: "Product images",
-    unavailable: "Product unavailable",
-    retry: "Retry",
-  },
-} as const;
 
 export function ProductDetailPage({
   locale,
@@ -37,7 +18,9 @@ export function ProductDetailPage({
   readonly locale: Locale;
   readonly slug: string;
 }) {
-  const copy = COPY[locale];
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.productDetail;
+  const basketCopy = dictionary.basket;
   const query = useQuery({
     queryKey: ["public-product", locale, slug],
     queryFn: () =>
@@ -84,12 +67,18 @@ export function ProductDetailPage({
         <section aria-label={copy.gallery}>
           <div className="flex aspect-square items-center justify-center rounded-card bg-paper-sunk">
             {currentMedia && currentImage ? (
+              // Runtime media host; see docs/adr/0004.
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={currentImage.url}
                 alt={currentMedia.alt_text}
                 width={currentImage.width}
                 height={currentImage.height}
+                // Above the fold and the page's LCP element, so it must not be
+                // lazy — that would defer the largest paint by a round trip.
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="h-full w-full object-contain p-8"
               />
             ) : (
@@ -138,14 +127,9 @@ export function ProductDetailPage({
           {product.oem_available ? (
             <p className="mt-6 font-medium text-ink">✓ {copy.oem}</p>
           ) : null}
-          <button
-            type="button"
-            disabled
-            title={copy.inquiry}
-            className="mt-8 w-full rounded-control bg-brand-green px-5 py-3 font-medium text-white disabled:opacity-60"
-          >
-            {copy.inquiry}
-          </button>
+          <div className="mt-8">
+            <AddToBasketControl product={product} copy={basketCopy} />
+          </div>
         </div>
       </div>
 

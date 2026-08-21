@@ -10,46 +10,12 @@ import { ApiErrorState, CatalogueSkeleton } from "../ui/AsyncState";
 import { ProductGrid } from "./ProductGrid";
 import { getDictionary } from "@/lib/i18n";
 
-const COPY = {
-  vi: {
-    eyebrow: "Danh mục đã xuất bản",
-    title: "Sản phẩm",
-    search: "Tìm theo tên, mô tả hoặc SKU",
-    allCategories: "Tất cả danh mục",
-    category: "Danh mục",
-    sort: "Sắp xếp",
-    featured: "Nổi bật",
-    name: "Tên sản phẩm",
-    newest: "Mới nhất",
-    previous: "Trang trước",
-    next: "Trang sau",
-    page: "Trang",
-    unavailable: "Không thể tải danh mục",
-    retry: "Thử lại",
-  },
-  en: {
-    eyebrow: "Published catalogue",
-    title: "Products",
-    search: "Search by name, summary or SKU",
-    allCategories: "All categories",
-    category: "Category",
-    sort: "Sort",
-    featured: "Featured",
-    name: "Product name",
-    newest: "Newest",
-    previous: "Previous",
-    next: "Next",
-    page: "Page",
-    unavailable: "Catalogue unavailable",
-    retry: "Retry",
-  },
-} as const;
-
 export function CataloguePage({ locale }: { readonly locale: Locale }) {
   const router = useRouter();
   const pathname = usePathname();
   const parameters = useSearchParams();
-  const copy = COPY[locale];
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.catalogue;
   const [search, setSearch] = useState(parameters.get("q") ?? "");
   const category = parameters.get("category") ?? "";
   const sort = parameters.get("sort") ?? "featured";
@@ -96,9 +62,20 @@ export function CataloguePage({ locale }: { readonly locale: Locale }) {
       ),
   });
 
+  const activeQuery = parameters.get("q") ?? "";
+  const hasFilters = activeQuery !== "" || category !== "";
+  const total = products.data?.pagination.total ?? 0;
+  const resultAnnouncement =
+    total === 0 && hasFilters
+      ? copy.noResults
+      : (hasFilters ? copy.resultCountFiltered : copy.resultCount).replace(
+          "{count}",
+          total.toLocaleString(locale),
+        );
+
   return (
     <section className="shell py-12 lg:py-20">
-      <p className="font-mono text-eyebrow uppercase tracking-widest text-brand-green">
+      <p className="font-mono text-eyebrow tracking-widest text-brand-green">
         {copy.eyebrow}
       </p>
       <h1 className="mt-3 text-h1 font-semibold text-ink">{copy.title}</h1>
@@ -144,7 +121,13 @@ export function CataloguePage({ locale }: { readonly locale: Locale }) {
         </label>
       </div>
 
-      <div className="mt-10">
+      {/* P1-05: the grid swaps silently after a debounced search, so the result
+          count is the only signal a screen reader gets that anything changed. */}
+      <p role="status" aria-live="polite" className="mt-6 text-data text-ink-muted">
+        {products.data ? resultAnnouncement : ""}
+      </p>
+
+      <div className="mt-4">
         {products.isPending ? <CatalogueSkeleton /> : null}
         {products.isError ? (
           <ApiErrorState
@@ -168,7 +151,8 @@ export function CataloguePage({ locale }: { readonly locale: Locale }) {
             <ProductGrid
               products={products.data.items}
               locale={locale}
-              copy={getDictionary(locale).products}
+              copy={dictionary.products}
+              basketCopy={dictionary.basket}
             />
             <nav
               aria-label={copy.page}
@@ -178,7 +162,7 @@ export function CataloguePage({ locale }: { readonly locale: Locale }) {
                 type="button"
                 disabled={page <= 1}
                 onClick={() => update({ page: String(page - 1) })}
-                className="rounded-control border border-line-strong px-4 py-2 disabled:opacity-40"
+                className="min-h-11 rounded-control border border-line-strong px-4 py-2 disabled:opacity-40"
               >
                 {copy.previous}
               </button>
@@ -189,7 +173,7 @@ export function CataloguePage({ locale }: { readonly locale: Locale }) {
                 type="button"
                 disabled={page >= products.data.pagination.total_pages}
                 onClick={() => update({ page: String(page + 1) })}
-                className="rounded-control border border-line-strong px-4 py-2 disabled:opacity-40"
+                className="min-h-11 rounded-control border border-line-strong px-4 py-2 disabled:opacity-40"
               >
                 {copy.next}
               </button>

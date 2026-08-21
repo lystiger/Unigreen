@@ -34,7 +34,7 @@ export default function AdminProductsPage() {
     <>
       <div className="flex flex-wrap items-end justify-between gap-5">
         <div>
-          <p className="font-mono text-eyebrow uppercase tracking-widest text-brand-green">
+          <p className="font-mono text-eyebrow tracking-widest text-brand-green">
             Catalogue
           </p>
           <h1 className="mt-2 text-h1 font-semibold">Products</h1>
@@ -42,7 +42,7 @@ export default function AdminProductsPage() {
         {staff.data?.permissions.includes("catalogue:write") ? (
           <Link
             href="/admin/products/new"
-            className="rounded-control bg-brand-green px-4 py-2 font-medium text-white"
+            className="inline-flex min-h-11 items-center rounded-control bg-brand-green px-4 py-2 font-medium text-white"
           >
             New product
           </Link>
