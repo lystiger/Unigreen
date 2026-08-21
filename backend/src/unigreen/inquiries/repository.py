@@ -5,6 +5,7 @@ from typing import cast
 from uuid import UUID
 
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -75,19 +76,22 @@ class InquiryRepository:
         if year is None:
             year = datetime.now(UTC).year
 
-        seq = await self.session.scalar(
-            select(InquirySequence).where(InquirySequence.year == year).with_for_update()
+        # Atomic upsert: concurrent callers racing on the first request of a
+        # new year must not both attempt an INSERT (SELECT ... FOR UPDATE
+        # only locks rows that already exist, so it cannot serialize two
+        # inserts of the same missing year). ON CONFLICT DO UPDATE lets
+        # Postgres resolve the race as a single row-level atomic operation.
+        stmt = (
+            pg_insert(InquirySequence)
+            .values(year=year, last_value=1)
+            .on_conflict_do_update(
+                index_elements=[InquirySequence.year],
+                set_={"last_value": InquirySequence.last_value + 1},
+            )
+            .returning(InquirySequence.last_value)
         )
-        if seq is None:
-            seq = InquirySequence(year=year, last_value=1)
-            self.session.add(seq)
-            await self.session.flush()
-            val = 1
-        else:
-            seq.last_value += 1
-            val = seq.last_value
-            await self.session.flush()
-
+        val = await self.session.scalar(stmt)
+        assert val is not None  # RETURNING always yields the upserted row
         return format_inquiry_reference(year, val)
 
     def add(self, entity: object) -> None:
