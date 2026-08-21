@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.exc import IntegrityError
 
 from unigreen.api.errors import ApiError
@@ -681,6 +682,32 @@ async def test_public_inquiry_endpoint_via_client(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
+async def test_next_reference_uses_atomic_upsert_to_avoid_first_of_year_race() -> None:
+    """Guards against a duplicate-key crash when two requests race on the
+    very first inquiry of a new year.
+
+    `SELECT ... FOR UPDATE` cannot serialize two concurrent INSERTs of a row
+    that does not exist yet, so `next_reference` must issue a single
+    `INSERT ... ON CONFLICT DO UPDATE` statement instead. This test asserts
+    the emitted statement is that atomic upsert (not a separate
+    select-then-insert/update sequence).
+    """
+    session = MagicMock()
+    session.scalar = AsyncMock(return_value=1)
+    repo = InquiryRepository(session)
+
+    ref = await repo.next_reference(2026)
+
+    assert ref == "UG-INQ-2026-000001"
+    session.scalar.assert_awaited_once()
+    (stmt,), _ = session.scalar.await_args
+    compiled = str(stmt.compile(dialect=postgresql.dialect()))  # type: ignore[no-untyped-call]
+    assert "ON CONFLICT" in compiled
+    assert "DO UPDATE SET" in compiled
+    assert "INSERT INTO inquiry_sequences" in compiled
+
+
+@pytest.mark.asyncio
 async def test_inquiry_repository_database_operations() -> None:
     session = MagicMock()
     prod = make_test_product()
@@ -695,7 +722,7 @@ async def test_inquiry_repository_database_operations() -> None:
     product_scalars = MagicMock()
     product_scalars.unique.return_value = [prod]
     session.scalars = AsyncMock(return_value=product_scalars)
-    session.scalar = AsyncMock(side_effect=[inquiry, inquiry, inquiry, None, None])
+    session.scalar = AsyncMock(side_effect=[inquiry, inquiry, inquiry, 1])
     session.flush = AsyncMock()
     session.commit = AsyncMock()
     session.rollback = AsyncMock()
