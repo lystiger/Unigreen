@@ -13,5 +13,8 @@ from unigreen.catalogue.models import (
     ProductSpecificationTranslation as ProductSpecificationTranslation,
 )
 from unigreen.catalogue.models import ProductTranslation as ProductTranslation
+from unigreen.inquiries.models import Inquiry as Inquiry
+from unigreen.inquiries.models import InquiryLine as InquiryLine
+from unigreen.inquiries.models import InquirySequence as InquirySequence
 from unigreen.media.models import ProductMedia as ProductMedia
 from unigreen.staff.models import StaffUser as StaffUser
