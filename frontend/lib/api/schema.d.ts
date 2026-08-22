@@ -299,6 +299,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/inquiries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Inquiry */
+        post: operations["create_inquiry_api_v1_public_inquiries_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/staff/products/{product_id}/media": {
         parameters: {
             query?: never;
@@ -523,6 +540,11 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /**
+         * InquiryStatus
+         * @enum {string}
+         */
+        InquiryStatus: "new" | "qualified" | "quoted" | "won" | "lost" | "spam" | "duplicate";
         /** LiveResponse */
         LiveResponse: {
             /**
@@ -740,6 +762,107 @@ export interface components {
             meta_title: string | null;
             /** Meta Description */
             meta_description: string | null;
+        };
+        /** PublicInquiryCreate */
+        PublicInquiryCreate: {
+            /** Contact Name */
+            contact_name: string;
+            /** Email */
+            email: string;
+            /** Phone */
+            phone?: string | null;
+            /** Company Name */
+            company_name?: string | null;
+            /** Tax Code */
+            tax_code?: string | null;
+            /** Address */
+            address?: string | null;
+            /** Destination */
+            destination?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Oem Requirements */
+            oem_requirements?: string | null;
+            /** @default vi */
+            locale: components["schemas"]["Locale"];
+            /** Lines */
+            lines: components["schemas"]["PublicInquiryLineCreate"][];
+        };
+        /** PublicInquiryLineCreate */
+        PublicInquiryLineCreate: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number | string;
+            /** Unit */
+            unit: string;
+            /** Requirements */
+            requirements?: string | null;
+        };
+        /** PublicInquiryLineResponse */
+        PublicInquiryLineResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Product Sku */
+            product_sku: string;
+            /** Product Name */
+            product_name: string;
+            /** Quantity */
+            quantity: string;
+            /** Unit */
+            unit: string;
+            /** Requirements */
+            requirements: string | null;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /** PublicInquiryResponse */
+        PublicInquiryResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reference */
+            reference: string;
+            status: components["schemas"]["InquiryStatus"];
+            /** Contact Name */
+            contact_name: string;
+            /** Email */
+            email: string;
+            /** Phone */
+            phone: string | null;
+            /** Company Name */
+            company_name: string | null;
+            /** Tax Code */
+            tax_code: string | null;
+            /** Address */
+            address: string | null;
+            /** Destination */
+            destination: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Oem Requirements */
+            oem_requirements: string | null;
+            locale: components["schemas"]["Locale"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Lines */
+            lines: components["schemas"]["PublicInquiryLineResponse"][];
         };
         /** PublicMediaResponse */
         PublicMediaResponse: {
@@ -2032,6 +2155,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicProductDetail"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_inquiry_api_v1_public_inquiries_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Optional idempotency key to prevent duplicate submissions. */
+                "Idempotency-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublicInquiryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicInquiryResponse"];
                 };
             };
             /** @description Request failed */
