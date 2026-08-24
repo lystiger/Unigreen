@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "@/lib/types";
@@ -29,12 +30,10 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper/[0.92] backdrop-blur-[8px]">
       <div className="shell flex h-[68px] items-center justify-between gap-10">
-        <Link href={`/${locale}#top`} className="flex items-baseline gap-2.5 text-ink">
+        <Link href={`/${locale}#top`} className="flex items-center gap-2.5 text-ink">
+          <Image src="/icon.svg" alt="" width={28} height={28} aria-hidden="true" />
           <span className="text-[19px] font-semibold tracking-[-0.02em]">
             Uni<span className="text-brand-green">-Green</span>
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-            Hưng Yên · VN
           </span>
         </Link>
 

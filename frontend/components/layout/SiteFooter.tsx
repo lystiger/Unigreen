@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Locale } from "@/lib/types";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -27,12 +28,14 @@ export function SiteFooter({ locale }: SiteFooterProps) {
     <footer className="bg-paper-raised">
       <div className="shell grid grid-cols-1 gap-10 pb-10 pt-16 md:grid-cols-2 lg:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))]">
         <div>
-          <p className="text-[19px] font-semibold tracking-[-0.02em]">
-            Uni<span className="text-brand-green">-Green</span>
-          </p>
+          <div className="flex items-center gap-2.5">
+            <Image src="/icon.svg" alt="" width={28} height={28} aria-hidden="true" />
+            <p className="text-[19px] font-semibold tracking-[-0.02em]">
+              Uni<span className="text-brand-green">-Green</span>
+            </p>
+          </div>
           <p className="mt-3 max-w-[32ch] text-[14px] leading-[1.6] text-ink-muted">
-            Tissue and paper manufacturing, made to specification. Hưng Yên, Việt
-            Nam.
+            Tissue and paper manufacturing, made to specification.
           </p>
         </div>
 

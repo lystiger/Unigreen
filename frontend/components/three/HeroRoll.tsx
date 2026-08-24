@@ -27,13 +27,21 @@ function webglSupported(): boolean {
  * is unavailable. Only capable desktop clients swap in the live canvas, so the
  * hero never ships a blank box or a heavy interaction to phones.
  */
-export function HeroRoll({ children }: { children: ReactNode }) {
+export function HeroRoll({
+  children,
+  fullBleed = false,
+}: {
+  children: ReactNode;
+  fullBleed?: boolean;
+}) {
   const [use3D, setUse3D] = useState(false);
 
   useEffect(() => {
     const decide = () => {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const coarseOrSmall = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+      const coarseOrSmall = window.matchMedia(
+        "(max-width: 768px), (pointer: coarse)",
+      ).matches;
       setUse3D(!reduce && !coarseOrSmall && webglSupported());
     };
     decide();
@@ -42,13 +50,27 @@ export function HeroRoll({ children }: { children: ReactNode }) {
   }, []);
 
   if (!use3D) {
-    return <div className="flex w-full items-center justify-center">{children}</div>;
+    return fullBleed ? (
+      <div className="shell flex h-full min-h-[520px] items-center justify-center lg:justify-end">
+        <div className="flex w-full items-center justify-center lg:w-[51.2%]">
+          {children}
+        </div>
+      </div>
+    ) : (
+      <div className="flex w-full items-center justify-center">{children}</div>
+    );
   }
 
   return (
     <div className="relative h-full min-h-[520px] w-full">
-      <JumboRollCanvas variant="hero" className="!absolute inset-0 h-full w-full" />
-      <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 select-none font-mono text-[11px] uppercase tracking-[0.16em] text-ink-faint/70">
+      <JumboRollCanvas
+        variant="hero"
+        fullBleed={fullBleed}
+        className="!absolute inset-0 h-full w-full"
+      />
+      <span
+        className={`pointer-events-none absolute bottom-3 select-none font-mono text-[11px] uppercase tracking-[0.16em] text-ink-faint/70 ${fullBleed ? "left-3/4 -translate-x-1/2" : "left-1/2 -translate-x-1/2"}`}
+      >
         Drag to rotate
       </span>
     </div>

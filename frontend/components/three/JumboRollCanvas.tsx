@@ -32,9 +32,14 @@ const matches = (q: string) =>
 type Props = {
   className?: string;
   variant?: "showcase" | "hero";
+  fullBleed?: boolean;
 };
 
-export default function JumboRollCanvas({ className, variant = "showcase" }: Props) {
+export default function JumboRollCanvas({
+  className,
+  variant = "showcase",
+  fullBleed = false,
+}: Props) {
   const [reducedMotion, setReducedMotion] = useState(() =>
     matches("(prefers-reduced-motion: reduce)"),
   );
@@ -68,6 +73,7 @@ export default function JumboRollCanvas({ className, variant = "showcase" }: Pro
       ? [0.4, 1.1, 12]
       : [0.2, 1.5, 9.6];
   const fov = isMobile ? 38 : isHero ? 34 : 32;
+  const heroOffset: [number, number, number] = fullBleed ? [3.15, 0, 0] : [0, 0, 0];
 
   // the roll itself; in hero mode it idles/floats and hangs a little paper
   const roll = (
@@ -136,7 +142,7 @@ export default function JumboRollCanvas({ className, variant = "showcase" }: Pro
             floatIntensity={0.7}
             floatingRange={[-0.12, 0.12]}
           >
-            {roll}
+            <group position={heroOffset}>{roll}</group>
           </Float>
         </PresentationControls>
       ) : (
@@ -145,7 +151,7 @@ export default function JumboRollCanvas({ className, variant = "showcase" }: Pro
 
       {/* soft grounded contact shadow (cheap, studio look) */}
       <ContactShadows
-        position={[0, isHero ? -2.2 : -1.85, 0]}
+        position={[isHero ? heroOffset[0] : 0, isHero ? -2.2 : -1.85, 0]}
         opacity={isHero ? 0.35 : 0.5}
         scale={12}
         blur={2.6}

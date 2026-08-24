@@ -69,8 +69,13 @@ export function Manufacturing() {
                 </div>
               </div>
             ))}
-            <div className="relative mt-8 aspect-[16/10] w-full bg-paper-sunk">
-              <ImageSlot placeholder="Production line — Hưng Yên" />
+            <div className="relative mt-8 aspect-[16/10] w-full overflow-hidden bg-paper-sunk rounded-control">
+              <ImageSlot
+                src="/images/factory/production-line.webp"
+                alt="Production line — Hưng Yên, Việt Nam"
+                placeholder="Production line — Hưng Yên"
+                objectFit="cover"
+              />
             </div>
           </div>
         </div>

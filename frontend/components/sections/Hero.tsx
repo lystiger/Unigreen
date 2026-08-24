@@ -14,11 +14,8 @@ import { HeroRollSvg } from "./HeroRollSvg";
  */
 export function Hero() {
   return (
-    <section
-      id="top"
-      className="relative overflow-clip border-b border-line"
-    >
-      <div className="shell grid min-h-[calc(100vh-68px)] grid-cols-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+    <section id="top" className="relative overflow-clip border-b border-line">
+      <div className="shell relative z-10 grid min-h-[calc(100vh-68px)] grid-cols-1 items-center gap-12 lg:pointer-events-none lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
         <div className="py-16 lg:py-20">
           <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
             01 / Parent roll — Hưng Yên, Việt Nam
@@ -35,11 +32,10 @@ export function Hero() {
           </p>
           <p className="mt-8 max-w-[44ch] text-[17px] leading-[1.6] text-ink-muted">
             Uni-Green converts parent jumbo rolls into finished tissue and paper
-            products on our production line in Hưng Yên. Jumbo rolls, napkins,
-            toilet paper and coreless paper — built to the specification you send
-            us.
+            products on our production line in Hưng Yên. Jumbo rolls, napkins, toilet
+            paper and coreless paper — built to the specification you send us.
           </p>
-          <div className="mt-9 flex flex-wrap gap-3">
+          <div className="mt-9 flex flex-wrap gap-3 lg:pointer-events-auto">
             <a
               href="#quotation"
               className="rounded-[2px] bg-brand-green px-7 py-4 text-[16px] font-medium text-white transition-colors hover:bg-brand-dark"
@@ -55,11 +51,13 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="relative flex min-h-[520px] items-center justify-center self-stretch">
-          <HeroRoll>
-            <HeroRollSvg />
-          </HeroRoll>
-        </div>
+        <div className="hidden lg:block" aria-hidden="true" />
+      </div>
+
+      <div className="relative min-h-[520px] lg:absolute lg:inset-0 lg:z-0 lg:min-h-0">
+        <HeroRoll fullBleed>
+          <HeroRollSvg />
+        </HeroRoll>
       </div>
     </section>
   );

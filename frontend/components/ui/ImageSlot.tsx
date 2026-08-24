@@ -1,22 +1,56 @@
+import Image from "next/image";
+
 interface ImageSlotProps {
-  /** Empty-state caption describing the pack/photo that belongs here. */
-  readonly placeholder: string;
+  /** Image source path (e.g. /images/products/jumbo-roll.webp). */
+  readonly src?: string;
+  /** Accessible alt text for the image. */
+  readonly alt?: string;
+  /** Empty-state caption describing the pack/photo when no src is given. */
+  readonly placeholder?: string;
   /** Rounded corners; the design uses square (rect) slots throughout. */
   readonly shape?: "rect" | "rounded";
   /** Dark tiles (factory grid) invert the placeholder chrome. */
   readonly tone?: "light" | "dark";
+  /** Image fitting mode: contain for isolated pack shots, cover for scenes. */
+  readonly objectFit?: "contain" | "cover";
+  /** High priority loading for above-the-fold or key items. */
+  readonly priority?: boolean;
 }
 
 /**
- * Static stand-in for the design's `<image-slot>` web component. The imported
- * `Uni-Green Landing.dc.html` fills these by drag-and-drop inside the Claude
- * Design canvas; on the real site there are no pack shots yet, so we render the
- * same dashed-ring empty state the component shows before an image is dropped.
- *
- * Swap the inner markup for `next/image` once real photography is available —
- * the sized wrapper each caller provides is the image frame.
+ * Image container component that renders high-resolution product cutouts
+ * with subtle elevation, or gracefully falls back to the design's placeholder frame.
  */
-export function ImageSlot({ placeholder, shape = "rect", tone = "light" }: ImageSlotProps) {
+export function ImageSlot({
+  src,
+  alt,
+  placeholder = "Product image",
+  shape = "rect",
+  tone = "light",
+  objectFit = "contain",
+  priority = false,
+}: ImageSlotProps) {
+  if (src) {
+    return (
+      <div
+        className={`group relative h-full w-full overflow-hidden flex items-center justify-center p-6 transition-all duration-300 ${
+          shape === "rounded" ? "rounded-card" : ""
+        }`}
+      >
+        <Image
+          src={src}
+          alt={alt || placeholder}
+          fill
+          priority={priority}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className={`transition-transform duration-500 ease-out group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.08)] ${
+            objectFit === "contain" ? "object-contain p-4" : "object-cover"
+          }`}
+        />
+      </div>
+    );
+  }
+
   const ring = tone === "dark" ? "border-white/25 text-white/55" : "border-line-strong text-ink-faint";
 
   return (

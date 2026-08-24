@@ -30,7 +30,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <Hero />
       <StandardsBar />
       <PaperJourney />
-      <ProductFamilies />
+      <ProductFamilies locale={locale} />
       <Manufacturing />
       <FactoryGallery />
       <OemBand />
