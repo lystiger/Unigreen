@@ -136,6 +136,7 @@ class CatalogueService:
             barcode=self._normalize_optional(payload.barcode),
             oem_available=payload.oem_available,
             featured=payload.featured,
+            pack_options=payload.pack_options,
             sort_order=payload.sort_order,
             status=PublicationStatus.DRAFT,
             version=1,
@@ -171,6 +172,8 @@ class CatalogueService:
             product.oem_available = payload.oem_available
         if payload.featured is not None:
             product.featured = payload.featured
+        if payload.pack_options is not None:
+            product.pack_options = payload.pack_options
         if payload.sort_order is not None:
             product.sort_order = payload.sort_order
         if payload.translations is not None:

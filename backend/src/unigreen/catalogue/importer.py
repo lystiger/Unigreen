@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy.exc import IntegrityError
 
 from unigreen.catalogue.domain import normalize_sku, normalize_slug, normalize_specification_key
@@ -23,6 +23,7 @@ from unigreen.catalogue.schemas import (
     CategoryTranslationInput,
     ProductTranslationInput,
     SpecificationInput,
+    normalize_pack_options,
 )
 from unigreen.db import session_factory
 from unigreen.domain.enums import PublicationStatus
@@ -41,10 +42,16 @@ class DraftProductImport(BaseModel):
     barcode: str | None = Field(default=None, max_length=100)
     oem_available: bool = False
     featured: bool = False
+    pack_options: list[str] = Field(default_factory=list, max_length=20)
     sort_order: int = Field(default=0, ge=0)
     category_slugs: list[str] = Field(default_factory=list)
     translations: list[ProductTranslationInput] = Field(min_length=1, max_length=2)
     specifications: list[SpecificationInput] = Field(default_factory=list, max_length=100)
+
+    @field_validator("pack_options")
+    @classmethod
+    def valid_pack_options(cls, value: list[str]) -> list[str]:
+        return normalize_pack_options(value)
 
 
 class CatalogueDraftManifest(BaseModel):
@@ -180,6 +187,7 @@ def build_draft_entities(
                 status=PublicationStatus.DRAFT,
                 oem_available=product_item.oem_available,
                 featured=product_item.featured,
+                pack_options=product_item.pack_options,
                 sort_order=product_item.sort_order,
                 version=1,
                 translations=[

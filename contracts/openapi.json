@@ -2957,6 +2957,14 @@
             "title": "Featured",
             "default": false
           },
+          "pack_options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Pack Options"
+          },
           "sort_order": {
             "type": "integer",
             "minimum": 0.0,
@@ -3026,6 +3034,13 @@
             "type": "boolean",
             "title": "Featured"
           },
+          "pack_options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Pack Options"
+          },
           "sort_order": {
             "type": "integer",
             "title": "Sort Order"
@@ -3066,6 +3081,7 @@
           "status",
           "oem_available",
           "featured",
+          "pack_options",
           "sort_order",
           "version",
           "category_ids",
@@ -3202,6 +3218,21 @@
               }
             ],
             "title": "Featured"
+          },
+          "pack_options": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Options"
           },
           "sort_order": {
             "anyOf": [
@@ -3427,9 +3458,42 @@
       "PublicInquiryLineCreate": {
         "properties": {
           "product_id": {
-            "type": "string",
-            "format": "uuid",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Product Id"
+          },
+          "product_slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Slug"
+          },
+          "pack_option": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Option"
           },
           "quantity": {
             "anyOf": [
@@ -3465,7 +3529,6 @@
         },
         "type": "object",
         "required": [
-          "product_id",
           "quantity",
           "unit"
         ],
@@ -3490,6 +3553,17 @@
           "product_name": {
             "type": "string",
             "title": "Product Name"
+          },
+          "pack_option": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack Option"
           },
           "quantity": {
             "type": "string",
@@ -3522,6 +3596,7 @@
           "product_id",
           "product_sku",
           "product_name",
+          "pack_option",
           "quantity",
           "unit",
           "requirements",
@@ -3739,6 +3814,13 @@
             "type": "boolean",
             "title": "Featured"
           },
+          "pack_options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Pack Options"
+          },
           "categories": {
             "items": {
               "$ref": "#/components/schemas/PublicCategoryResponse"
@@ -3812,6 +3894,7 @@
           "summary",
           "oem_available",
           "featured",
+          "pack_options",
           "categories",
           "primary_media",
           "description",
@@ -3877,6 +3960,13 @@
             "type": "boolean",
             "title": "Featured"
           },
+          "pack_options": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Pack Options"
+          },
           "categories": {
             "items": {
               "$ref": "#/components/schemas/PublicCategoryResponse"
@@ -3903,6 +3993,7 @@
           "summary",
           "oem_available",
           "featured",
+          "pack_options",
           "categories",
           "primary_media"
         ],

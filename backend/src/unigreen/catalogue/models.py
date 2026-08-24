@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID, uuid4
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     CheckConstraint,
     DateTime,
@@ -85,6 +86,7 @@ class Product(Base):
     sku: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     slug: Mapped[str] = mapped_column(String(160), unique=True, index=True)
     barcode: Mapped[str | None] = mapped_column(String(100), unique=True, index=True)
+    pack_options: Mapped[list[str]] = mapped_column(JSON, default=list)
     status: Mapped[PublicationStatus] = mapped_column(
         String(20), default=PublicationStatus.DRAFT, index=True
     )

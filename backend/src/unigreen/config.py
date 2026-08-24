@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     staff_session_hours: int = Field(default=12, ge=1, le=168)
     login_attempt_limit: int = Field(default=5, ge=1, le=100)
     login_attempt_window_seconds: int = Field(default=900, ge=60, le=86400)
+    quotation_recipient_email: str = "dohunganh5002@gmail.com"
+    smtp_host: str = ""
+    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+    smtp_from_email: str = ""
 
 
 @lru_cache

@@ -48,6 +48,7 @@ class PublicProductSummary(BaseModel):
     summary: str
     oem_available: bool
     featured: bool
+    pack_options: list[str]
     categories: list[PublicCategoryResponse]
     primary_media: PublicMediaResponse | None
 

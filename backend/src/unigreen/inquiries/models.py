@@ -106,6 +106,7 @@ class InquiryLine(Base):
     )
     product_sku: Mapped[str] = mapped_column(String(100))
     product_name: Mapped[str] = mapped_column(String(200))
+    pack_option: Mapped[str | None] = mapped_column(String(100))
     product_snapshot: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
     quantity: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     unit: Mapped[str] = mapped_column(String(50))

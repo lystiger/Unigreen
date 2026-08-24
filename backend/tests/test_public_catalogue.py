@@ -65,6 +65,7 @@ def product(
         status=PublicationStatus.PUBLISHED,
         oem_available=True,
         featured=True,
+        pack_options=["6 rolls", "12 rolls"],
         sort_order=0,
         version=1,
         translations=[
@@ -217,6 +218,7 @@ async def test_public_product_detail_localizes_specs_and_uses_display_override()
     detail = await service.product("bathroom-tissue", Locale.VI)
 
     assert detail.description == "Chi tiết"
+    assert detail.pack_options == ["6 rolls", "12 rolls"]
     assert detail.specifications[0].model_dump() == {
         "key": "basis_weight",
         "label": "Định lượng",

@@ -104,6 +104,7 @@ class PublicCatalogueService:
             summary=translation.summary,
             oem_available=product.oem_available,
             featured=product.featured,
+            pack_options=product.pack_options or [],
             categories=categories,
             primary_media=next(
                 (
