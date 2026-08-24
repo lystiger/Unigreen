@@ -160,7 +160,7 @@ export function ProductEditor({
                 `Product ${verb}ed.`,
               );
             }}
-            className="rounded-control bg-brand-green px-4 py-2 font-medium text-white disabled:opacity-50"
+            className="min-h-11 rounded-control bg-brand-green px-4 py-2 font-medium text-white disabled:opacity-50"
           >
             {product.status === "published" ? "Unpublish" : "Publish"}
           </button>
@@ -272,7 +272,7 @@ export function ProductEditor({
           {canWrite ? (
             <button
               type="submit"
-              className="mt-6 rounded-control bg-brand-green px-5 py-3 font-medium text-white"
+              className="min-h-11 mt-6 rounded-control bg-brand-green px-5 py-3 font-medium text-white"
             >
               Save product
             </button>
@@ -429,7 +429,7 @@ function SpecificationEditor({
               },
             ])
           }
-          className="rounded-control border border-line-strong px-3 py-2"
+          className="min-h-11 rounded-control border border-line-strong px-3 py-2"
         >
           Add row
         </button>
@@ -491,7 +491,7 @@ function SpecificationEditor({
                   specifications.filter((_, current) => current !== index),
                 )
               }
-              className="self-end rounded-control border border-status-rejected/40 px-3 py-2 text-status-rejected"
+              className="min-h-11 self-end rounded-control border border-status-rejected/40 px-3 py-2 text-status-rejected"
             >
               Remove
             </button>
@@ -502,7 +502,7 @@ function SpecificationEditor({
         type="button"
         disabled={disabled}
         onClick={onSave}
-        className="mt-5 rounded-control bg-brand-green px-4 py-2 font-medium text-white disabled:opacity-50"
+        className="min-h-11 mt-5 rounded-control bg-brand-green px-4 py-2 font-medium text-white disabled:opacity-50"
       >
         Save specifications
       </button>
@@ -637,7 +637,7 @@ function MediaEditor({
           />
           <button
             type="submit"
-            className="rounded-control bg-brand-green px-4 py-2 font-medium text-white"
+            className="min-h-11 rounded-control bg-brand-green px-4 py-2 font-medium text-white"
           >
             Upload
           </button>
@@ -658,11 +658,15 @@ function MediaEditor({
             >
               <div className="flex h-24 items-center justify-center bg-paper-sunk">
                 {thumbnail ? (
-                  // Dynamic media hosts are controlled by the backend contract.
+                  // Runtime media host; see docs/adr/0004.
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={`${apiBaseUrl()}/api/v1/staff/products/${product.id}/media/${item.id}/variants/${thumbnail.name}`}
                     alt={item.alt_en}
+                    width={thumbnail.width}
+                    height={thumbnail.height}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-contain"
                   />
                 ) : null}
@@ -691,7 +695,7 @@ function MediaEditor({
                     type="button"
                     disabled={index === 0}
                     onClick={() => reorder(index, -1)}
-                    className="rounded-control border px-2 py-1"
+                    className="min-h-11 rounded-control border px-2 py-1"
                   >
                     ↑
                   </button>
@@ -699,7 +703,7 @@ function MediaEditor({
                     type="button"
                     disabled={index === media.length - 1}
                     onClick={() => reorder(index, 1)}
-                    className="rounded-control border px-2 py-1"
+                    className="min-h-11 rounded-control border px-2 py-1"
                   >
                     ↓
                   </button>
@@ -719,7 +723,7 @@ function MediaEditor({
                         ),
                       )
                     }
-                    className="rounded-control border px-2 py-1"
+                    className="min-h-11 rounded-control border px-2 py-1"
                   >
                     Approve + primary
                   </button>
@@ -734,7 +738,7 @@ function MediaEditor({
                           ),
                         );
                     }}
-                    className="rounded-control border border-status-rejected/40 px-2 py-1 text-status-rejected"
+                    className="min-h-11 rounded-control border border-status-rejected/40 px-2 py-1 text-status-rejected"
                   >
                     Delete
                   </button>

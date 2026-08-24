@@ -14,9 +14,14 @@ const VARIANT: Record<ButtonVariant, string> = {
   ghost: "text-ink-muted hover:bg-paper-sunk hover:text-ink",
 };
 
+/**
+ * Heights are floors, not padding, so a control still clears WCAG 2.5.8's 44px
+ * when its label is short or its font-size is small. `py-*` alone computed to
+ * 41.6px at `md`, which is why this is expressed as `min-h-*`.
+ */
 const SIZE: Record<ButtonSize, string> = {
-  md: "px-4 py-2 text-body",
-  lg: "px-6 py-3 text-lead",
+  md: "min-h-11 px-4 text-body",
+  lg: "min-h-12 px-6 text-lead",
 };
 
 function classesFor(variant: ButtonVariant, size: ButtonSize, extra?: string): string {

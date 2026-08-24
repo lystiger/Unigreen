@@ -143,8 +143,8 @@ export function PaperJourney() {
         <div className="shell grid h-full grid-cols-1 items-center gap-16 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)]">
           {/* Stage list */}
           <div className="relative z-[2]">
-            <p className="mb-7 font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
-              02 / The paper journey
+            <p className="mb-7 font-mono text-[11px] tracking-[0.16em] text-brand-green">
+              02 / THE PAPER JOURNEY
             </p>
             <div className="flex flex-col gap-7 lg:gap-3.5">
               {STAGES.map((stage, i) => (
@@ -186,7 +186,7 @@ export function PaperJourney() {
               {STAGES.map((stage, i) => (
                 <div key={stage.title} className="relative pt-4">
                   <span className="absolute left-0 right-0 top-0 h-px bg-brand-green/60" />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.08em] text-brand-green">
+                  <span className="font-mono text-[9px] tracking-[0.08em] text-brand-green">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
@@ -197,15 +197,15 @@ export function PaperJourney() {
           {/* Journey visual */}
           <div className="relative hidden h-full items-center justify-center lg:flex">
             <div className="relative h-[76vh] w-full max-w-[660px]">
-              <div className="absolute inset-x-8 top-5 flex items-center justify-between border-b border-white/15 pb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-white/45">
-                <span>Parent roll input</span>
-                <span className="text-brand-green">Continuous web</span>
+              <div className="absolute inset-x-8 top-5 flex items-center justify-between border-b border-white/15 pb-3 font-mono text-[10px] tracking-[0.14em] text-white/45">
+                <span>PARENT ROLL INPUT</span>
+                <span className="text-brand-green">CONTINUOUS WEB</span>
                 <span>Finished output</span>
               </div>
 
-              <div className="absolute inset-x-8 bottom-5 flex justify-between font-mono text-[9px] uppercase tracking-[0.12em] text-white/35">
-                <span>Width controlled</span>
-                <span>Ply / emboss / cut</span>
+              <div className="absolute inset-x-8 bottom-5 flex justify-between font-mono text-[9px] tracking-[0.12em] text-white/35">
+                <span>WIDTH CONTROLLED</span>
+                <span>PLY / EMBOSS / CUT</span>
                 <span>QC released</span>
               </div>
 

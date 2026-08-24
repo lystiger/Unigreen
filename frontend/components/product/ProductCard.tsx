@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { AddToBasketControl } from "@/components/basket/AddToBasketControl";
 import type { PublicProduct } from "@/lib/api/types";
 import type { Dictionary } from "@/lib/i18n";
 import { productPath } from "@/lib/routes";
@@ -9,6 +10,7 @@ interface ProductCardProps {
   readonly product: PublicProduct;
   readonly locale: Locale;
   readonly copy: Dictionary["products"];
+  readonly basketCopy: Dictionary["basket"];
 }
 
 function getFallbackImage(product: PublicProduct): string {
@@ -25,7 +27,7 @@ function getFallbackImage(product: PublicProduct): string {
   return "/images/products/toilet-paper.webp";
 }
 
-export function ProductCard({ product, locale, copy }: ProductCardProps) {
+export function ProductCard({ product, locale, copy, basketCopy }: ProductCardProps) {
   const image =
     product.primary_media?.variants.find((item) => item.width >= 480) ??
     product.primary_media?.variants.at(-1);
@@ -37,12 +39,15 @@ export function ProductCard({ product, locale, copy }: ProductCardProps) {
       <div className="h-1 w-full bg-brand-green/30 transition-colors duration-300 group-hover:bg-brand-green" aria-hidden="true" />
       <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-paper-sunk p-6">
         {image && product.primary_media ? (
+          // Runtime media host; see docs/adr/0004.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={image.url}
             alt={product.primary_media.alt_text}
             width={image.width}
             height={image.height}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
@@ -59,7 +64,7 @@ export function ProductCard({ product, locale, copy }: ProductCardProps) {
             </span>
           </div>
         )}
-        <span className="absolute right-3 top-3 rounded-full bg-paper/90 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-ink-muted backdrop-blur-xs transition-colors group-hover:bg-brand-green group-hover:text-white">
+        <span className="absolute right-3 top-3 rounded-full bg-paper/90 px-2 py-0.5 font-mono text-[10px] tracking-wider text-ink-muted backdrop-blur-xs transition-colors group-hover:bg-brand-green group-hover:text-white">
           {product.sku}
         </span>
       </div>
@@ -97,6 +102,9 @@ export function ProductCard({ product, locale, copy }: ProductCardProps) {
               &rarr;
             </span>
           </div>
+        </div>
+        <div className="relative z-10 mt-4">
+          <AddToBasketControl product={product} copy={basketCopy} compact />
         </div>
       </div>
     </article>

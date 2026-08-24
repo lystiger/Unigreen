@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { BasketDrawer } from "@/components/basket/BasketDrawer";
+import { BasketProvider } from "@/components/basket/BasketProvider";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ToastProvider } from "@/components/ui/Toast";
 import { HTML_LANG, LOCALES, getDictionary, isLocale } from "@/lib/i18n";
 
 const beVietnam = Be_Vietnam_Pro({
@@ -73,23 +76,34 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       <body className="flex min-h-screen flex-col">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-brand-green focus:px-4 focus:py-2 focus:text-white"
+          className="sr-only focus:not-sr-only focus:inline-flex focus:min-h-11 focus:items-center focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-brand-green focus:px-4 focus:py-2 focus:text-white"
         >
           {dictionary.nav.skipToContent}
         </a>
 
         <QueryProvider>
-          <SiteHeader
-            locale={locale}
-            copy={dictionary.nav}
-            hotline={dictionary.footer.hotline}
-          />
+          <ToastProvider>
+            <BasketProvider>
+              <SiteHeader
+                locale={locale}
+                copy={dictionary.nav}
+                hotline={dictionary.footer.hotline}
+                basketCopy={dictionary.basket}
+              />
 
-          <main id="main" className="flex-1">
-            {children}
-          </main>
+              <main id="main" className="flex-1">
+                {children}
+              </main>
 
-          <SiteFooter locale={locale} copy={dictionary.footer} nav={dictionary.nav} />
+              <SiteFooter
+                locale={locale}
+                copy={dictionary.footer}
+                nav={dictionary.nav}
+              />
+
+              <BasketDrawer locale={locale} copy={dictionary.basket} />
+            </BasketProvider>
+          </ToastProvider>
         </QueryProvider>
       </body>
     </html>

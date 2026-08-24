@@ -25,8 +25,8 @@ export default function ThreeTestPage() {
         <JumboRollCanvas className="!absolute inset-0 h-full w-full" />
 
         <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-center gap-2 p-8 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-ink/50">
-            Prototype · procedural R3F
+          <p className="text-xs font-medium tracking-[0.2em] text-ink/50">
+            PROTOTYPE · PROCEDURAL R3F
           </p>
           <h1 className="text-2xl font-semibold text-ink/80 sm:text-3xl">
             Unigreen Jumbo Roll
@@ -38,8 +38,8 @@ export default function ThreeTestPage() {
         </div>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
-          <span className="animate-pulse text-xs uppercase tracking-widest text-ink/40">
-            ↓ scroll ↓
+          <span className="animate-pulse text-xs tracking-widest text-ink/40">
+            ↓ SCROLL ↓
           </span>
         </div>
       </div>

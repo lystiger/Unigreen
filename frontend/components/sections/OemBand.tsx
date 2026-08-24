@@ -16,8 +16,8 @@ export function OemBand() {
   return (
     <section id="oem" className="border-b border-line bg-paper-sunk">
       <div className="shell py-24 lg:py-30">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
-          06 / OEM &amp; private label
+        <p className="font-mono text-[11px] tracking-[0.16em] text-brand-green">
+          06 / OEM &amp; PRIVATE LABEL
         </p>
         <div className="mt-7 grid grid-cols-1 items-start gap-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
           <div>

@@ -39,8 +39,8 @@ export function FactoryGallery() {
   return (
     <section id="factory" className="bg-ink text-paper">
       <div className="shell pb-10 pt-24 lg:pt-30">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
-          05 / Factory
+        <p className="font-mono text-[11px] tracking-[0.16em] text-brand-green">
+          05 / FACTORY
         </p>
         <div className="mt-5 flex flex-wrap items-end justify-between gap-6">
           <div>

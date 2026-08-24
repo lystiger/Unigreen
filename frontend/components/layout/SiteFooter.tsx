@@ -40,8 +40,8 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         </div>
 
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-            Products
+          <p className="font-mono text-[10px] tracking-[0.16em] text-ink-faint">
+            PRODUCTS
           </p>
           <div className="mt-3.5 flex flex-col gap-2.5">
             {PRODUCT_LINKS.map((label) => (
@@ -57,8 +57,8 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         </div>
 
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-            Company
+          <p className="font-mono text-[10px] tracking-[0.16em] text-ink-faint">
+            COMPANY
           </p>
           <div className="mt-3.5 flex flex-col gap-2.5">
             {company.map((link) => (
@@ -74,8 +74,8 @@ export function SiteFooter({ locale }: SiteFooterProps) {
         </div>
 
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
-            Contact
+          <p className="font-mono text-[10px] tracking-[0.16em] text-ink-faint">
+            CONTACT
           </p>
           <div className="mt-3.5 flex flex-col gap-2.5 text-[14px]">
             <span className="text-ink-muted">Hưng Yên, Việt Nam</span>
@@ -88,10 +88,10 @@ export function SiteFooter({ locale }: SiteFooterProps) {
 
       <div className="border-t border-line">
         <div className="shell flex flex-wrap items-center justify-between gap-4 py-5">
-          <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint">
+          <span className="font-mono text-[11px] tracking-[0.1em] text-ink-faint">
             © 2026 Uni-Green
           </span>
-          <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-faint">
+          <span className="font-mono text-[11px] tracking-[0.1em] text-ink-faint">
             VI / EN
           </span>
         </div>

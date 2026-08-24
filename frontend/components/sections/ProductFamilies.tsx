@@ -17,7 +17,7 @@ interface Family {
 
 const FAMILIES: readonly Family[] = [
   {
-    index: "Family 01",
+    index: "FAMILY 01",
     slug: "jumbo-rolls",
     name: "Jumbo rolls",
     vi: "Cuộn giấy jumbo",
@@ -28,7 +28,7 @@ const FAMILIES: readonly Family[] = [
     image: "/images/products/jumbo-roll.webp",
   },
   {
-    index: "Family 02",
+    index: "FAMILY 02",
     slug: "napkins",
     name: "Napkins",
     vi: "Khăn giấy ăn",
@@ -39,7 +39,7 @@ const FAMILIES: readonly Family[] = [
     image: "/images/products/napkins.webp",
   },
   {
-    index: "Family 03",
+    index: "FAMILY 03",
     slug: "toilet-paper",
     name: "Toilet paper & holders",
     vi: "Giấy vệ sinh và hộp đựng",
@@ -50,7 +50,7 @@ const FAMILIES: readonly Family[] = [
     image: "/images/products/toilet-paper.webp",
   },
   {
-    index: "Family 04",
+    index: "FAMILY 04",
     slug: "coreless-paper",
     name: "Coreless paper",
     vi: "Giấy không lõi",
@@ -69,8 +69,8 @@ export function ProductFamilies({ locale = "vi" }: { readonly locale?: Locale })
       <div className="shell py-24 lg:py-30">
         <div className="flex flex-wrap items-end justify-between gap-6 border-b border-line pb-7">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
-              03 / Products
+            <p className="font-mono text-[11px] tracking-[0.16em] text-brand-green">
+              03 / PRODUCTS
             </p>
             <h2 className="mt-5 text-[clamp(32px,4vw,54px)] font-semibold leading-[1.05] tracking-[-0.03em]">
               What we produce
@@ -104,7 +104,7 @@ export function ProductFamilies({ locale = "vi" }: { readonly locale?: Locale })
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col p-8">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+                  <p className="font-mono text-[10px] tracking-[0.16em] text-ink-faint">
                     {family.index}
                   </p>
                   <h3 className="mt-3 text-[26px] font-medium tracking-[-0.02em] text-ink transition-colors group-hover:text-brand-green">

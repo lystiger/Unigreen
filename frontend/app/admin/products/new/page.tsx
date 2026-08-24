@@ -52,7 +52,7 @@ export default function NewProductPage() {
   const error = create.error instanceof ApiClientError ? create.error : null;
   return (
     <form onSubmit={submit} className="max-w-4xl">
-      <p className="font-mono text-eyebrow uppercase tracking-widest text-brand-green">
+      <p className="font-mono text-eyebrow tracking-widest text-brand-green">
         New draft
       </p>
       <h1 className="mt-2 text-h1 font-semibold">Create product</h1>
@@ -107,7 +107,7 @@ export default function NewProductPage() {
       <button
         type="submit"
         disabled={create.isPending}
-        className="mt-6 rounded-control bg-brand-green px-5 py-3 font-medium text-white disabled:opacity-50"
+        className="min-h-11 mt-6 rounded-control bg-brand-green px-5 py-3 font-medium text-white disabled:opacity-50"
       >
         {create.isPending ? "Creating…" : "Create draft"}
       </button>

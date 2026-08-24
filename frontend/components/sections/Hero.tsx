@@ -17,7 +17,7 @@ export function Hero() {
     <section id="top" className="relative overflow-clip border-b border-line">
       <div className="shell relative z-10 grid min-h-[calc(100vh-68px)] grid-cols-1 items-center gap-12 lg:pointer-events-none lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
         <div className="py-16 lg:py-20">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
+          <p className="font-mono text-[11px] tracking-[0.16em] text-brand-green">
             01 / Parent roll — Hưng Yên, Việt Nam
           </p>
           <h1 className="mt-7 text-balance text-[clamp(44px,5.6vw,80px)] font-semibold leading-[1.02] tracking-[-0.035em]">

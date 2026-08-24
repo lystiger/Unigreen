@@ -4,19 +4,24 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { BasketBadge } from "@/components/basket/BasketBadge";
+import { LocaleCode } from "@/components/ui/LocaleCode";
 import type { Locale } from "@/lib/types";
 import type { Dictionary } from "@/lib/i18n";
-import { LOCALES, swapLocaleInPath } from "@/lib/i18n";
+import { swapLocaleInPath } from "@/lib/i18n";
+import { telHref } from "@/lib/format";
 
 interface SiteHeaderProps {
   readonly locale: Locale;
   readonly copy: Dictionary["nav"];
   readonly hotline: string;
+  readonly basketCopy: Dictionary["basket"];
 }
 
-export function SiteHeader({ locale, copy }: SiteHeaderProps) {
+export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const otherLocale: Locale = locale === "vi" ? "en" : "vi";
 
   // In-page anchors on the landing; prefixed with the locale so they resolve
   // (navigate home, then scroll) from any route the header is rendered on.
@@ -49,33 +54,27 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-5">
-          <div className="hidden items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.12em] sm:flex">
-            {LOCALES.map((candidate, index) => (
-              <span key={candidate} className="flex items-center gap-1.5">
-                {index > 0 ? <span className="text-line-strong">/</span> : null}
-                {candidate === locale ? (
-                  <span className="text-ink">{candidate}</span>
-                ) : (
-                  <Link
-                    href={swapLocaleInPath(pathname, candidate)}
-                    hrefLang={candidate}
-                    aria-label={copy.switchLocale}
-                    className="text-ink-faint transition-colors hover:text-ink"
-                  >
-                    {candidate}
-                  </Link>
-                )}
-              </span>
-            ))}
-          </div>
+        {/* One badge at every breakpoint. Rendering a desktop copy and a
+            mobile copy would put two identically-labelled buttons in the
+            accessibility tree, which a screen reader reads out twice however
+            they are hidden visually. */}
+        <div className="flex items-center gap-2 lg:gap-4">
+          <BasketBadge copy={basketCopy} />
 
-          <Link
-            href={`/${locale}#quotation`}
-            className="hidden rounded-[2px] bg-brand-green px-[18px] py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-brand-dark sm:inline-block"
-          >
-            {copy.inquiry}
-          </Link>
+          <div className="hidden items-center gap-4 lg:flex">
+            <LocaleCode
+              href={swapLocaleInPath(pathname, otherLocale)}
+              locale={otherLocale}
+              label={copy.switchLocale}
+              className="text-ink-faint transition-colors hover:text-ink"
+            />
+            <Link
+              href={`/${locale}/inquiry`}
+              className="inline-flex min-h-11 items-center rounded-control bg-brand-green px-[18px] text-[14px] font-medium text-white transition-colors hover:bg-brand-dark"
+            >
+              {copy.inquiry}
+            </Link>
+          </div>
 
           <button
             type="button"
@@ -83,7 +82,7 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
             aria-expanded={isOpen}
             aria-controls="site-menu"
             aria-label={isOpen ? copy.closeMenu : copy.openMenu}
-            className="rounded-[2px] border border-line px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] text-ink lg:hidden"
+            className="min-h-11 rounded-control border border-line px-3 py-2 font-mono text-eyebrow tracking-[0.12em] text-ink lg:hidden"
           >
             {isOpen ? copy.closeMenu : copy.openMenu}
           </button>
@@ -99,7 +98,7 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
                   <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className="block rounded-[2px] px-2 py-3 text-lead text-ink"
+                    className="flex min-h-11 items-center rounded-control px-2 py-3 text-lead text-ink"
                   >
                     {link.label}
                   </Link>
@@ -109,31 +108,28 @@ export function SiteHeader({ locale, copy }: SiteHeaderProps) {
 
             <div className="mt-4 flex items-center justify-between gap-4 border-t border-line pt-4">
               <Link
-                href={`/${locale}#quotation`}
+                href={`/${locale}/inquiry`}
                 onClick={() => setIsOpen(false)}
-                className="rounded-[2px] bg-brand-green px-4 py-3 text-center text-[14px] font-medium text-white"
+                className="flex min-h-11 items-center justify-center rounded-control bg-brand-green px-4 text-center text-[14px] font-medium text-white"
               >
                 {copy.inquiry}
               </Link>
-              <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em]">
-                {LOCALES.map((candidate, index) => (
-                  <span key={candidate} className="flex items-center gap-2">
-                    {index > 0 ? <span className="text-line-strong">/</span> : null}
-                    {candidate === locale ? (
-                      <span className="text-ink">{candidate}</span>
-                    ) : (
-                      <Link
-                        href={swapLocaleInPath(pathname, candidate)}
-                        hrefLang={candidate}
-                        aria-label={copy.switchLocale}
-                        onClick={() => setIsOpen(false)}
-                        className="text-ink-faint"
-                      >
-                        {candidate}
-                      </Link>
-                    )}
-                  </span>
-                ))}
+              <div className="flex items-center gap-4">
+                {hotline ? (
+                  <a
+                    href={telHref(hotline)}
+                    className="font-mono text-data text-ink-muted"
+                  >
+                    {copy.callUs}: {hotline}
+                  </a>
+                ) : null}
+                <LocaleCode
+                  href={swapLocaleInPath(pathname, otherLocale)}
+                  locale={otherLocale}
+                  label={copy.switchLocale}
+                  onClick={() => setIsOpen(false)}
+                  className="text-ink-muted"
+                />
               </div>
             </div>
           </nav>

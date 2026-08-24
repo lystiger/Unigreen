@@ -6,6 +6,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { apiRequest } from "@/lib/api/client";
 import type { PublicProductDetail } from "@/lib/api/types";
+import { AddToBasketControl } from "@/components/basket/AddToBasketControl";
+import { getDictionary } from "@/lib/i18n";
 import { cataloguePath, productPath } from "@/lib/routes";
 import type { Locale } from "@/lib/types";
 import { CatalogueSkeleton } from "../ui/AsyncState";
@@ -165,37 +167,6 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
   },
 };
 
-const COPY = {
-  vi: {
-    home: "Trang chủ",
-    products: "Sản phẩm",
-    back: "← Trở lại danh mục",
-    specifications: "Thông số kỹ thuật chi tiết",
-    oem: "Hỗ trợ gia công OEM / Thương hiệu riêng",
-    oemTag: "Gia công OEM",
-    inquiry: "Yêu cầu báo giá sản phẩm này",
-    gallery: "Hình ảnh sản phẩm & chuyền may",
-    standardNote: "Sản phẩm được sản xuất trực tiếp tại xưởng Hưng Yên theo tiêu chuẩn chất lượng Nhật Bản.",
-    relatedTitle: "Các dòng sản phẩm khác",
-    viewDetail: "Xem chi tiết",
-    requestSpecSheet: "Tải bảng thông số quy cách",
-  },
-  en: {
-    home: "Home",
-    products: "Products",
-    back: "← Back to catalogue",
-    specifications: "Detailed technical specifications",
-    oem: "OEM / Private label manufacturing available",
-    oemTag: "OEM Available",
-    inquiry: "Request quotation for this product",
-    gallery: "Product & line photography",
-    standardNote: "Manufactured on our production line in Hưng Yên, Vietnam under Japanese quality standards.",
-    relatedTitle: "Other product families",
-    viewDetail: "View details",
-    requestSpecSheet: "Download specification sheet",
-  },
-} as const;
-
 export function ProductDetailPage({
   locale,
   slug,
@@ -203,7 +174,9 @@ export function ProductDetailPage({
   readonly locale: Locale;
   readonly slug: string;
 }) {
-  const copy = COPY[locale];
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.productDetail;
+  const basketCopy = dictionary.basket;
   const [selected, setSelected] = useState(0);
 
   const query = useQuery({
@@ -240,13 +213,26 @@ export function ProductDetailPage({
   }));
 
   const images = apiProduct?.media?.length
-    ? apiProduct.media.map((m) => ({
-        src: m.variants.at(-1)?.url ?? "/images/products/toilet-paper.webp",
-        alt: m.alt_text,
-      }))
+    ? apiProduct.media.map((m) => {
+        const variant = m.variants.at(-1);
+        return variant
+          ? {
+              src: variant.url,
+              alt: m.alt_text,
+              runtime: true as const,
+              width: variant.width,
+              height: variant.height,
+            }
+          : {
+              src: "/images/products/toilet-paper.webp",
+              alt: m.alt_text,
+              runtime: false as const,
+            };
+      })
     : staticFallback.images.map((img) => ({
         src: img.src,
         alt: img.alt[locale],
+        runtime: false as const,
       }));
 
   const specifications = apiProduct?.specifications?.length
@@ -263,7 +249,13 @@ export function ProductDetailPage({
         unit: s.unit,
       }));
 
-  const currentImage = images[selected] ?? images[0] ?? { src: "/images/products/toilet-paper.webp", alt: productName };
+  const currentImage =
+    images[selected] ??
+    images[0] ?? {
+      src: "/images/products/toilet-paper.webp",
+      alt: productName,
+      runtime: false as const,
+    };
 
   // Related product families
   const relatedKeys = Object.keys(STATIC_PRODUCTS).filter((k) => k !== slug).slice(0, 3);
@@ -291,15 +283,34 @@ export function ProductDetailPage({
           {/* Gallery View */}
           <section aria-label={copy.gallery} className="flex flex-col">
             <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-card border border-line bg-paper-raised p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] sm:aspect-square">
-              <Image
-                src={currentImage.src}
-                alt={currentImage.alt}
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain p-6 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_16px_32px_rgba(0,0,0,0.08)]"
-              />
-              <span className="absolute left-4 top-4 rounded-full bg-paper-sunk px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-ink-muted border border-line">
+              {currentImage.runtime ? (
+                // Runtime media host; see docs/adr/0004 — it must not be routed
+                // through next/image, whose remotePatterns cannot enumerate an
+                // environment-dependent host.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={currentImage.src}
+                  alt={currentImage.alt}
+                  width={currentImage.width}
+                  height={currentImage.height}
+                  // Above the fold and the page's LCP element, so it must not be
+                  // lazy — that would defer the largest paint by a round trip.
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_16px_32px_rgba(0,0,0,0.08)]"
+                />
+              ) : (
+                <Image
+                  src={currentImage.src}
+                  alt={currentImage.alt}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-contain p-6 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_16px_32px_rgba(0,0,0,0.08)]"
+                />
+              )}
+              <span className="absolute left-4 top-4 rounded-full bg-paper-sunk px-3 py-1 font-mono text-[11px] tracking-wider text-ink-muted border border-line">
                 {productSku}
               </span>
             </div>
@@ -320,13 +331,27 @@ export function ProductDetailPage({
                         : "border-line bg-paper-sunk hover:border-line-strong"
                     }`}
                   >
-                    <Image
-                      src={img.src}
-                      alt={img.alt}
-                      fill
-                      sizes="120px"
-                      className="object-contain p-2"
-                    />
+                    {img.runtime ? (
+                      // Runtime media host; see docs/adr/0004.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={img.src}
+                        alt={img.alt}
+                        width={img.width}
+                        height={img.height}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-contain p-2"
+                      />
+                    ) : (
+                      <Image
+                        src={img.src}
+                        alt={img.alt}
+                        fill
+                        sizes="120px"
+                        className="object-contain p-2"
+                      />
+                    )}
                   </button>
                 ))}
               </div>
@@ -336,7 +361,7 @@ export function ProductDetailPage({
           {/* Product Info */}
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green font-semibold">
+              <span className="font-mono text-[11px] tracking-[0.16em] text-brand-green font-semibold">
                 {productSku}
               </span>
               {isOem ? (
@@ -381,9 +406,15 @@ export function ProductDetailPage({
             </div>
 
             {/* Action CTAs */}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            {apiProduct ? (
+              <div className="mt-8">
+                <AddToBasketControl product={apiProduct} copy={basketCopy} />
+              </div>
+            ) : null}
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <a
-                href={`/${locale}#quotation`}
+                href={`/${locale}/inquiry`}
                 className="inline-flex items-center justify-center rounded-[2px] bg-brand-green px-7 py-4 text-[16px] font-medium text-white transition-colors hover:bg-brand-dark shadow-sm"
               >
                 {copy.inquiry} &rarr;
@@ -402,8 +433,8 @@ export function ProductDetailPage({
         <section className="mt-20 border-t border-line pt-12">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
-                Technical Data Sheet
+              <p className="font-mono text-[11px] tracking-[0.16em] text-brand-green">
+                TECHNICAL DATA SHEET
               </p>
               <h2 className="mt-2 text-[clamp(24px,2.5vw,36px)] font-semibold tracking-[-0.02em] text-ink">
                 {copy.specifications}
@@ -455,7 +486,7 @@ export function ProductDetailPage({
                     />
                   </div>
                   <div className="p-6">
-                    <p className="font-mono text-[10px] uppercase tracking-wider text-ink-faint">
+                    <p className="font-mono text-[10px] tracking-wider text-ink-faint">
                       {rel.sku}
                     </p>
                     <h3 className="mt-1 text-[18px] font-medium text-ink transition-colors group-hover:text-brand-green">

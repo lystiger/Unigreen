@@ -4,10 +4,10 @@ interface StandardItem {
 }
 
 const ITEMS: readonly StandardItem[] = [
-  { label: "Production", value: "Hưng Yên, Việt Nam" },
-  { label: "Standard", value: "Japanese quality" },
-  { label: "Supplied to", value: "Honda · Fushan Foxconn" },
-  { label: "Service", value: "OEM / private label" },
+  { label: "PRODUCTION", value: "Hưng Yên, Việt Nam" },
+  { label: "STANDARD", value: "Japanese quality" },
+  { label: "SUPPLIED TO", value: "Honda · Fushan Foxconn" },
+  { label: "SERVICE", value: "OEM / private label" },
 ];
 
 /** The standards-and-supply strip beneath the hero. */
@@ -22,7 +22,7 @@ export function StandardsBar() {
               index < ITEMS.length - 1 ? "md:border-r md:border-line md:pr-6" : ""
             } ${index > 0 ? "md:pl-6" : ""}`}
           >
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-faint">
+            <p className="font-mono text-[10px] tracking-[0.16em] text-ink-faint">
               {item.label}
             </p>
             <p className="mt-2 text-[16px] font-medium">{item.value}</p>

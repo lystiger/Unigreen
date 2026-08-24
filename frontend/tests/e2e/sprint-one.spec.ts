@@ -136,7 +136,11 @@ test("staff login uses cookie auth and opens permission-aware products", async (
   await page.route("http://localhost:8000/api/v1/auth/login", async (route) => {
     await route.fulfill({
       headers: {
-        "access-control-allow-origin": "http://localhost:3000",
+        // Credentialed CORS requires an exact origin match, so this has to
+        // follow whatever port the suite is actually served from rather than
+        // assume 3000.
+        "access-control-allow-origin":
+          route.request().headers()["origin"] ?? "http://localhost:3000",
         "access-control-allow-credentials": "true",
         "set-cookie": "ug_csrf=test-token; Path=/; SameSite=Lax",
       },

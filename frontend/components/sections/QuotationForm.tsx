@@ -20,11 +20,11 @@ const FAMILY_OPTIONS = [
 const FIELD =
   "rounded-[2px] border border-line-strong bg-paper px-3.5 py-3 text-[15px] text-ink";
 const FIELD_LABEL =
-  "font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint";
+  "font-mono text-[10px] tracking-[0.14em] text-ink-faint";
 
 /**
  * Request-quotation section, ported from `Uni-Green Landing.dc.html`. Submitting
- * flips to the design's inline "Request received" acknowledgement (client state
+ * flips to the design's inline "REQUEST RECEIVED" acknowledgement (client state
  * only — wire to the inquiry backend when that endpoint is available).
  */
 export function QuotationForm() {
@@ -35,8 +35,8 @@ export function QuotationForm() {
       <div className="shell py-24 lg:py-30">
         <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div className="lg:sticky lg:top-30">
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
-              07 / Request quotation
+            <p className="font-mono text-[11px] tracking-[0.16em] text-brand-green">
+              07 / REQUEST QUOTATION
             </p>
             <h2 className="mt-5 text-[clamp(32px,4vw,54px)] font-semibold leading-[1.05] tracking-[-0.03em]">
               Tell us the specification.
@@ -70,8 +70,8 @@ export function QuotationForm() {
           <div className="border border-line bg-paper-raised p-10">
             {sent ? (
               <div className="py-12 text-left">
-                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-brand-green">
-                  Request received
+                <p className="font-mono text-[11px] tracking-[0.16em] text-brand-green">
+                  REQUEST RECEIVED
                 </p>
                 <p className="mt-4 text-[26px] font-medium leading-[1.2] tracking-[-0.02em]">
                   Thank you. We will come back with a written quotation.
