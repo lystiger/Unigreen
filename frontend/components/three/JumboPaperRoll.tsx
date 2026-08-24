@@ -31,7 +31,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /**
  * Warm-white fibrous paper roughness/bump noise. Small (256px) and procedural,
- * repeated across the surface — cheap, no texture download.
+ * repeated across the surface — clean and soft.
  */
 function makePaperNoise(): THREE.CanvasTexture {
   const size = 256;
@@ -40,23 +40,22 @@ function makePaperNoise(): THREE.CanvasTexture {
   const ctx = c.getContext("2d")!;
   const img = ctx.createImageData(size, size);
   for (let i = 0; i < img.data.length; i += 4) {
-    // low-contrast grain centred around mid grey
-    const v = 150 + Math.floor(Math.random() * 105);
+    // gentle fine grain centered around luminous warm white
+    const v = 190 + Math.floor(Math.random() * 65);
     img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
     img.data[i + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
   const tex = new THREE.CanvasTexture(c);
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(10, 4);
+  tex.repeat.set(8, 3);
   tex.anisotropy = 8;
   return tex;
 }
 
 /**
- * Concentric wound-layer rings for the roll end caps. The RingGeometry uses a
- * planar UV, so a concentric-circle canvas maps as true concentric rings on the
- * annular face.
+ * Concentric wound-layer rings for the roll end caps.
+ * Combines fine paper winding rings with a subtle brand-green radius spec indicator.
  */
 function makeRingTexture(): THREE.CanvasTexture {
   const size = 512;
@@ -65,22 +64,70 @@ function makeRingTexture(): THREE.CanvasTexture {
   const ctx = c.getContext("2d")!;
   const cx = size / 2;
 
-  ctx.fillStyle = "#f2ece0"; // warm white base
+  // Luminous warm virgin paper base
+  ctx.fillStyle = "#FAF8F3";
   ctx.fillRect(0, 0, size, size);
 
-  // faint, tightly-spaced concentric rings suggesting wound paper layers
-  const rings = 120;
+  // Concentric wound paper rings
+  const rings = 140;
   for (let i = rings; i > 0; i--) {
-    const r = (i / rings) * cx * 0.96;
-    const shade = 210 + Math.floor(Math.sin(i * 1.7) * 12 + (Math.random() - 0.5) * 8);
+    const r = (i / rings) * cx * 0.98;
+    const alpha = 0.15 + (Math.sin(i * 1.5) + 1) * 0.12;
     ctx.beginPath();
     ctx.arc(cx, cx, r, 0, Math.PI * 2);
-    ctx.lineWidth = 1.2;
-    ctx.strokeStyle = `rgba(${shade - 40}, ${shade - 55}, ${shade - 80}, 0.35)`;
+    ctx.lineWidth = i % 8 === 0 ? 1.4 : 0.8;
+    ctx.strokeStyle = `rgba(180, 172, 155, ${alpha})`;
     ctx.stroke();
   }
+
+  // Green technical radius measurement line (from original blueprint design)
+  const coreEdge = cx * 0.28;
+  const outerEdge = cx * 0.97;
+  ctx.beginPath();
+  ctx.moveTo(cx, cx - coreEdge);
+  ctx.lineTo(cx, cx - outerEdge);
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = "#1E9445";
+  ctx.stroke();
+
+  // Subtle radius tick at the tip
+  ctx.beginPath();
+  ctx.moveTo(cx - 4, cx - outerEdge);
+  ctx.lineTo(cx + 4, cx - outerEdge);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#1E9445";
+  ctx.stroke();
+
   const tex = new THREE.CanvasTexture(c);
-  tex.anisotropy = 4;
+  tex.anisotropy = 8;
+  return tex;
+}
+
+/**
+ * Kraft cardboard texture for the inner winding core.
+ */
+function makeCoreTexture(): THREE.CanvasTexture {
+  const size = 256;
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const ctx = c.getContext("2d")!;
+
+  ctx.fillStyle = "#C29B6C"; // kraft base
+  ctx.fillRect(0, 0, size, size);
+
+  // spiral seams
+  ctx.strokeStyle = "#A47E50";
+  ctx.lineWidth = 3;
+  for (let y = -size; y < size * 2; y += 48) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(size, y + size * 0.5);
+    ctx.stroke();
+  }
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(4, 1);
   return tex;
 }
 
@@ -179,6 +226,7 @@ export function JumboPaperRoll({
   // --- geometries & textures (built once) -----------------------------------
   const paperNoise = useMemo(() => makePaperNoise(), []);
   const ringTexture = useMemo(() => makeRingTexture(), []);
+  const coreTexture = useMemo(() => makeCoreTexture(), []);
 
   const paperGeo = useMemo(() => {
     const g = new THREE.CylinderGeometry(ROLL_RADIUS, ROLL_RADIUS, ROLL_LENGTH, radialSeg, 1, true);
@@ -205,10 +253,10 @@ export function JumboPaperRoll({
   // dispose GPU resources on unmount
   useEffect(() => {
     return () => {
-      [paperNoise, ringTexture].forEach((t) => t.dispose());
+      [paperNoise, ringTexture, coreTexture].forEach((t) => t.dispose());
       [paperGeo, capGeo, coreGeo, sheet.geo].forEach((g) => g.dispose());
     };
-  }, [paperNoise, ringTexture, paperGeo, capGeo, coreGeo, sheet.geo]);
+  }, [paperNoise, ringTexture, coreTexture, paperGeo, capGeo, coreGeo, sheet.geo]);
 
   // --- scroll tracking ------------------------------------------------------
   useEffect(() => {
@@ -269,20 +317,20 @@ export function JumboPaperRoll({
           the roll axis stays fixed while spinRef turns the body around it */}
       <group rotation={[-0.14, -0.58, 0.05]}>
       <group ref={spinRef}>
-        {/* white paper roll body */}
+        {/* luminous warm white virgin tissue roll body */}
         <mesh geometry={paperGeo} castShadow receiveShadow>
           <meshStandardMaterial
-            color="#f5efe4"
-            roughness={0.92}
+            color="#FAF8F3"
+            roughness={0.88}
             metalness={0}
             roughnessMap={paperNoise}
             bumpMap={paperNoise}
-            bumpScale={0.006}
+            bumpScale={0.003}
             side={THREE.DoubleSide}
           />
         </mesh>
 
-        {/* wound-layer end caps (annulus) */}
+        {/* wound-layer end caps (annulus) with spec radius indicator */}
         {([1, -1] as const).map((dir) => (
           <mesh
             key={dir}
@@ -293,16 +341,21 @@ export function JumboPaperRoll({
           >
             <meshStandardMaterial
               map={ringTexture}
-              roughness={0.95}
+              roughness={0.92}
               metalness={0}
               side={THREE.DoubleSide}
             />
           </mesh>
         ))}
 
-        {/* brown cardboard core, poking out both ends */}
+        {/* kraft cardboard core tube */}
         <mesh geometry={coreGeo} castShadow receiveShadow>
-          <meshStandardMaterial color="#9c6b3f" roughness={0.85} metalness={0} />
+          <meshStandardMaterial
+            color="#C69E70"
+            map={coreTexture}
+            roughness={0.85}
+            metalness={0}
+          />
         </mesh>
       </group>
 
@@ -315,12 +368,12 @@ export function JumboPaperRoll({
         receiveShadow
       >
         <meshStandardMaterial
-          color="#f6f1e8"
-          roughness={0.95}
+          color="#FCFAF5"
+          roughness={0.9}
           metalness={0}
           roughnessMap={paperNoise}
           bumpMap={paperNoise}
-          bumpScale={0.005}
+          bumpScale={0.0025}
           side={THREE.DoubleSide}
         />
       </mesh>

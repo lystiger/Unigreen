@@ -106,7 +106,7 @@ export default function JumboRollCanvas({
       camera={{ position: camera, fov }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = isJourney ? 1.15 : 1.05;
+        gl.toneMappingExposure = isJourney ? 1.15 : 1.0;
       }}
     >
       {/* opaque studio backdrop for the showcase; transparent for hero/journey so
@@ -114,19 +114,19 @@ export default function JumboRollCanvas({
       {!isHero && !isJourney && <color attach="background" args={["#efe9df"]} />}
 
       {/* --- soft studio lighting ------------------------------------------ */}
-      <ambientLight intensity={isJourney ? 0.55 : 0.45} />
+      <ambientLight intensity={isJourney ? 0.55 : 0.7} />
       <hemisphereLight
         args={
           isJourney
             ? ["#fffaf2", "#0c1b14", 0.7]
-            : ["#fffaf2", "#cbb89a", 0.6]
+            : ["#FFFFFF", "#EBE5D8", 0.7]
         }
       />
-      {/* key light, slightly warm, casts the soft shadow */}
+      {/* key light, warm studio sun, casts the soft shadow */}
       <directionalLight
-        position={[4, 7, 5]}
-        intensity={isJourney ? 2.4 : 2.1}
-        color="#fff4e2"
+        position={[5, 8, 6]}
+        intensity={isJourney ? 2.4 : 1.7}
+        color={isJourney ? "#fff4e2" : "#FFF8EF"}
         castShadow={shadows}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-near={1}
@@ -137,11 +137,11 @@ export default function JumboRollCanvas({
         shadow-camera-bottom={-8}
         shadow-bias={-0.0004}
       />
-      {/* cool fill or brand-green rim light from the opposite side */}
+      {/* soft fill light / green rim for journey */}
       <directionalLight
-        position={[-6, 2, -3]}
-        intensity={isJourney ? 1.1 : 0.5}
-        color={isJourney ? "#1e9445" : "#dfe7ff"}
+        position={[-6, 3, -3]}
+        intensity={isJourney ? 1.1 : 0.4}
+        color={isJourney ? "#1e9445" : "#EDF4FF"}
       />
 
       {isHero ? (
@@ -173,15 +173,15 @@ export default function JumboRollCanvas({
       <ContactShadows
         position={[
           isHero ? heroOffset[0] : 0,
-          isHero ? -2.2 : isJourney ? -1.95 : -1.85,
+          isHero ? -2.15 : isJourney ? -1.95 : -1.85,
           0,
         ]}
-        opacity={isHero ? 0.35 : isJourney ? 0.65 : 0.5}
-        scale={12}
-        blur={2.6}
+        opacity={isHero ? 0.16 : isJourney ? 0.65 : 0.5}
+        scale={11}
+        blur={3.4}
         far={5}
         resolution={isMobile ? 256 : 512}
-        color={isJourney ? "#000000" : "#3b2f22"}
+        color={isJourney ? "#000000" : "#261E14"}
       />
     </Canvas>
   );
