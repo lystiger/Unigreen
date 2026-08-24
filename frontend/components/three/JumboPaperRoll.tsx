@@ -239,7 +239,7 @@ export function JumboPaperRoll({
       const idle = reducedMotion ? 0 : state.clock.elapsedTime * 0.04;
       const targetSpin = p * SCROLL_TURNS * Math.PI * 2 + idle;
       spinAngle.current = lerp(spinAngle.current, targetSpin, reducedMotion ? 1 : 0.12);
-      sheetTarget = p;
+      sheetTarget = baseUnroll > 0 ? baseUnroll + p * (1 - baseUnroll) : p;
     }
     if (spinRef.current) spinRef.current.rotation.x = spinAngle.current;
 

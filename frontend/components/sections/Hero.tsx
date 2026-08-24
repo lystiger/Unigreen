@@ -1,5 +1,4 @@
 import { HeroRoll } from "@/components/three/HeroRoll";
-import { HeroRollSvg } from "./HeroRollSvg";
 
 /**
  * Landing hero — imported from `Uni-Green Landing.dc.html`.
@@ -8,9 +7,8 @@ import { HeroRollSvg } from "./HeroRollSvg";
  * design specifies, so it renders identically for both locales. In-page CTAs
  * scroll to the products and quotation sections on the same page.
  *
- * The roll illustration is an interactive, floating 3D model on capable desktop
- * clients ({@link HeroRoll}), falling back to the original static SVG
- * ({@link HeroRollSvg}) on reduced-motion, touch/small screens, or no WebGL.
+ * The roll illustration is the interactive 3D procedural Jumbo Roll ({@link HeroRoll})
+ * with drag-to-rotate, scroll-driven paper unwinding, and mouse parallax.
  */
 export function Hero() {
   return (
@@ -55,9 +53,7 @@ export function Hero() {
       </div>
 
       <div className="relative min-h-[520px] lg:absolute lg:inset-0 lg:z-0 lg:min-h-0">
-        <HeroRoll fullBleed>
-          <HeroRollSvg />
-        </HeroRoll>
+        <HeroRoll fullBleed />
       </div>
     </section>
   );

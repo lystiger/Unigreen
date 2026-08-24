@@ -16,13 +16,15 @@ import { JumboPaperRoll } from "./JumboPaperRoll";
  *  - soft contact shadow instead of a tuned shadow-map ground
  *  - mobile / prefers-reduced-motion -> reduced animation + lower poly + DPR 1
  *
- * Two variants:
+ * Three variants:
  *  - "showcase" (default): opaque background, page scroll drives spin + unroll.
  *    Used by the /3d-test harness.
  *  - "hero": transparent background, model floats and is drag-to-rotate. Used
  *    as the landing hero centrepiece.
+ *  - "journey": transparent background for dark journey section, scroll-driven
+ *    spin and unroll feeding into the continuous web conveyor.
  */
-const MOBILE_QUERY = "(max-width: 768px), (pointer: coarse)";
+const MOBILE_QUERY = "(max-width: 1024px)";
 
 // Read synchronously so the Canvas mounts with the right camera/quality on the
 // first frame. Safe because this component is loaded client-only (ssr: false).
@@ -31,7 +33,7 @@ const matches = (q: string) =>
 
 type Props = {
   className?: string;
-  variant?: "showcase" | "hero";
+  variant?: "showcase" | "hero" | "journey";
   fullBleed?: boolean;
 };
 
@@ -62,6 +64,7 @@ export default function JumboRollCanvas({
   }, []);
 
   const isHero = variant === "hero";
+  const isJourney = variant === "journey";
   const quality: "high" | "low" = isMobile ? "low" : "high";
   const shadows = !isMobile;
 
@@ -71,17 +74,20 @@ export default function JumboRollCanvas({
     ? [0.2, 1.2, 15]
     : isHero
       ? [0.4, 1.1, 12]
-      : [0.2, 1.5, 9.6];
+      : isJourney
+        ? [0.2, 1.3, 10.5]
+        : [0.2, 1.5, 9.6];
   const fov = isMobile ? 38 : isHero ? 34 : 32;
-  const heroOffset: [number, number, number] = fullBleed ? [3.15, 0, 0] : [0, 0, 0];
+  const heroOffset: [number, number, number] =
+    fullBleed && !isMobile ? [3.15, 0, 0] : [0, 0, 0];
 
-  // the roll itself; in hero mode it idles/floats and hangs a little paper
+  // the roll itself; handles scroll unrolling, parallax, and idle dynamics
   const roll = (
     <JumboPaperRoll
       reducedMotion={reducedMotion}
       quality={quality}
-      spin={isHero ? "auto" : "scroll"}
-      parallax={!isHero}
+      spin="scroll"
+      parallax={!isMobile}
       baseUnroll={isHero ? 0.16 : 0}
     />
   );
@@ -92,24 +98,34 @@ export default function JumboRollCanvas({
       className={className}
       shadows={shadows}
       dpr={isMobile ? 1 : [1, 1.5]}
-      gl={{ antialias: true, alpha: isHero, powerPreference: "high-performance" }}
+      gl={{
+        antialias: true,
+        alpha: isHero || isJourney,
+        powerPreference: "high-performance",
+      }}
       camera={{ position: camera, fov }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.05;
+        gl.toneMappingExposure = isJourney ? 1.15 : 1.05;
       }}
     >
-      {/* opaque studio backdrop for the showcase; transparent for the hero so
-          it blends onto the page */}
-      {!isHero && <color attach="background" args={["#efe9df"]} />}
+      {/* opaque studio backdrop for the showcase; transparent for hero/journey so
+          they blend onto their parent section backgrounds */}
+      {!isHero && !isJourney && <color attach="background" args={["#efe9df"]} />}
 
       {/* --- soft studio lighting ------------------------------------------ */}
-      <ambientLight intensity={0.45} />
-      <hemisphereLight args={["#fffaf2", "#cbb89a", 0.6]} />
+      <ambientLight intensity={isJourney ? 0.55 : 0.45} />
+      <hemisphereLight
+        args={
+          isJourney
+            ? ["#fffaf2", "#0c1b14", 0.7]
+            : ["#fffaf2", "#cbb89a", 0.6]
+        }
+      />
       {/* key light, slightly warm, casts the soft shadow */}
       <directionalLight
         position={[4, 7, 5]}
-        intensity={2.1}
+        intensity={isJourney ? 2.4 : 2.1}
         color="#fff4e2"
         castShadow={shadows}
         shadow-mapSize={[1024, 1024]}
@@ -121,8 +137,12 @@ export default function JumboRollCanvas({
         shadow-camera-bottom={-8}
         shadow-bias={-0.0004}
       />
-      {/* cool fill from the opposite side to open up the shadows */}
-      <directionalLight position={[-6, 2, -3]} intensity={0.5} color="#dfe7ff" />
+      {/* cool fill or brand-green rim light from the opposite side */}
+      <directionalLight
+        position={[-6, 2, -3]}
+        intensity={isJourney ? 1.1 : 0.5}
+        color={isJourney ? "#1e9445" : "#dfe7ff"}
+      />
 
       {isHero ? (
         // drag-to-rotate with a spring return, plus a gentle idle float
@@ -149,15 +169,19 @@ export default function JumboRollCanvas({
         roll
       )}
 
-      {/* soft grounded contact shadow (cheap, studio look) */}
+      {/* soft grounded contact shadow */}
       <ContactShadows
-        position={[isHero ? heroOffset[0] : 0, isHero ? -2.2 : -1.85, 0]}
-        opacity={isHero ? 0.35 : 0.5}
+        position={[
+          isHero ? heroOffset[0] : 0,
+          isHero ? -2.2 : isJourney ? -1.95 : -1.85,
+          0,
+        ]}
+        opacity={isHero ? 0.35 : isJourney ? 0.65 : 0.5}
         scale={12}
         blur={2.6}
         far={5}
         resolution={isMobile ? 256 : 512}
-        color="#3b2f22"
+        color={isJourney ? "#000000" : "#3b2f22"}
       />
     </Canvas>
   );
