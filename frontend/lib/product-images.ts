@@ -20,7 +20,7 @@ export function getProductFallbackImage(
     combinedText.includes("ve sinh")
   ) {
     return {
-      url: "/products/IMG_1541_nobg.webp",
+      url: "/images/products/toilet-paper.webp",
       alt: "Uni-Green Bathroom Tissue",
     };
   }
@@ -32,7 +32,7 @@ export function getProductFallbackImage(
     combinedText.includes("bep")
   ) {
     return {
-      url: "/products/IMG_1544_nobg.webp",
+      url: "/images/products/toilet-paper-12rolls.webp",
       alt: "Uni-Green Paper Towels",
     };
   }
@@ -45,7 +45,7 @@ export function getProductFallbackImage(
     combinedText.includes("rut")
   ) {
     return {
-      url: "/products/IMG_1535_nobg.webp",
+      url: "/images/products/napkins-500g.webp",
       alt: "Uni-Green Facial Tissue",
     };
   }
@@ -57,7 +57,7 @@ export function getProductFallbackImage(
     combinedText.includes("khan an")
   ) {
     return {
-      url: "/products/IMG_1537_nobg.webp",
+      url: "/images/products/napkins.webp",
       alt: "Uni-Green Table Napkins",
     };
   }
@@ -68,13 +68,13 @@ export function getProductFallbackImage(
     combinedText.includes("cuon lon")
   ) {
     return {
-      url: "/products/IMG_1553_nobg.webp",
+      url: "/images/products/jumbo-roll.webp",
       alt: "Uni-Green Jumbo Roll Tissue",
     };
   }
 
   return {
-    url: "/products/IMG_1541_nobg.webp",
+    url: "/images/products/toilet-paper.webp",
     alt: "Uni-Green Products",
   };
 }

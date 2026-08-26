@@ -34,7 +34,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <Manufacturing />
       <FactoryGallery />
       <OemBand />
-      <QuotationForm />
+      <QuotationForm locale={locale} />
     </>
   );
 }

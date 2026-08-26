@@ -5,10 +5,26 @@ interface Step {
 }
 
 const STEPS: readonly Step[] = [
-  { index: "01", title: "Dimensions", body: "Width, length, diameter, sheet count, core size or none at all." },
-  { index: "02", title: "Ply & substrate", body: "Number of plies, basis weight and embossing pattern." },
-  { index: "03", title: "Packaging", body: "Wrap, units per pack, cartons per pallet, labelling and barcodes." },
-  { index: "04", title: "Branding", body: "Your artwork printed on the product, the wrap or the carton." },
+  {
+    index: "01",
+    title: "Dimensions",
+    body: "Width, length, diameter, sheet count, core size or none at all.",
+  },
+  {
+    index: "02",
+    title: "Ply & substrate",
+    body: "Number of plies, basis weight and embossing pattern.",
+  },
+  {
+    index: "03",
+    title: "Packaging",
+    body: "Wrap, units per pack, cartons per pallet, labelling and barcodes.",
+  },
+  {
+    index: "04",
+    title: "Branding",
+    body: "Your artwork printed on the product, the wrap or the carton.",
+  },
 ];
 
 /** OEM / private-label section. */
@@ -32,8 +48,8 @@ export function OemBand() {
               Giấy của bạn. Quy cách của bạn. Thương hiệu của bạn.
             </p>
             <p className="mt-8 max-w-[46ch] text-[16px] leading-[1.65] text-ink-muted">
-              Send us what the product needs to be and we will manufacture it under
-              your label. Nothing about the specification is fixed until you fix it.
+              Send us what the product needs to be and we will manufacture it under your
+              label. Nothing about the specification is fixed until you fix it.
             </p>
             <a
               href="#quotation"
@@ -49,10 +65,14 @@ export function OemBand() {
                 key={step.index}
                 className="grid grid-cols-[44px_minmax(0,1fr)] gap-5 border-b border-line-strong py-6"
               >
-                <span className="font-mono text-[11px] text-brand-green">{step.index}</span>
+                <span className="font-mono text-[11px] text-brand-green">
+                  {step.index}
+                </span>
                 <div>
                   <p className="text-[17px] font-medium">{step.title}</p>
-                  <p className="mt-1.5 text-[15px] leading-[1.55] text-ink-muted">{step.body}</p>
+                  <p className="mt-1.5 text-[15px] leading-[1.55] text-ink-muted">
+                    {step.body}
+                  </p>
                 </div>
               </div>
             ))}

@@ -1,0 +1,74 @@
+name: unigreen-production
+
+services:
+  db:
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${UNIGREEN_POSTGRES_DB:?set UNIGREEN_POSTGRES_DB}
+      POSTGRES_USER: ${UNIGREEN_POSTGRES_USER:?set UNIGREEN_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${UNIGREEN_POSTGRES_PASSWORD:?set UNIGREEN_POSTGRES_PASSWORD}
+
+  redis:
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - ${UNIGREEN_REDIS_PASSWORD:?set UNIGREEN_REDIS_PASSWORD}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - redis-cli -a "$${UNIGREEN_REDIS_PASSWORD}" ping
+    environment:
+      UNIGREEN_REDIS_PASSWORD: ${UNIGREEN_REDIS_PASSWORD:?set UNIGREEN_REDIS_PASSWORD}
+
+  migrate:
+    environment:
+      UNIGREEN_ENVIRONMENT: production
+
+  backend:
+    restart: unless-stopped
+    environment:
+      UNIGREEN_ENVIRONMENT: production
+    ports: !reset []
+
+  worker:
+    restart: unless-stopped
+    environment:
+      UNIGREEN_ENVIRONMENT: production
+
+  web:
+    restart: unless-stopped
+    build:
+      args:
+        NEXT_PUBLIC_API_URL: ""
+        NEXT_PUBLIC_SITE_URL: https://${UNIGREEN_DOMAIN:?set UNIGREEN_DOMAIN}
+    environment:
+      UNIGREEN_API_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: ""
+      NEXT_PUBLIC_SITE_URL: https://${UNIGREEN_DOMAIN:?set UNIGREEN_DOMAIN}
+    ports: !reset []
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      UNIGREEN_DOMAIN: ${UNIGREEN_DOMAIN:?set UNIGREEN_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    depends_on:
+      web:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - unigreen-caddy-data:/data
+      - unigreen-caddy-config:/config
+
+volumes:
+  unigreen-caddy-data:
+  unigreen-caddy-config:

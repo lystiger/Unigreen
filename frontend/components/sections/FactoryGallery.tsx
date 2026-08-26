@@ -35,7 +35,7 @@ const TILES: readonly Tile[] = [
   {
     slot: "Factory exterior",
     className: "aspect-[16/9] md:col-span-2",
-    image: "/images/factory/IMG_1529.webp",
+    image: "/images/factory/rewinder-detail.webp",
   },
 ];
 
@@ -57,15 +57,18 @@ export function FactoryGallery() {
             </p>
           </div>
           <p className="max-w-[38ch] text-[15px] leading-[1.6] text-[#8FA096]">
-            Buyers are welcome to visit the site. These are real photographs from
-            the Hưng Yên production line.
+            Buyers are welcome to visit the site. These are real photographs from the
+            Hưng Yên production line.
           </p>
         </div>
       </div>
 
       <div className="shell grid grid-cols-1 gap-4 pb-24 md:grid-cols-3 lg:pb-30">
         {TILES.map((tile) => (
-          <div key={tile.slot} className={`relative overflow-hidden rounded-control bg-[#14261C] ${tile.className}`}>
+          <div
+            key={tile.slot}
+            className={`relative overflow-hidden rounded-control bg-[#14261C] ${tile.className}`}
+          >
             <ImageSlot
               src={tile.image}
               alt={tile.slot}

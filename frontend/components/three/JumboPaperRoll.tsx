@@ -229,7 +229,14 @@ export function JumboPaperRoll({
   const coreTexture = useMemo(() => makeCoreTexture(), []);
 
   const paperGeo = useMemo(() => {
-    const g = new THREE.CylinderGeometry(ROLL_RADIUS, ROLL_RADIUS, ROLL_LENGTH, radialSeg, 1, true);
+    const g = new THREE.CylinderGeometry(
+      ROLL_RADIUS,
+      ROLL_RADIUS,
+      ROLL_LENGTH,
+      radialSeg,
+      1,
+      true,
+    );
     g.rotateZ(Math.PI / 2); // lay the roll along X
     return g;
   }, [radialSeg]);
@@ -240,7 +247,13 @@ export function JumboPaperRoll({
   );
 
   const coreGeo = useMemo(() => {
-    const g = new THREE.CylinderGeometry(CORE_RADIUS, CORE_RADIUS, ROLL_LENGTH * 1.04, radialSeg, 1);
+    const g = new THREE.CylinderGeometry(
+      CORE_RADIUS,
+      CORE_RADIUS,
+      ROLL_LENGTH * 1.04,
+      radialSeg,
+      1,
+    );
     g.rotateZ(Math.PI / 2);
     return g;
   }, [radialSeg]);
@@ -263,7 +276,8 @@ export function JumboPaperRoll({
     if (reducedMotion || spin !== "scroll") return;
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
-      scrollProgress.current = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      scrollProgress.current =
+        max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -307,7 +321,11 @@ export function JumboPaperRoll({
       const py = reducedMotion ? 0 : state.pointer.y;
       const damp = 1 - Math.pow(0.001, delta); // frame-rate independent easing
       modelRef.current.rotation.y = lerp(modelRef.current.rotation.y, px * 0.16, damp);
-      modelRef.current.rotation.x = lerp(modelRef.current.rotation.x, -0.08 + py * 0.08, damp);
+      modelRef.current.rotation.x = lerp(
+        modelRef.current.rotation.x,
+        -0.08 + py * 0.08,
+        damp,
+      );
     }
   });
 
@@ -316,67 +334,67 @@ export function JumboPaperRoll({
       {/* static 3/4 pose so the wound-ring caps and brown core stay visible;
           the roll axis stays fixed while spinRef turns the body around it */}
       <group rotation={[-0.14, -0.58, 0.05]}>
-      <group ref={spinRef}>
-        {/* luminous warm white virgin tissue roll body */}
-        <mesh geometry={paperGeo} castShadow receiveShadow>
-          <meshStandardMaterial
-            color="#FAF8F3"
-            roughness={0.88}
-            metalness={0}
-            roughnessMap={paperNoise}
-            bumpMap={paperNoise}
-            bumpScale={0.003}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-
-        {/* wound-layer end caps (annulus) with spec radius indicator */}
-        {([1, -1] as const).map((dir) => (
-          <mesh
-            key={dir}
-            geometry={capGeo}
-            position={[dir * (ROLL_LENGTH / 2 - 0.001), 0, 0]}
-            rotation={[0, (dir * Math.PI) / 2, 0]}
-            castShadow
-          >
+        <group ref={spinRef}>
+          {/* luminous warm white virgin tissue roll body */}
+          <mesh geometry={paperGeo} castShadow receiveShadow>
             <meshStandardMaterial
-              map={ringTexture}
-              roughness={0.92}
+              color="#FAF8F3"
+              roughness={0.88}
               metalness={0}
+              roughnessMap={paperNoise}
+              bumpMap={paperNoise}
+              bumpScale={0.003}
               side={THREE.DoubleSide}
             />
           </mesh>
-        ))}
 
-        {/* kraft cardboard core tube */}
-        <mesh geometry={coreGeo} castShadow receiveShadow>
+          {/* wound-layer end caps (annulus) with spec radius indicator */}
+          {([1, -1] as const).map((dir) => (
+            <mesh
+              key={dir}
+              geometry={capGeo}
+              position={[dir * (ROLL_LENGTH / 2 - 0.001), 0, 0]}
+              rotation={[0, (dir * Math.PI) / 2, 0]}
+              castShadow
+            >
+              <meshStandardMaterial
+                map={ringTexture}
+                roughness={0.92}
+                metalness={0}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          ))}
+
+          {/* kraft cardboard core tube */}
+          <mesh geometry={coreGeo} castShadow receiveShadow>
+            <meshStandardMaterial
+              color="#C69E70"
+              map={coreTexture}
+              roughness={0.85}
+              metalness={0}
+            />
+          </mesh>
+        </group>
+
+        {/* peeling sheet, hung from the lower-front of the roll (does not spin) */}
+        <mesh
+          ref={sheetRef}
+          geometry={sheet.geo}
+          position={[0, -ROLL_RADIUS * 0.28, ROLL_RADIUS * 0.96]}
+          castShadow
+          receiveShadow
+        >
           <meshStandardMaterial
-            color="#C69E70"
-            map={coreTexture}
-            roughness={0.85}
+            color="#FCFAF5"
+            roughness={0.9}
             metalness={0}
+            roughnessMap={paperNoise}
+            bumpMap={paperNoise}
+            bumpScale={0.0025}
+            side={THREE.DoubleSide}
           />
         </mesh>
-      </group>
-
-      {/* peeling sheet, hung from the lower-front of the roll (does not spin) */}
-      <mesh
-        ref={sheetRef}
-        geometry={sheet.geo}
-        position={[0, -ROLL_RADIUS * 0.28, ROLL_RADIUS * 0.96]}
-        castShadow
-        receiveShadow
-      >
-        <meshStandardMaterial
-          color="#FCFAF5"
-          roughness={0.9}
-          metalness={0}
-          roughnessMap={paperNoise}
-          bumpMap={paperNoise}
-          bumpScale={0.0025}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
       </group>
     </group>
   );

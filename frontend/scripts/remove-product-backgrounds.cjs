@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- standalone Node utility */
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const sharp = require("sharp");
@@ -29,7 +30,9 @@ const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
 async function processFile(file) {
   const source = path.join(root, file);
-  const { data, info } = await sharp(source).raw().toBuffer({ resolveWithObject: true });
+  const { data, info } = await sharp(source)
+    .raw()
+    .toBuffer({ resolveWithObject: true });
   const channels = info.channels;
   const pixelCount = info.width * info.height;
   const visited = new Uint8Array(pixelCount);

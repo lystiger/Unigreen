@@ -48,9 +48,9 @@ export function Manufacturing() {
               Một dây chuyền, vận hành đúng chuẩn.
             </p>
             <p className="mt-7 max-w-[42ch] text-[16px] leading-[1.65] text-ink-muted">
-              Uni-Green is a small manufacturer. Our production line sits in Hưng
-              Yên and runs to a Japanese quality standard — the reason industrial
-              buyers such as Honda and Fushan Foxconn source their paper from us.
+              Uni-Green is a small manufacturer. Our production line sits in Hưng Yên
+              and runs to a Japanese quality standard — the reason industrial buyers
+              such as Honda and Fushan Foxconn source their paper from us.
             </p>
           </div>
 
@@ -64,8 +64,12 @@ export function Manufacturing() {
                   {detail.label}
                 </span>
                 <div>
-                  <p className="text-[20px] font-medium tracking-[-0.015em]">{detail.value}</p>
-                  <p className="mt-1.5 text-[15px] leading-[1.6] text-ink-muted">{detail.body}</p>
+                  <p className="text-[20px] font-medium tracking-[-0.015em]">
+                    {detail.value}
+                  </p>
+                  <p className="mt-1.5 text-[15px] leading-[1.6] text-ink-muted">
+                    {detail.body}
+                  </p>
                 </div>
               </div>
             ))}

@@ -13,7 +13,10 @@ const ITEMS: readonly StandardItem[] = [
 /** The standards-and-supply strip beneath the hero. */
 export function StandardsBar() {
   return (
-    <section aria-label="Standards and supply" className="border-b border-line bg-paper-raised">
+    <section
+      aria-label="Standards and supply"
+      className="border-b border-line bg-paper-raised"
+    >
       <div className="shell grid grid-cols-2 md:grid-cols-4">
         {ITEMS.map((item, index) => (
           <div

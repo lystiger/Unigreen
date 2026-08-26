@@ -12,7 +12,11 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function ThreeTestLayout({ children }: { readonly children: ReactNode }) {
+export default function ThreeTestLayout({
+  children,
+}: {
+  readonly children: ReactNode;
+}) {
   return (
     <html lang="en">
       <body>{children}</body>

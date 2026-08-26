@@ -116,11 +116,7 @@ export default function JumboRollCanvas({
       {/* --- soft studio lighting ------------------------------------------ */}
       <ambientLight intensity={isJourney ? 0.55 : 0.7} />
       <hemisphereLight
-        args={
-          isJourney
-            ? ["#fffaf2", "#0c1b14", 0.7]
-            : ["#FFFFFF", "#EBE5D8", 0.7]
-        }
+        args={isJourney ? ["#fffaf2", "#0c1b14", 0.7] : ["#FFFFFF", "#EBE5D8", 0.7]}
       />
       {/* key light, warm studio sun, casts the soft shadow */}
       <directionalLight

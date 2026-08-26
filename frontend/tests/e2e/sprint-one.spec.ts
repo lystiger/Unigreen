@@ -89,11 +89,17 @@ test("the root redirects to the Vietnamese landing page", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Made to specification",
   );
+  await expect(page.getByRole("heading", { name: "What we produce" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Jumbo rolls" })).toBeVisible();
+});
+
+test("the landing quotation callout opens the real inquiry flow", async ({ page }) => {
+  await page.goto("/en");
+  await page.getByRole("link", { name: "Open quotation request" }).click();
+
+  await expect(page).toHaveURL(/\/en\/inquiry$/);
   await expect(
-    page.getByRole("heading", { name: "What we produce" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Jumbo rolls" }),
+    page.getByRole("heading", { name: "Send a quotation request" }),
   ).toBeVisible();
 });
 

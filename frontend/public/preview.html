@@ -1,317 +1,332 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>UniGreen - Authentic Product Photography & Transparent Cutouts</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
-      padding: 30px;
-      margin: 0;
-    }
-    .header {
-      max-width: 1200px;
-      margin: 0 auto 30px auto;
-    }
-    h1 { margin-bottom: 6px; color: #ffffff; }
-    p.subtitle { color: #94a3b8; margin-top: 0; margin-bottom: 24px; font-size: 15px; }
-    .badge {
-      display: inline-block;
-      background: #065f46;
-      color: #34d399;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 12px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .card {
-      background: #1e293b;
-      border-radius: 14px;
-      padding: 16px;
-      border: 1px solid #334155;
-      display: flex;
-      flex-direction: column;
-    }
-    .card h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 15px;
-      color: #38bdf8;
-      font-family: monospace;
-    }
-    .img-box {
-      width: 100%;
-      height: 280px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #ffffff;
-      background-image:
-        linear-gradient(45deg, #f1f5f9 25%, transparent 25%),
-        linear-gradient(-45deg, #f1f5f9 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #f1f5f9 75%),
-        linear-gradient(-45deg, transparent 75%, #f1f5f9 75%);
-      background-size: 16px 16px;
-      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
-    }
-    .img-box img {
-      max-width: 90%;
-      max-height: 90%;
-      object-fit: contain;
-      transition: transform 0.2s ease;
-    }
-    .card:hover .img-box img {
-      transform: scale(1.05);
-    }
-    .footer {
-      margin-top: 12px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: #94a3b8;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <span class="badge">100% Authentic Company Product Cutouts</span>
-    <h1>UniGreen - Real Product Packaging Cutouts</h1>
-    <p class="subtitle">Original company product images with background removed cleanly on transparent backdrops.</p>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <title>UniGreen - Authentic Product Photography & Transparent Cutouts</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #0f172a;
+        color: #f8fafc;
+        padding: 30px;
+        margin: 0;
+      }
+      .header {
+        max-width: 1200px;
+        margin: 0 auto 30px auto;
+      }
+      h1 {
+        margin-bottom: 6px;
+        color: #ffffff;
+      }
+      p.subtitle {
+        color: #94a3b8;
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-size: 15px;
+      }
+      .badge {
+        display: inline-block;
+        background: #065f46;
+        color: #34d399;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .card {
+        background: #1e293b;
+        border-radius: 14px;
+        padding: 16px;
+        border: 1px solid #334155;
+        display: flex;
+        flex-direction: column;
+      }
+      .card h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 15px;
+        color: #38bdf8;
+        font-family: monospace;
+      }
+      .img-box {
+        width: 100%;
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #ffffff;
+        background-image:
+          linear-gradient(45deg, #f1f5f9 25%, transparent 25%),
+          linear-gradient(-45deg, #f1f5f9 25%, transparent 25%),
+          linear-gradient(45deg, transparent 75%, #f1f5f9 75%),
+          linear-gradient(-45deg, transparent 75%, #f1f5f9 75%);
+        background-size: 16px 16px;
+        background-position:
+          0 0,
+          0 8px,
+          8px -8px,
+          -8px 0px;
+      }
+      .img-box img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        transition: transform 0.2s ease;
+      }
+      .card:hover .img-box img {
+        transform: scale(1.05);
+      }
+      .footer {
+        margin-top: 12px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <span class="badge">100% Authentic Company Product Cutouts</span>
+      <h1>UniGreen - Real Product Packaging Cutouts</h1>
+      <p class="subtitle">
+        Original company product images with background removed cleanly on transparent
+        backdrops.
+      </p>
+    </div>
 
-  <div class="grid">
-    <div class="card">
-      <h3>IMG_1532</h3>
-      <div class="img-box">
-        <img src="products/IMG_1532_nobg.png" alt="IMG_1532" loading="lazy">
+    <div class="grid">
+      <div class="card">
+        <h3>IMG_1532</h3>
+        <div class="img-box">
+          <img src="products/IMG_1532_nobg.png" alt="IMG_1532" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
       </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
+      <div class="card">
+        <h3>IMG_1533</h3>
+        <div class="img-box">
+          <img src="products/IMG_1533_nobg.png" alt="IMG_1533" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1535</h3>
+        <div class="img-box">
+          <img src="products/IMG_1535_nobg.png" alt="IMG_1535" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1536</h3>
+        <div class="img-box">
+          <img src="products/IMG_1536_nobg.png" alt="IMG_1536" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1537</h3>
+        <div class="img-box">
+          <img src="products/IMG_1537_nobg.png" alt="IMG_1537" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1538</h3>
+        <div class="img-box">
+          <img src="products/IMG_1538_nobg.png" alt="IMG_1538" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1539</h3>
+        <div class="img-box">
+          <img src="products/IMG_1539_nobg.png" alt="IMG_1539" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1540</h3>
+        <div class="img-box">
+          <img src="products/IMG_1540_nobg.png" alt="IMG_1540" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1541</h3>
+        <div class="img-box">
+          <img src="products/IMG_1541_nobg.png" alt="IMG_1541" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1543</h3>
+        <div class="img-box">
+          <img src="products/IMG_1543_nobg.png" alt="IMG_1543" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1544</h3>
+        <div class="img-box">
+          <img src="products/IMG_1544_nobg.png" alt="IMG_1544" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1545</h3>
+        <div class="img-box">
+          <img src="products/IMG_1545_nobg.png" alt="IMG_1545" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1546</h3>
+        <div class="img-box">
+          <img src="products/IMG_1546_nobg.png" alt="IMG_1546" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1547</h3>
+        <div class="img-box">
+          <img src="products/IMG_1547_nobg.png" alt="IMG_1547" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1548</h3>
+        <div class="img-box">
+          <img src="products/IMG_1548_nobg.png" alt="IMG_1548" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1553</h3>
+        <div class="img-box">
+          <img src="products/IMG_1553_nobg.png" alt="IMG_1553" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1554</h3>
+        <div class="img-box">
+          <img src="products/IMG_1554_nobg.png" alt="IMG_1554" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1555</h3>
+        <div class="img-box">
+          <img src="products/IMG_1555_nobg.png" alt="IMG_1555" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_1556</h3>
+        <div class="img-box">
+          <img src="products/IMG_1556_nobg.png" alt="IMG_1556" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_3903</h3>
+        <div class="img-box">
+          <img src="products/IMG_3903_nobg.png" alt="IMG_3903" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_5275</h3>
+        <div class="img-box">
+          <img src="products/IMG_5275_nobg.png" alt="IMG_5275" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>IMG_5444</h3>
+        <div class="img-box">
+          <img src="products/IMG_5444_nobg.png" alt="IMG_5444" loading="lazy" />
+        </div>
+        <div class="footer">
+          <span>Transparent PNG & WebP</span>
+          <span>Original Packaging</span>
+        </div>
       </div>
     </div>
-    <div class="card">
-      <h3>IMG_1533</h3>
-      <div class="img-box">
-        <img src="products/IMG_1533_nobg.png" alt="IMG_1533" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1535</h3>
-      <div class="img-box">
-        <img src="products/IMG_1535_nobg.png" alt="IMG_1535" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1536</h3>
-      <div class="img-box">
-        <img src="products/IMG_1536_nobg.png" alt="IMG_1536" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1537</h3>
-      <div class="img-box">
-        <img src="products/IMG_1537_nobg.png" alt="IMG_1537" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1538</h3>
-      <div class="img-box">
-        <img src="products/IMG_1538_nobg.png" alt="IMG_1538" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1539</h3>
-      <div class="img-box">
-        <img src="products/IMG_1539_nobg.png" alt="IMG_1539" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1540</h3>
-      <div class="img-box">
-        <img src="products/IMG_1540_nobg.png" alt="IMG_1540" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1541</h3>
-      <div class="img-box">
-        <img src="products/IMG_1541_nobg.png" alt="IMG_1541" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1543</h3>
-      <div class="img-box">
-        <img src="products/IMG_1543_nobg.png" alt="IMG_1543" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1544</h3>
-      <div class="img-box">
-        <img src="products/IMG_1544_nobg.png" alt="IMG_1544" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1545</h3>
-      <div class="img-box">
-        <img src="products/IMG_1545_nobg.png" alt="IMG_1545" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1546</h3>
-      <div class="img-box">
-        <img src="products/IMG_1546_nobg.png" alt="IMG_1546" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1547</h3>
-      <div class="img-box">
-        <img src="products/IMG_1547_nobg.png" alt="IMG_1547" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1548</h3>
-      <div class="img-box">
-        <img src="products/IMG_1548_nobg.png" alt="IMG_1548" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1553</h3>
-      <div class="img-box">
-        <img src="products/IMG_1553_nobg.png" alt="IMG_1553" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1554</h3>
-      <div class="img-box">
-        <img src="products/IMG_1554_nobg.png" alt="IMG_1554" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1555</h3>
-      <div class="img-box">
-        <img src="products/IMG_1555_nobg.png" alt="IMG_1555" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_1556</h3>
-      <div class="img-box">
-        <img src="products/IMG_1556_nobg.png" alt="IMG_1556" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_3903</h3>
-      <div class="img-box">
-        <img src="products/IMG_3903_nobg.png" alt="IMG_3903" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_5275</h3>
-      <div class="img-box">
-        <img src="products/IMG_5275_nobg.png" alt="IMG_5275" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-    <div class="card">
-      <h3>IMG_5444</h3>
-      <div class="img-box">
-        <img src="products/IMG_5444_nobg.png" alt="IMG_5444" loading="lazy">
-      </div>
-      <div class="footer">
-        <span>Transparent PNG & WebP</span>
-        <span>Original Packaging</span>
-      </div>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

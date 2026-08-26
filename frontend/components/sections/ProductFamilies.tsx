@@ -25,7 +25,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "WIDTH · GSM · LENGTH · CORE Ø",
     slot: "Jumbo roll — pack shot",
-    image: "/images/products/usable/cutouts/Gemini_Generated_Image_qtdxibqtdxibqtdx.png",
+    image: "/images/products/jumbo-roll.webp",
   },
   {
     index: "FAMILY 02",
@@ -36,7 +36,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "SIZE · PLY · FOLD · EMBOSS",
     slot: "Napkins — pack shot",
-    image: "/images/products/usable/cutouts/napkins1000.png",
+    image: "/images/products/napkins.webp",
   },
   {
     index: "FAMILY 03",
@@ -47,7 +47,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "WIDTH · PLY · LENGTH · SHEET COUNT",
     slot: "Toilet paper & holder — pack shot",
-    image: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png",
+    image: "/images/products/toilet-paper.webp",
   },
   {
     index: "FAMILY 04",
@@ -58,7 +58,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "WIDTH · PLY · LENGTH · DIAMETER",
     slot: "Coreless roll — pack shot",
-    image: "/images/products/usable/cutouts/Gemini_Generated_Image_988hc6988hc6988h.png",
+    image: "/images/products/coreless.webp",
   },
 ];
 
@@ -80,8 +80,8 @@ export function ProductFamilies({ locale = "vi" }: { readonly locale?: Locale })
             </p>
           </div>
           <p className="max-w-[38ch] text-[15px] leading-[1.6] text-ink-muted">
-            Every family below is manufactured to the buyer&apos;s specification.
-            Full specification sheets are issued with the quotation.
+            Every family below is manufactured to the buyer&apos;s specification. Full
+            specification sheets are issued with the quotation.
           </p>
         </div>
 
@@ -110,12 +110,17 @@ export function ProductFamilies({ locale = "vi" }: { readonly locale?: Locale })
                   <h3 className="mt-3 text-[26px] font-medium tracking-[-0.02em] text-ink transition-colors group-hover:text-brand-green">
                     {family.name}
                   </h3>
-                  <p className="mt-1 text-[16px] font-light text-ink-faint">{family.vi}</p>
-                  <p className="mt-4 text-[15px] leading-[1.6] text-ink-muted">{family.body}</p>
+                  <p className="mt-1 text-[16px] font-light text-ink-faint">
+                    {family.vi}
+                  </p>
+                  <p className="mt-4 text-[15px] leading-[1.6] text-ink-muted">
+                    {family.body}
+                  </p>
                   <div className="mt-auto pt-6">
                     <div className="flex items-center justify-between border-t border-line pt-4">
                       <p className="font-mono text-[11px] tracking-[0.1em] text-ink-faint">
-                        {family.specLabel}&nbsp;&nbsp;<span className="text-ink font-medium">{family.specValue}</span>
+                        {family.specLabel}&nbsp;&nbsp;
+                        <span className="text-ink font-medium">{family.specValue}</span>
                       </p>
                       <span className="font-mono text-[12px] font-medium text-brand-green transition-transform duration-200 group-hover:translate-x-1">
                         &rarr;

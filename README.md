@@ -78,6 +78,12 @@ Staff authentication uses a revocable opaque `HttpOnly` session cookie.
 Cookie-authenticated mutations must echo the `ug_csrf` cookie value in the
 `X-CSRF-Token` header.
 
+Quotation requests are stored before an SMTP notification is attempted. For a
+Gmail test inbox, set `UNIGREEN_SMTP_USERNAME` to the sending Gmail address and
+`UNIGREEN_SMTP_PASSWORD` to a Google App Password in `.env`; do not use the
+account's normal password. `UNIGREEN_QUOTATION_RECIPIENT_EMAIL` controls the
+notification recipient.
+
 For frontend-only development (requires Node 22):
 
 ```bash
@@ -86,6 +92,30 @@ npm install
 npm run dev
 npm run lint && npm run typecheck && npm test
 ```
+
+## Production deployment
+
+The production Compose overlay requires Docker Compose, a public hostname whose
+DNS points at the host, and inbound TCP ports 80 and 443. Caddy provisions and
+renews HTTPS certificates automatically.
+
+```bash
+cp .env.production.example .env.production
+# Replace every example domain, password and mailbox in .env.production.
+docker compose --env-file .env.production \
+  -f compose.yaml -f compose.production.yaml config --quiet
+docker compose --env-file .env.production \
+  -f compose.yaml -f compose.production.yaml up -d --build
+```
+
+The production overlay exposes only Caddy. Browser API traffic stays on the
+site origin and is proxied to the private backend service. Backend startup
+rejects non-HTTPS public URLs, missing SMTP settings and disabled SMTP TLS when
+`UNIGREEN_ENVIRONMENT=production`.
+
+After the first migration, create the initial administrator and upload approved
+catalogue media through the staff workspace. Static fallback images committed
+under `frontend/public/images/` remain available until runtime media is attached.
 
 ## Repository layout
 

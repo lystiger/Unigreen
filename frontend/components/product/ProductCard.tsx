@@ -3,6 +3,7 @@ import Image from "next/image";
 import { AddToBasketControl } from "@/components/basket/AddToBasketControl";
 import type { PublicProduct } from "@/lib/api/types";
 import type { Dictionary } from "@/lib/i18n";
+import { getProductFallbackImage } from "@/lib/product-images";
 import { productPath } from "@/lib/routes";
 import type { Locale } from "@/lib/types";
 
@@ -13,30 +14,19 @@ interface ProductCardProps {
   readonly basketCopy: Dictionary["basket"];
 }
 
-function getFallbackImage(product: PublicProduct): string {
-  const text = `${product.slug} ${product.sku} ${product.name} ${product.categories.map((c) => c.slug).join(" ")}`.toLowerCase();
-  if (text.includes("jumbo") || text.includes("jrt")) {
-    return "/images/products/usable/cutouts/Gemini_Generated_Image_qtdxibqtdxibqtdx.png";
-  }
-  if (text.includes("napkin") || text.includes("khan") || text.includes("nk")) {
-    return "/images/products/usable/cutouts/napkins1000.png";
-  }
-  if (text.includes("coreless") || text.includes("khong-loi") || text.includes("khong loi")) {
-    return "/images/products/usable/cutouts/Gemini_Generated_Image_988hc6988hc6988h.png";
-  }
-  return "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png";
-}
-
 export function ProductCard({ product, locale, copy, basketCopy }: ProductCardProps) {
   const image =
     product.primary_media?.variants.find((item) => item.width >= 480) ??
     product.primary_media?.variants.at(-1);
 
-  const fallbackSrc = getFallbackImage(product);
+  const fallbackSrc = getProductFallbackImage(product).url;
 
   return (
     <article className="group relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-paper-raised transition-all duration-300 hover:-translate-y-1 hover:border-brand-green/40 hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
-      <div className="h-1 w-full bg-brand-green/30 transition-colors duration-300 group-hover:bg-brand-green" aria-hidden="true" />
+      <div
+        className="h-1 w-full bg-brand-green/30 transition-colors duration-300 group-hover:bg-brand-green"
+        aria-hidden="true"
+      />
       <div className="product-image-surface relative flex aspect-[4/3] items-center justify-center overflow-hidden p-6">
         {image && product.primary_media ? (
           // Runtime media host; see docs/adr/0004.
@@ -78,8 +68,10 @@ export function ProductCard({ product, locale, copy, basketCopy }: ProductCardPr
             {product.name}
           </Link>
         </h3>
-        <p className="mt-2 line-clamp-2 text-[14px] leading-relaxed text-ink-muted">{product.summary}</p>
-        
+        <p className="mt-2 line-clamp-2 text-[14px] leading-relaxed text-ink-muted">
+          {product.summary}
+        </p>
+
         <div className="mt-auto pt-5">
           <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4">
             <div className="flex flex-wrap gap-1.5">

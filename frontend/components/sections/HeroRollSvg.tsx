@@ -35,18 +35,74 @@ export function HeroRollSvg() {
         strokeWidth="1"
       />
 
-      <ellipse cx="590" cy="250" rx="86" ry="200" fill="#E6E3DA" stroke="#CBC8BE" strokeWidth="1" />
+      <ellipse
+        cx="590"
+        cy="250"
+        rx="86"
+        ry="200"
+        fill="#E6E3DA"
+        stroke="#CBC8BE"
+        strokeWidth="1"
+      />
       <rect x="180" y="50" width="410" height="400" fill="url(#ugBody)" />
       <line x1="180" y1="50" x2="590" y2="50" stroke="#CBC8BE" strokeWidth="1" />
       <line x1="180" y1="450" x2="590" y2="450" stroke="#CBC8BE" strokeWidth="1" />
 
       <g style={{ transformOrigin: "180px 250px" }}>
-        <ellipse cx="180" cy="250" rx="86" ry="200" fill="url(#ugFace)" stroke="#0C1B14" strokeWidth="1.4" />
-        <ellipse cx="180" cy="250" rx="70" ry="163" fill="none" stroke="#E2E0D9" strokeWidth="1" />
-        <ellipse cx="180" cy="250" rx="55" ry="128" fill="none" stroke="#E2E0D9" strokeWidth="1" />
-        <ellipse cx="180" cy="250" rx="41" ry="95" fill="none" stroke="#E2E0D9" strokeWidth="1" />
-        <ellipse cx="180" cy="250" rx="27" ry="63" fill="none" stroke="#E2E0D9" strokeWidth="1" />
-        <ellipse cx="180" cy="250" rx="15" ry="35" fill="#F4F2EC" stroke="#CBC8BE" strokeWidth="1" />
+        <ellipse
+          cx="180"
+          cy="250"
+          rx="86"
+          ry="200"
+          fill="url(#ugFace)"
+          stroke="#0C1B14"
+          strokeWidth="1.4"
+        />
+        <ellipse
+          cx="180"
+          cy="250"
+          rx="70"
+          ry="163"
+          fill="none"
+          stroke="#E2E0D9"
+          strokeWidth="1"
+        />
+        <ellipse
+          cx="180"
+          cy="250"
+          rx="55"
+          ry="128"
+          fill="none"
+          stroke="#E2E0D9"
+          strokeWidth="1"
+        />
+        <ellipse
+          cx="180"
+          cy="250"
+          rx="41"
+          ry="95"
+          fill="none"
+          stroke="#E2E0D9"
+          strokeWidth="1"
+        />
+        <ellipse
+          cx="180"
+          cy="250"
+          rx="27"
+          ry="63"
+          fill="none"
+          stroke="#E2E0D9"
+          strokeWidth="1"
+        />
+        <ellipse
+          cx="180"
+          cy="250"
+          rx="15"
+          ry="35"
+          fill="#F4F2EC"
+          stroke="#CBC8BE"
+          strokeWidth="1"
+        />
         <line x1="180" y1="215" x2="180" y2="50" stroke="#1E9445" strokeWidth="1.6" />
       </g>
 

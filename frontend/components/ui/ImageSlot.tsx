@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 interface ImageSlotProps {
-  /** Image source path (e.g. /images/products/usable/cutouts/napkins1000.png). */
+  /** Image source path (e.g. /images/products/napkins.webp). */
   readonly src?: string;
   /** Accessible alt text for the image. */
   readonly alt?: string;
@@ -53,7 +53,10 @@ export function ImageSlot({
     );
   }
 
-  const ring = tone === "dark" ? "border-white/25 text-white/55" : "border-line-strong text-ink-faint";
+  const ring =
+    tone === "dark"
+      ? "border-white/25 text-white/55"
+      : "border-line-strong text-ink-faint";
 
   return (
     <div

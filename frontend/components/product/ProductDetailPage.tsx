@@ -21,7 +21,12 @@ interface StaticProduct {
   categories: { slug: string; name: { vi: string; en: string } }[];
   images: { src: string; alt: { vi: string; en: string } }[];
   oem_available: boolean;
-  specifications: { key: string; label: { vi: string; en: string }; value: { vi: string; en: string }; unit?: string }[];
+  specifications: {
+    key: string;
+    label: { vi: string; en: string };
+    value: { vi: string; en: string };
+    unit?: string;
+  }[];
 }
 
 const STATIC_PRODUCTS: Record<string, StaticProduct> = {
@@ -45,23 +50,80 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
       { slug: "raw-material", name: { en: "Raw Material", vi: "Nguyên liệu" } },
     ],
     images: [
-      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_qtdxibqtdxibqtdx.png", alt: { en: "Jumbo roll catalogue image", vi: "Ảnh cuộn giấy jumbo" } },
-      { src: "/images/factory/jumbo-storage.webp", alt: { en: "Jumbo roll storage at the factory", vi: "Kho cuộn jumbo tại nhà máy" } },
-      { src: "/images/factory/rewinder-detail.webp", alt: { en: "Rewinder equipment at the factory", vi: "Thiết bị cuộn lại tại nhà máy" } },
+      {
+        src: "/images/products/jumbo-roll.webp",
+        alt: { en: "Jumbo roll catalogue image", vi: "Ảnh cuộn giấy jumbo" },
+      },
+      {
+        src: "/images/factory/jumbo-storage.webp",
+        alt: {
+          en: "Jumbo roll storage at the factory",
+          vi: "Kho cuộn jumbo tại nhà máy",
+        },
+      },
+      {
+        src: "/images/factory/rewinder-detail.webp",
+        alt: {
+          en: "Rewinder equipment at the factory",
+          vi: "Thiết bị cuộn lại tại nhà máy",
+        },
+      },
     ],
     oem_available: true,
     specifications: [
-      { key: "gsm", label: { en: "Basis Weight (GSM)", vi: "Định lượng (GSM)" }, value: { en: "13 – 18", vi: "13 – 18" }, unit: "g/m²" },
-      { key: "ply", label: { en: "Ply Count", vi: "Số lớp" }, value: { en: "1 – 3 ply", vi: "1 – 3 lớp" } },
-      { key: "diameter", label: { en: "Roll Diameter", vi: "Đường kính cuộn" }, value: { en: "1,000 – 1,200", vi: "1.000 – 1.200" }, unit: "mm" },
-      { key: "width", label: { en: "Roll Width", vi: "Khổ rộng cuộn" }, value: { en: "1,200 – 2,800", vi: "1.200 – 2.800" }, unit: "mm" },
-      { key: "core", label: { en: "Core Inner Diameter", vi: "Đường kính lõi trong" }, value: { en: "76 (3 inch)", vi: "76 (3 inch)" }, unit: "mm" },
-      { key: "material", label: { en: "Material Origin", vi: "Nguồn gốc nguyên liệu" }, value: { en: "100% Virgin wood pulp / Mix pulp", vi: "100% Bột gỗ nguyên sinh / Bột hỗn hợp" } },
-      { key: "brightness", label: { en: "Brightness", vi: "Độ trắng" }, value: { en: "82% – 88% ISO", vi: "82% – 88% ISO" } },
-      { key: "standards", label: { en: "Quality Standard", vi: "Tiêu chuẩn chất lượng" }, value: { en: "Japanese Standard / ISO 9001:2015", vi: "Tiêu chuẩn Nhật Bản / ISO 9001:2015" } },
+      {
+        key: "gsm",
+        label: { en: "Basis Weight (GSM)", vi: "Định lượng (GSM)" },
+        value: { en: "13 – 18", vi: "13 – 18" },
+        unit: "g/m²",
+      },
+      {
+        key: "ply",
+        label: { en: "Ply Count", vi: "Số lớp" },
+        value: { en: "1 – 3 ply", vi: "1 – 3 lớp" },
+      },
+      {
+        key: "diameter",
+        label: { en: "Roll Diameter", vi: "Đường kính cuộn" },
+        value: { en: "1,000 – 1,200", vi: "1.000 – 1.200" },
+        unit: "mm",
+      },
+      {
+        key: "width",
+        label: { en: "Roll Width", vi: "Khổ rộng cuộn" },
+        value: { en: "1,200 – 2,800", vi: "1.200 – 2.800" },
+        unit: "mm",
+      },
+      {
+        key: "core",
+        label: { en: "Core Inner Diameter", vi: "Đường kính lõi trong" },
+        value: { en: "76 (3 inch)", vi: "76 (3 inch)" },
+        unit: "mm",
+      },
+      {
+        key: "material",
+        label: { en: "Material Origin", vi: "Nguồn gốc nguyên liệu" },
+        value: {
+          en: "100% Virgin wood pulp / Mix pulp",
+          vi: "100% Bột gỗ nguyên sinh / Bột hỗn hợp",
+        },
+      },
+      {
+        key: "brightness",
+        label: { en: "Brightness", vi: "Độ trắng" },
+        value: { en: "82% – 88% ISO", vi: "82% – 88% ISO" },
+      },
+      {
+        key: "standards",
+        label: { en: "Quality Standard", vi: "Tiêu chuẩn chất lượng" },
+        value: {
+          en: "Japanese Standard / ISO 9001:2015",
+          vi: "Tiêu chuẩn Nhật Bản / ISO 9001:2015",
+        },
+      },
     ],
   },
-  "napkins": {
+  napkins: {
     slug: "napkins",
     sku: "UG-NPK-02",
     name: {
@@ -81,18 +143,67 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
       { slug: "horeca", name: { en: "Horeca Supply", vi: "Dịch vụ F&B" } },
     ],
     images: [
-      { src: "/images/products/usable/cutouts/napkins1000.png", alt: { en: "Napkin catalogue image", vi: "Ảnh khăn giấy ăn" } },
-      { src: "/images/products/usable/cutouts/napkins500.png", alt: { en: "Napkin catalogue image", vi: "Ảnh khăn giấy ăn" } },
-      { src: "/images/factory/packing-labelling.webp", alt: { en: "Packing and labelling line", vi: "Dây chuyền đóng gói và dán nhãn" } },
+      {
+        src: "/images/products/napkins.webp",
+        alt: { en: "Napkin catalogue image", vi: "Ảnh khăn giấy ăn" },
+      },
+      {
+        src: "/images/products/napkins-500g.webp",
+        alt: { en: "Napkin catalogue image", vi: "Ảnh khăn giấy ăn" },
+      },
+      {
+        src: "/images/factory/packing-labelling.webp",
+        alt: {
+          en: "Packing and labelling line",
+          vi: "Dây chuyền đóng gói và dán nhãn",
+        },
+      },
     ],
     oem_available: true,
     specifications: [
-      { key: "size", label: { en: "Sheet Dimensions", vi: "Kích thước tờ" }, value: { en: "240 x 240 / 330 x 330", vi: "240 x 240 / 330 x 330" }, unit: "mm" },
-      { key: "ply", label: { en: "Ply Count", vi: "Số lớp" }, value: { en: "1 – 2 ply", vi: "1 – 2 lớp" } },
-      { key: "fold", label: { en: "Folding Type", vi: "Quy cách gấp" }, value: { en: "1/4 Fold / Interfold / 1/8 Fold", vi: "Gấp 1/4 / Gấp rút / Gấp 1/8" } },
-      { key: "emboss", label: { en: "Embossing", vi: "Dập nổi hoa văn" }, value: { en: "Border embossed / Full embossed", vi: "Dập viền / Dập nổi toàn phần" } },
-      { key: "packaging", label: { en: "Pack Weight", vi: "Đóng gói" }, value: { en: "500g / 1,000g per bag (20 bags/carton)", vi: "500g / 1.000g mỗi gói (20 gói/thùng)" } },
-      { key: "oem", label: { en: "OEM / Brand Print", vi: "Gia công in logo", }, value: { en: "Available (up to 2-color flexo)", vi: "Có (In flexo tối đa 2 màu)" } },
+      {
+        key: "size",
+        label: { en: "Sheet Dimensions", vi: "Kích thước tờ" },
+        value: { en: "240 x 240 / 330 x 330", vi: "240 x 240 / 330 x 330" },
+        unit: "mm",
+      },
+      {
+        key: "ply",
+        label: { en: "Ply Count", vi: "Số lớp" },
+        value: { en: "1 – 2 ply", vi: "1 – 2 lớp" },
+      },
+      {
+        key: "fold",
+        label: { en: "Folding Type", vi: "Quy cách gấp" },
+        value: {
+          en: "1/4 Fold / Interfold / 1/8 Fold",
+          vi: "Gấp 1/4 / Gấp rút / Gấp 1/8",
+        },
+      },
+      {
+        key: "emboss",
+        label: { en: "Embossing", vi: "Dập nổi hoa văn" },
+        value: {
+          en: "Border embossed / Full embossed",
+          vi: "Dập viền / Dập nổi toàn phần",
+        },
+      },
+      {
+        key: "packaging",
+        label: { en: "Pack Weight", vi: "Đóng gói" },
+        value: {
+          en: "500g / 1,000g per bag (20 bags/carton)",
+          vi: "500g / 1.000g mỗi gói (20 gói/thùng)",
+        },
+      },
+      {
+        key: "oem",
+        label: { en: "OEM / Brand Print", vi: "Gia công in logo" },
+        value: {
+          en: "Available (up to 2-color flexo)",
+          vi: "Có (In flexo tối đa 2 màu)",
+        },
+      },
     ],
   },
   "toilet-paper": {
@@ -112,23 +223,81 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
     },
     categories: [
       { slug: "toilet-paper", name: { en: "Toilet Tissue", vi: "Giấy vệ sinh" } },
-      { slug: "retail-pack", name: { en: "Retail & Commercial", vi: "Bán lẻ & Tòa nhà" } },
+      {
+        slug: "retail-pack",
+        name: { en: "Retail & Commercial", vi: "Bán lẻ & Tòa nhà" },
+      },
     ],
     images: [
-      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png", alt: { en: "Toilet tissue catalogue image", vi: "Ảnh giấy vệ sinh cuộn" } },
-      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_h99e50h99e50h99e.png", alt: { en: "Toilet tissue catalogue image", vi: "Ảnh giấy vệ sinh cuộn" } },
-      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_988hc6988hc6988h.png", alt: { en: "Coreless tissue catalogue image", vi: "Ảnh giấy vệ sinh không lõi" } },
-      { src: "/images/factory/quality-check.webp", alt: { en: "Factory quality check station", vi: "Khu vực kiểm tra chất lượng tại nhà máy" } },
+      {
+        src: "/images/products/toilet-paper.webp",
+        alt: { en: "Toilet tissue catalogue image", vi: "Ảnh giấy vệ sinh cuộn" },
+      },
+      {
+        src: "/images/products/toilet-paper-12rolls.webp",
+        alt: { en: "Toilet tissue catalogue image", vi: "Ảnh giấy vệ sinh cuộn" },
+      },
+      {
+        src: "/images/products/coreless.webp",
+        alt: {
+          en: "Coreless tissue catalogue image",
+          vi: "Ảnh giấy vệ sinh không lõi",
+        },
+      },
+      {
+        src: "/images/factory/quality-check.webp",
+        alt: {
+          en: "Factory quality check station",
+          vi: "Khu vực kiểm tra chất lượng tại nhà máy",
+        },
+      },
     ],
     oem_available: true,
     specifications: [
-      { key: "gsm", label: { en: "Basis Weight", vi: "Định lượng" }, value: { en: "15 – 17", vi: "15 – 17" }, unit: "g/m²" },
-      { key: "ply", label: { en: "Ply Count", vi: "Số lớp" }, value: { en: "2 – 3 ply", vi: "2 – 3 lớp" } },
-      { key: "roll_weight", label: { en: "Roll Weight", vi: "Trọng lượng cuộn" }, value: { en: "90g – 140g per roll", vi: "90g – 140g / cuộn" } },
-      { key: "sheet_size", label: { en: "Perforation Size", vi: "Kích thước đoạn cắt" }, value: { en: "100 x 100", vi: "100 x 100" }, unit: "mm" },
-      { key: "core_dia", label: { en: "Core Diameter", vi: "Đường kính lõi" }, value: { en: "40 – 45", vi: "40 – 45" }, unit: "mm" },
-      { key: "packaging", label: { en: "Packaging Format", vi: "Quy cách đóng gói" }, value: { en: "10 rolls / 12 rolls polybag with carry handle", vi: "Bọc 10 cuộn / 12 cuộn có quai xách tiện lợi" } },
-      { key: "solubility", label: { en: "Water Solubility", vi: "Độ tan trong nước" }, value: { en: "Fast dispersion (< 15 seconds)", vi: "Tan nhanh (< 15 giây), chống tắc cống" } },
+      {
+        key: "gsm",
+        label: { en: "Basis Weight", vi: "Định lượng" },
+        value: { en: "15 – 17", vi: "15 – 17" },
+        unit: "g/m²",
+      },
+      {
+        key: "ply",
+        label: { en: "Ply Count", vi: "Số lớp" },
+        value: { en: "2 – 3 ply", vi: "2 – 3 lớp" },
+      },
+      {
+        key: "roll_weight",
+        label: { en: "Roll Weight", vi: "Trọng lượng cuộn" },
+        value: { en: "90g – 140g per roll", vi: "90g – 140g / cuộn" },
+      },
+      {
+        key: "sheet_size",
+        label: { en: "Perforation Size", vi: "Kích thước đoạn cắt" },
+        value: { en: "100 x 100", vi: "100 x 100" },
+        unit: "mm",
+      },
+      {
+        key: "core_dia",
+        label: { en: "Core Diameter", vi: "Đường kính lõi" },
+        value: { en: "40 – 45", vi: "40 – 45" },
+        unit: "mm",
+      },
+      {
+        key: "packaging",
+        label: { en: "Packaging Format", vi: "Quy cách đóng gói" },
+        value: {
+          en: "10 rolls / 12 rolls polybag with carry handle",
+          vi: "Bọc 10 cuộn / 12 cuộn có quai xách tiện lợi",
+        },
+      },
+      {
+        key: "solubility",
+        label: { en: "Water Solubility", vi: "Độ tan trong nước" },
+        value: {
+          en: "Fast dispersion (< 15 seconds)",
+          vi: "Tan nhanh (< 15 giây), chống tắc cống",
+        },
+      },
     ],
   },
   "coreless-paper": {
@@ -148,21 +317,68 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
     },
     categories: [
       { slug: "coreless", name: { en: "Coreless Paper", vi: "Giấy không lõi" } },
-      { slug: "eco-friendly", name: { en: "Eco-friendly", vi: "Thân thiện môi trường" } },
+      {
+        slug: "eco-friendly",
+        name: { en: "Eco-friendly", vi: "Thân thiện môi trường" },
+      },
     ],
     images: [
-      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_988hc6988hc6988h.png", alt: { en: "Coreless tissue catalogue image", vi: "Ảnh giấy vệ sinh không lõi" } },
-      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_ck5ut4ck5ut4ck5u.png", alt: { en: "Coreless tissue detail image", vi: "Ảnh chi tiết giấy vệ sinh không lõi" } },
-      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_h99e50h99e50h99e.png", alt: { en: "Tissue catalogue image", vi: "Ảnh sản phẩm giấy" } },
+      {
+        src: "/images/products/coreless.webp",
+        alt: {
+          en: "Coreless tissue catalogue image",
+          vi: "Ảnh giấy vệ sinh không lõi",
+        },
+      },
+      {
+        src: "/images/products/coreless-6rolls.webp",
+        alt: {
+          en: "Coreless tissue detail image",
+          vi: "Ảnh chi tiết giấy vệ sinh không lõi",
+        },
+      },
+      {
+        src: "/images/products/toilet-paper.webp",
+        alt: { en: "Tissue catalogue image", vi: "Ảnh sản phẩm giấy" },
+      },
     ],
     oem_available: true,
     specifications: [
-      { key: "gsm", label: { en: "Basis Weight", vi: "Định lượng" }, value: { en: "15 – 16", vi: "15 – 16" }, unit: "g/m²" },
-      { key: "ply", label: { en: "Ply Count", vi: "Số lớp" }, value: { en: "3 ply (high density)", vi: "3 lớp nén chắc" } },
-      { key: "roll_weight", label: { en: "Roll Weight", vi: "Trọng lượng cuộn" }, value: { en: "100g – 150g per roll", vi: "100g – 150g / cuộn" } },
-      { key: "roll_dia", label: { en: "Roll Diameter", vi: "Đường kính cuộn" }, value: { en: "105 – 115", vi: "105 – 115" }, unit: "mm" },
-      { key: "packaging", label: { en: "Pack Units", vi: "Quy cách đóng gói" }, value: { en: "6 rolls / 10 rolls sealed pack", vi: "Lốc 6 cuộn / 10 cuộn màng co kín" } },
-      { key: "core_waste", label: { en: "Core Waste", vi: "Rác thải lõi" }, value: { en: "0% (No paper core)", vi: "0% (Không dùng lõi giấy)" } },
+      {
+        key: "gsm",
+        label: { en: "Basis Weight", vi: "Định lượng" },
+        value: { en: "15 – 16", vi: "15 – 16" },
+        unit: "g/m²",
+      },
+      {
+        key: "ply",
+        label: { en: "Ply Count", vi: "Số lớp" },
+        value: { en: "3 ply (high density)", vi: "3 lớp nén chắc" },
+      },
+      {
+        key: "roll_weight",
+        label: { en: "Roll Weight", vi: "Trọng lượng cuộn" },
+        value: { en: "100g – 150g per roll", vi: "100g – 150g / cuộn" },
+      },
+      {
+        key: "roll_dia",
+        label: { en: "Roll Diameter", vi: "Đường kính cuộn" },
+        value: { en: "105 – 115", vi: "105 – 115" },
+        unit: "mm",
+      },
+      {
+        key: "packaging",
+        label: { en: "Pack Units", vi: "Quy cách đóng gói" },
+        value: {
+          en: "6 rolls / 10 rolls sealed pack",
+          vi: "Lốc 6 cuộn / 10 cuộn màng co kín",
+        },
+      },
+      {
+        key: "core_waste",
+        label: { en: "Core Waste", vi: "Rác thải lõi" },
+        value: { en: "0% (No paper core)", vi: "0% (Không dùng lõi giấy)" },
+      },
     ],
   },
 };
@@ -205,12 +421,15 @@ export function ProductDetailPage({
   const productName = apiProduct?.name ?? staticFallback.name[locale];
   const productSku = apiProduct?.sku ?? staticFallback.sku;
   const productSummary = apiProduct?.summary ?? staticFallback.summary[locale];
-  const productDescription = apiProduct?.description ?? staticFallback.description[locale];
+  const productDescription =
+    apiProduct?.description ?? staticFallback.description[locale];
   const isOem = apiProduct?.oem_available ?? staticFallback.oem_available;
-  const categories = apiProduct?.categories ?? staticFallback.categories.map((c) => ({
-    slug: c.slug,
-    name: c.name[locale],
-  }));
+  const categories =
+    apiProduct?.categories ??
+    staticFallback.categories.map((c) => ({
+      slug: c.slug,
+      name: c.name[locale],
+    }));
 
   const images = apiProduct?.media?.length
     ? apiProduct.media.map((m) => {
@@ -224,7 +443,7 @@ export function ProductDetailPage({
               height: variant.height,
             }
           : {
-              src: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png",
+              src: "/images/products/toilet-paper.webp",
               alt: m.alt_text,
               runtime: false as const,
             };
@@ -249,27 +468,34 @@ export function ProductDetailPage({
         unit: s.unit,
       }));
 
-  const currentImage =
-    images[selected] ??
+  const currentImage = images[selected] ??
     images[0] ?? {
-      src: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png",
+      src: "/images/products/toilet-paper.webp",
       alt: productName,
       runtime: false as const,
     };
 
   // Related product families
-  const relatedKeys = Object.keys(STATIC_PRODUCTS).filter((k) => k !== slug).slice(0, 3);
+  const relatedKeys = Object.keys(STATIC_PRODUCTS)
+    .filter((k) => k !== slug)
+    .slice(0, 3);
 
   return (
     <article className="min-h-screen bg-paper pb-24 pt-8 lg:pb-32 lg:pt-12">
       <div className="shell">
         {/* Breadcrumbs */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 font-mono text-[12px] text-ink-faint">
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center gap-2 font-mono text-[12px] text-ink-faint"
+        >
           <Link href={`/${locale}`} className="transition-colors hover:text-ink">
             {copy.home}
           </Link>
           <span>/</span>
-          <Link href={cataloguePath(locale)} className="transition-colors hover:text-ink">
+          <Link
+            href={cataloguePath(locale)}
+            className="transition-colors hover:text-ink"
+          >
             {copy.products}
           </Link>
           <span>/</span>
@@ -452,7 +678,9 @@ export function ProductDetailPage({
                   <dt className="font-medium text-[15px] text-ink">{spec.label}</dt>
                   <dd className="font-mono text-[14px] text-ink-muted">
                     <span className="text-ink font-medium">{spec.value}</span>
-                    {spec.unit ? <span className="ml-1 text-ink-faint">{spec.unit}</span> : null}
+                    {spec.unit ? (
+                      <span className="ml-1 text-ink-faint">{spec.unit}</span>
+                    ) : null}
                   </dd>
                 </div>
               ))}
@@ -469,7 +697,8 @@ export function ProductDetailPage({
             {relatedKeys.map((relKey) => {
               const rel = STATIC_PRODUCTS[relKey];
               if (!rel) return null;
-              const firstImg = rel.images[0]?.src ?? "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png";
+              const firstImg =
+                rel.images[0]?.src ?? "/images/products/toilet-paper.webp";
               return (
                 <Link
                   key={rel.slug}

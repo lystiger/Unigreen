@@ -1,4 +1,7 @@
 .env
+.env.*
+!.env.example
+!.env.production.example
 .venv/
 __pycache__/
 .pytest_cache/
@@ -24,12 +27,13 @@ github.md
 !contracts/openapi.json
 !backend/examples/catalogue-draft-import.json
 
-# Raster images
+# Images
 *.png
 *.jpg
 *.jpeg
 *.gif
 *.webp
+*.svg
 
 # Local browser/devtools noise
 frontend/debug.log
