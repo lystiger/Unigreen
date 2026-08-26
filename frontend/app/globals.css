@@ -55,4 +55,10 @@
   .shell {
     @apply mx-auto w-full max-w-shell px-6 lg:px-8;
   }
+
+  /* Shared surface for catalogue pack shots: the image and its card should
+     read as one material, not as a white rectangle placed on the page. */
+  .product-image-surface {
+    background-color: #e1ded6;
+  }
 }

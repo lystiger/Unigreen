@@ -22,6 +22,7 @@ export interface BasketItem {
   readonly imageUrl: string | null;
   readonly quantity: number;
   readonly unit: QuantityUnit;
+  readonly packOption?: string | null;
   readonly note: string | null;
   readonly availability: Availability;
 }

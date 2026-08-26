@@ -25,7 +25,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "WIDTH · GSM · LENGTH · CORE Ø",
     slot: "Jumbo roll — pack shot",
-    image: "/images/products/jumbo-roll.webp",
+    image: "/images/products/usable/cutouts/Gemini_Generated_Image_qtdxibqtdxibqtdx.png",
   },
   {
     index: "FAMILY 02",
@@ -36,7 +36,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "SIZE · PLY · FOLD · EMBOSS",
     slot: "Napkins — pack shot",
-    image: "/images/products/napkins.webp",
+    image: "/images/products/usable/cutouts/napkins1000.png",
   },
   {
     index: "FAMILY 03",
@@ -47,7 +47,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "WIDTH · PLY · LENGTH · SHEET COUNT",
     slot: "Toilet paper & holder — pack shot",
-    image: "/images/products/toilet-paper.webp",
+    image: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png",
   },
   {
     index: "FAMILY 04",
@@ -58,7 +58,7 @@ const FAMILIES: readonly Family[] = [
     specLabel: "SPECIFIED ON",
     specValue: "WIDTH · PLY · LENGTH · DIAMETER",
     slot: "Coreless roll — pack shot",
-    image: "/images/products/coreless.webp",
+    image: "/images/products/usable/cutouts/Gemini_Generated_Image_988hc6988hc6988h.png",
   },
 ];
 
@@ -93,7 +93,7 @@ export function ProductFamilies({ locale = "vi" }: { readonly locale?: Locale })
               className="group block bg-paper-raised transition-all duration-300 hover:bg-[#FAF9F5] focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green"
             >
               <article className="h-full flex flex-col">
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-paper-sunk">
+                <div className="product-image-surface relative aspect-[4/3] w-full overflow-hidden">
                   <ImageSlot
                     src={family.image}
                     alt={`${family.name} — ${family.vi}`}

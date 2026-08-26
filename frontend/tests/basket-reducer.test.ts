@@ -55,6 +55,11 @@ describe("add", () => {
     expect(next.items[0]!.unit).toBe("containers_40hc");
   });
 
+  it("keeps the selected product pack with the line", () => {
+    const next = add(base, { ...product(1), packOption: "12 rolls" });
+    expect(next.items[0]!.packOption).toBe("12 rolls");
+  });
+
   it("increments an existing line rather than duplicating it", () => {
     const once = add(base, { ...product(1), quantity: 150 });
     const result = basketReducer(

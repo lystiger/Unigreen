@@ -24,10 +24,12 @@ github.md
 !contracts/openapi.json
 !backend/examples/catalogue-draft-import.json
 
-# Stray image dumps. Scoped negation: the app's own served assets are part
-# of the build and must stay trackable.
-images/*
-!frontend/public/images/**
+# Raster images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
 
 # Local browser/devtools noise
 frontend/debug.log

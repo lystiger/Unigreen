@@ -72,6 +72,10 @@ export function ProductEditor({
             barcode: String(data.get("barcode") ?? "") || null,
             oem_available: data.get("oem_available") === "on",
             featured: data.get("featured") === "on",
+            pack_options: String(data.get("pack_options") ?? "")
+              .split("\n")
+              .map((item) => item.trim())
+              .filter(Boolean),
             category_ids: selectedCategories,
             translations: [
               {
@@ -219,6 +223,11 @@ export function ProductEditor({
               label="Barcode"
               name="barcode"
               defaultValue={product.barcode ?? ""}
+            />
+            <Area
+              label="Pack options (one per line, first is the default)"
+              name="pack_options"
+              defaultValue={product.pack_options.join("\n")}
             />
             <div className="flex items-end gap-5 pb-2">
               <label>

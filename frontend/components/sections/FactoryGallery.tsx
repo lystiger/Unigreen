@@ -8,14 +8,14 @@ interface Tile {
 
 const TILES: readonly Tile[] = [
   {
-    slot: "Factory floor — wide shot",
+    slot: "Main production line",
     className: "aspect-[16/9] md:col-span-2",
-    image: "/images/factory/factory-floor.webp",
+    image: "/images/factory/production-line.webp",
   },
   {
     slot: "Rewinder / converting detail",
     className: "aspect-[16/9]",
-    image: "/images/factory/rewinder-detail.webp",
+    image: "/images/factory/factory-floor.webp",
   },
   {
     slot: "Jumbo roll storage",
@@ -31,6 +31,11 @@ const TILES: readonly Tile[] = [
     slot: "Quality check",
     className: "aspect-[4/3]",
     image: "/images/factory/quality-check.webp",
+  },
+  {
+    slot: "Factory exterior",
+    className: "aspect-[16/9] md:col-span-2",
+    image: "/images/factory/IMG_1529.webp",
   },
 ];
 
@@ -52,8 +57,8 @@ export function FactoryGallery() {
             </p>
           </div>
           <p className="max-w-[38ch] text-[15px] leading-[1.6] text-[#8FA096]">
-            Buyers are welcome to visit the site. Photography below is from the
-            Hưng Yên line.
+            Buyers are welcome to visit the site. These are real photographs from
+            the Hưng Yên production line.
           </p>
         </div>
       </div>

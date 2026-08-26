@@ -73,6 +73,12 @@ export function BasketLineRow({
           )}
         </h3>
 
+        {line.packOption ? (
+          <p className="mt-1 font-mono text-data text-brand-dark">
+            {copy.packSize}: {line.packOption}
+          </p>
+        ) : null}
+
         {unavailable ? (
           <p id={hintId} className="mt-2 text-data text-status-rejected">
             {copy.unavailable} — {copy.unavailableHint}

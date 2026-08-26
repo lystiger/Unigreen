@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 interface ImageSlotProps {
-  /** Image source path (e.g. /images/products/jumbo-roll.webp). */
+  /** Image source path (e.g. /images/products/usable/cutouts/napkins1000.png). */
   readonly src?: string;
   /** Accessible alt text for the image. */
   readonly alt?: string;
@@ -43,8 +43,10 @@ export function ImageSlot({
           fill
           priority={priority}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className={`transition-transform duration-500 ease-out group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.08)] ${
-            objectFit === "contain" ? "object-contain p-4" : "object-cover"
+          className={`transition-transform duration-500 ease-out group-hover:scale-105 ${
+            objectFit === "contain"
+              ? "object-contain p-4 drop-shadow-[0_10px_20px_rgba(39,48,40,0.10)]"
+              : "object-cover"
           }`}
         />
       </div>

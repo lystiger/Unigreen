@@ -57,7 +57,7 @@ export function CataloguePage({ locale }: { readonly locale: Locale }) {
           q: parameters.get("q"),
           sort,
           page,
-          page_size: 12,
+          page_size: 50,
         })}`,
       ),
   });

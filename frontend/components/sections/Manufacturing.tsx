@@ -72,7 +72,7 @@ export function Manufacturing() {
             <div className="relative mt-8 aspect-[16/10] w-full overflow-hidden bg-paper-sunk rounded-control">
               <ImageSlot
                 src="/images/factory/production-line.webp"
-                alt="Production line — Hưng Yên, Việt Nam"
+                alt="Production line at the Hưng Yên tissue factory"
                 placeholder="Production line — Hưng Yên"
                 objectFit="cover"
               />

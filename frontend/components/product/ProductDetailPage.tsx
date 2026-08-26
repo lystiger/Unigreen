@@ -33,8 +33,8 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
       vi: "Cuộn giấy Jumbo",
     },
     summary: {
-      en: "Parent jumbo rolls converted to custom width, basis weight (GSM), diameter and core diameter for industrial converting.",
-      vi: "Cuộn giấy jumbo nguyên liệu được chia khổ, cuộn lại theo đúng định lượng (GSM), đường kính và lõi yêu cầu.",
+      en: "Parent jumbo rolls converted to custom width, GSM, diameter and core diameter for industrial converting.",
+      vi: "Cuộn giấy jumbo nguyên liệu được chia khổ, cuộn lại theo đúng GSM, đường kính và lõi yêu cầu.",
     },
     description: {
       en: "Uni-Green produces and converts jumbo parent rolls on our automated production lines in Hưng Yên. Tailored for tissue converters, packaging facilities, and industrial buyers requiring consistent tensile strength, brightness, and controlled moisture levels across every production batch.",
@@ -45,9 +45,9 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
       { slug: "raw-material", name: { en: "Raw Material", vi: "Nguyên liệu" } },
     ],
     images: [
-      { src: "/images/products/jumbo-roll.webp", alt: { en: "Uni-Green Jumbo Roll Pack", vi: "Cuộn giấy Jumbo Uni-Green" } },
-      { src: "/images/factory/jumbo-storage.webp", alt: { en: "Jumbo roll storage", vi: "Kho lưu trữ cuộn Jumbo" } },
-      { src: "/images/factory/rewinder-detail.webp", alt: { en: "Rewinder line detail", vi: "Dây chuyền cuộn xả" } },
+      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_qtdxibqtdxibqtdx.png", alt: { en: "Jumbo roll catalogue image", vi: "Ảnh cuộn giấy jumbo" } },
+      { src: "/images/factory/jumbo-storage.webp", alt: { en: "Jumbo roll storage at the factory", vi: "Kho cuộn jumbo tại nhà máy" } },
+      { src: "/images/factory/rewinder-detail.webp", alt: { en: "Rewinder equipment at the factory", vi: "Thiết bị cuộn lại tại nhà máy" } },
     ],
     oem_available: true,
     specifications: [
@@ -81,9 +81,9 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
       { slug: "horeca", name: { en: "Horeca Supply", vi: "Dịch vụ F&B" } },
     ],
     images: [
-      { src: "/images/products/napkins.webp", alt: { en: "Uni-Green 1000g Napkin Pack", vi: "Gói khăn giấy ăn Uni-Green 1000g" } },
-      { src: "/images/products/napkins-500g.webp", alt: { en: "Uni-Green 500g Napkin Pack", vi: "Gói khăn giấy ăn Uni-Green 500g" } },
-      { src: "/images/factory/packing-labelling.webp", alt: { en: "Packing and labelling line", vi: "Dây chuyền đóng gói dán nhãn" } },
+      { src: "/images/products/usable/cutouts/napkins1000.png", alt: { en: "Napkin catalogue image", vi: "Ảnh khăn giấy ăn" } },
+      { src: "/images/products/usable/cutouts/napkins500.png", alt: { en: "Napkin catalogue image", vi: "Ảnh khăn giấy ăn" } },
+      { src: "/images/factory/packing-labelling.webp", alt: { en: "Packing and labelling line", vi: "Dây chuyền đóng gói và dán nhãn" } },
     ],
     oem_available: true,
     specifications: [
@@ -115,10 +115,10 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
       { slug: "retail-pack", name: { en: "Retail & Commercial", vi: "Bán lẻ & Tòa nhà" } },
     ],
     images: [
-      { src: "/images/products/toilet-paper.webp", alt: { en: "Uni-Green 10-roll Pack", vi: "Lốc 10 cuộn Uni-Green" } },
-      { src: "/images/products/toilet-paper-12rolls.webp", alt: { en: "Uni-Green 12-roll Pack", vi: "Lốc 12 cuộn Uni-Green" } },
-      { src: "/images/products/toilet-paper-pink-core.webp", alt: { en: "Pink Core Tissue", vi: "Giấy vệ sinh lõi hồng" } },
-      { src: "/images/factory/quality-check.webp", alt: { en: "Quality inspection", vi: "Kiểm tra chất lượng" } },
+      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png", alt: { en: "Toilet tissue catalogue image", vi: "Ảnh giấy vệ sinh cuộn" } },
+      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_h99e50h99e50h99e.png", alt: { en: "Toilet tissue catalogue image", vi: "Ảnh giấy vệ sinh cuộn" } },
+      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_988hc6988hc6988h.png", alt: { en: "Coreless tissue catalogue image", vi: "Ảnh giấy vệ sinh không lõi" } },
+      { src: "/images/factory/quality-check.webp", alt: { en: "Factory quality check station", vi: "Khu vực kiểm tra chất lượng tại nhà máy" } },
     ],
     oem_available: true,
     specifications: [
@@ -151,9 +151,9 @@ const STATIC_PRODUCTS: Record<string, StaticProduct> = {
       { slug: "eco-friendly", name: { en: "Eco-friendly", vi: "Thân thiện môi trường" } },
     ],
     images: [
-      { src: "/images/products/coreless.webp", alt: { en: "Uni-Green Coreless 10-roll Pack", vi: "Giấy vệ sinh không lõi 10 cuộn" } },
-      { src: "/images/products/coreless-6rolls.webp", alt: { en: "Coreless 6-roll Pack", vi: "Lốc không lõi 6 cuộn" } },
-      { src: "/images/products/coreless-recycle.webp", alt: { en: "Eco-recycled coreless pack", vi: "Giấy không lõi tái chế sinh thái" } },
+      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_988hc6988hc6988h.png", alt: { en: "Coreless tissue catalogue image", vi: "Ảnh giấy vệ sinh không lõi" } },
+      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_ck5ut4ck5ut4ck5u.png", alt: { en: "Coreless tissue detail image", vi: "Ảnh chi tiết giấy vệ sinh không lõi" } },
+      { src: "/images/products/usable/cutouts/Gemini_Generated_Image_h99e50h99e50h99e.png", alt: { en: "Tissue catalogue image", vi: "Ảnh sản phẩm giấy" } },
     ],
     oem_available: true,
     specifications: [
@@ -224,7 +224,7 @@ export function ProductDetailPage({
               height: variant.height,
             }
           : {
-              src: "/images/products/toilet-paper.webp",
+              src: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png",
               alt: m.alt_text,
               runtime: false as const,
             };
@@ -252,7 +252,7 @@ export function ProductDetailPage({
   const currentImage =
     images[selected] ??
     images[0] ?? {
-      src: "/images/products/toilet-paper.webp",
+      src: "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png",
       alt: productName,
       runtime: false as const,
     };
@@ -282,7 +282,7 @@ export function ProductDetailPage({
         <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16">
           {/* Gallery View */}
           <section aria-label={copy.gallery} className="flex flex-col">
-            <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-card border border-line bg-paper-raised p-8 shadow-[0_8px_30px_rgba(0,0,0,0.04)] sm:aspect-square">
+            <div className="product-image-surface group relative aspect-[4/3] w-full overflow-hidden rounded-card border border-line p-8 shadow-[0_8px_30px_rgba(39,48,40,0.06)] sm:aspect-square">
               {currentImage.runtime ? (
                 // Runtime media host; see docs/adr/0004 — it must not be routed
                 // through next/image, whose remotePatterns cannot enumerate an
@@ -298,7 +298,7 @@ export function ProductDetailPage({
                   loading="eager"
                   fetchPriority="high"
                   decoding="async"
-                  className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_16px_32px_rgba(0,0,0,0.08)]"
+                  className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(39,48,40,0.10)]"
                 />
               ) : (
                 <Image
@@ -307,7 +307,7 @@ export function ProductDetailPage({
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain p-6 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_16px_32px_rgba(0,0,0,0.08)]"
+                  className="object-contain p-6 transition-transform duration-500 group-hover:scale-105 drop-shadow-[0_12px_24px_rgba(39,48,40,0.10)]"
                 />
               )}
               <span className="absolute left-4 top-4 rounded-full bg-paper-sunk px-3 py-1 font-mono text-[11px] tracking-wider text-ink-muted border border-line">
@@ -328,7 +328,7 @@ export function ProductDetailPage({
                     className={`relative aspect-[4/3] overflow-hidden rounded-control border transition-all ${
                       selected === index
                         ? "border-brand-green ring-2 ring-brand-green/20 bg-paper-raised"
-                        : "border-line bg-paper-sunk hover:border-line-strong"
+                        : "border-line product-image-surface hover:border-line-strong"
                     }`}
                   >
                     {img.runtime ? (
@@ -469,7 +469,7 @@ export function ProductDetailPage({
             {relatedKeys.map((relKey) => {
               const rel = STATIC_PRODUCTS[relKey];
               if (!rel) return null;
-              const firstImg = rel.images[0]?.src ?? "/images/products/toilet-paper.webp";
+              const firstImg = rel.images[0]?.src ?? "/images/products/usable/cutouts/Gemini_Generated_Image_ri79s5ri79s5ri79.png";
               return (
                 <Link
                   key={rel.slug}
