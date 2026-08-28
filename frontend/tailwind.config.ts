@@ -48,7 +48,24 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-be-vietnam)", "system-ui", "sans-serif"],
-        mono: ["var(--font-plex-mono)", "ui-monospace", "monospace"],
+        mono: [
+          "var(--font-inter-tight)",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'SF Compact Display'",
+          "'SF Compact Text'",
+          "ui-sans-serif",
+          "sans-serif",
+        ],
+        compact: [
+          "var(--font-inter-tight)",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "'SF Compact Display'",
+          "'SF Compact Text'",
+          "ui-sans-serif",
+          "sans-serif",
+        ],
       },
       fontSize: {
         eyebrow: ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.12em" }],

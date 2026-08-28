@@ -8,6 +8,11 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Standalone, unlocalized prototype harness for the procedural 3D roll.
+  if (pathname === "/3d-test" || pathname.startsWith("/3d-test/")) {
+    return NextResponse.next();
+  }
+
   const hasLocale = LOCALES.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   );

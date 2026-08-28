@@ -72,6 +72,25 @@ class InquiryRepository:
         )
         return list(result.unique())
 
+    async def get_products_by_slugs(self, slugs: list[str]) -> list[Product]:
+        if not slugs:
+            return []
+        result = await self.session.scalars(
+            select(Product)
+            .where(Product.slug.in_(slugs))
+            .options(
+                selectinload(Product.translations),
+                selectinload(Product.category_links)
+                .selectinload(ProductCategoryLink.category)
+                .selectinload(ProductCategory.translations),
+                selectinload(Product.specifications).selectinload(
+                    ProductSpecification.translations
+                ),
+                selectinload(Product.media),
+            )
+        )
+        return list(result.unique())
+
     async def next_reference(self, year: int | None = None) -> str:
         if year is None:
             year = datetime.now(UTC).year

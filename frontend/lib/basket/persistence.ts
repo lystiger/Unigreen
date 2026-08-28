@@ -115,6 +115,9 @@ function parseItem(value: unknown): BasketItem | null {
   const name = str("name");
   const imageUrl = nullableStr("imageUrl");
   const note = nullableStr("note");
+  // Added without a storage-version bump so existing pre-launch baskets keep
+  // working; old lines simply have no selected pack.
+  const packOption = v.packOption === undefined ? null : nullableStr("packOption");
 
   if (
     productSlug === null ||
@@ -122,6 +125,7 @@ function parseItem(value: unknown): BasketItem | null {
     name === null ||
     imageUrl === undefined ||
     note === undefined ||
+    packOption === undefined ||
     typeof v.quantity !== "number" ||
     !Number.isFinite(v.quantity) ||
     !UNITS.includes(v.unit as QuantityUnit)
@@ -136,6 +140,7 @@ function parseItem(value: unknown): BasketItem | null {
     imageUrl,
     quantity: v.quantity,
     unit: v.unit as QuantityUnit,
+    packOption,
     note,
     // Availability is never trusted from storage. Anything restored is stale
     // until reconcile has spoken to the catalogue (section 4.2).

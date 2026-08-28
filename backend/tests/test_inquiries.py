@@ -85,6 +85,7 @@ def make_test_product(
         status=status,
         oem_available=True,
         featured=True,
+        pack_options=["6 rolls", "12 rolls"],
         sort_order=0,
         version=1,
         translations=[
@@ -193,6 +194,10 @@ class FakeInquiryRepository:
 
     async def get_products_by_ids(self, product_ids: list[UUID]) -> list[Product]:
         return [self.products[pid] for pid in product_ids if pid in self.products]
+
+    async def get_products_by_slugs(self, slugs: list[str]) -> list[Product]:
+        wanted = set(slugs)
+        return [product for product in self.products.values() if product.slug in wanted]
 
     async def next_reference(self, year: int | None = None) -> str:
         self.seq += 1
@@ -312,6 +317,7 @@ async def test_create_inquiry_success() -> None:
     assert line1.product_name == "Giấy vệ sinh cuộn"
     assert line1.quantity == Decimal("500")
     assert line1.unit == "carton"
+    assert line1.pack_option == "6 rolls"
     assert line1.requirements == "Standard packing"
     assert line1.sort_order == 0
 
@@ -323,6 +329,57 @@ async def test_create_inquiry_success() -> None:
     assert line2.sort_order == 1
 
     assert repo.commits == 1
+
+
+@pytest.mark.asyncio
+async def test_slug_submission_keeps_selected_pack_option() -> None:
+    product = make_test_product(slug="coreless-tissue")
+    repo = FakeInquiryRepository(products=[product])
+    service = PublicInquiryService(repo)  # type: ignore[arg-type]
+
+    response = await service.create_inquiry(
+        PublicInquiryCreate(
+            contact_name="Buyer",
+            email="buyer@example.com",
+            locale=Locale.EN,
+            lines=[
+                PublicInquiryLineCreate(
+                    product_slug=product.slug,
+                    pack_option="12 rolls",
+                    quantity=Decimal("50"),
+                    unit="cartons",
+                )
+            ],
+        )
+    )
+
+    assert response.lines[0].product_id == product.id
+    assert response.lines[0].pack_option == "12 rolls"
+
+
+@pytest.mark.asyncio
+async def test_unknown_pack_option_is_rejected() -> None:
+    product = make_test_product()
+    repository = FakeInquiryRepository(products=[product])
+    service = PublicInquiryService(repository)  # type: ignore[arg-type]
+
+    with pytest.raises(ApiError) as error:
+        await service.create_inquiry(
+            PublicInquiryCreate(
+                contact_name="Buyer",
+                email="buyer@example.com",
+                lines=[
+                    PublicInquiryLineCreate(
+                        product_slug=product.slug,
+                        pack_option="24 rolls",
+                        quantity=Decimal("1"),
+                        unit="cartons",
+                    )
+                ],
+            )
+        )
+
+    assert error.value.code == "INVALID_PACK_OPTION"
 
 
 @pytest.mark.asyncio

@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BasketBadge } from "@/components/basket/BasketBadge";
 import { LocaleCode } from "@/components/ui/LocaleCode";
-import { cataloguePath } from "@/lib/routes";
 import type { Locale } from "@/lib/types";
-import { telHref } from "@/lib/format";
 import type { Dictionary } from "@/lib/i18n";
 import { swapLocaleInPath } from "@/lib/i18n";
+import { telHref } from "@/lib/format";
 
 interface SiteHeaderProps {
   readonly locale: Locale;
@@ -23,31 +23,35 @@ export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProp
   const pathname = usePathname();
   const otherLocale: Locale = locale === "vi" ? "en" : "vi";
 
-  const links = [{ href: cataloguePath(locale), label: copy.products }];
+  // In-page anchors on the landing; prefixed with the locale so they resolve
+  // (navigate home, then scroll) from any route the header is rendered on.
+  const links = [
+    { href: `/${locale}#products`, label: copy.products },
+    { href: `/${locale}#manufacturing`, label: copy.manufacturing },
+    { href: `/${locale}#oem`, label: copy.oem },
+    { href: `/${locale}#quotation`, label: copy.contact },
+  ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
-      <div className="shell flex h-16 items-center justify-between gap-6">
-        <Link
-          href={`/${locale}`}
-          className="text-h3 font-semibold tracking-tight text-ink"
-        >
-          Uni<span className="text-brand-green">-Green</span>
+    <header className="sticky top-0 z-50 border-b border-line bg-paper/[0.92] backdrop-blur-[8px]">
+      <div className="shell flex h-[68px] items-center justify-between gap-10">
+        <Link href={`/${locale}#top`} className="flex items-center gap-2.5 text-ink">
+          <Image src="/icon.svg" alt="" width={28} height={28} aria-hidden="true" />
+          <span className="text-[19px] font-semibold tracking-[-0.02em]">
+            Uni<span className="text-brand-green">-Green</span>
+          </span>
         </Link>
 
-        <nav aria-label={copy.products} className="hidden lg:block">
-          <ul className="flex items-center gap-8">
-            {links.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-body text-ink-muted transition-colors hover:text-ink"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <nav aria-label={copy.products} className="hidden items-center gap-9 lg:flex">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-[14px] text-ink-muted transition-colors hover:text-ink"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
         {/* One badge at every breakpoint. Rendering a desktop copy and a
@@ -62,11 +66,11 @@ export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProp
               href={swapLocaleInPath(pathname, otherLocale)}
               locale={otherLocale}
               label={copy.switchLocale}
-              className="text-ink-muted transition-colors hover:text-ink"
+              className="text-ink-faint transition-colors hover:text-ink"
             />
             <Link
               href={`/${locale}/inquiry`}
-              className="inline-flex min-h-11 items-center rounded-control bg-brand-green px-4 py-2 text-body font-medium text-white transition-colors hover:bg-brand-dark"
+              className="inline-flex min-h-11 items-center rounded-control bg-brand-green px-[18px] text-[14px] font-medium text-white transition-colors hover:bg-brand-dark"
             >
               {copy.inquiry}
             </Link>
@@ -78,7 +82,7 @@ export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProp
             aria-expanded={isOpen}
             aria-controls="site-menu"
             aria-label={isOpen ? copy.closeMenu : copy.openMenu}
-            className="min-h-11 rounded-control border border-line px-3 py-2 font-mono text-eyebrow tracking-widest text-ink lg:hidden"
+            className="min-h-11 rounded-control border border-line px-3 py-2 font-mono text-eyebrow tracking-[0.12em] text-ink lg:hidden"
           >
             {isOpen ? copy.closeMenu : copy.openMenu}
           </button>
@@ -102,15 +106,15 @@ export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProp
               ))}
             </ul>
 
-            <div className="mt-4 flex flex-col gap-3 border-t border-line pt-4">
+            <div className="mt-4 flex items-center justify-between gap-4 border-t border-line pt-4">
               <Link
                 href={`/${locale}/inquiry`}
                 onClick={() => setIsOpen(false)}
-                className="flex min-h-11 items-center justify-center rounded-control bg-brand-green px-4 py-3 text-center text-body font-medium text-white"
+                className="flex min-h-11 items-center justify-center rounded-control bg-brand-green px-4 text-center text-[14px] font-medium text-white"
               >
                 {copy.inquiry}
               </Link>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
                 {hotline ? (
                   <a
                     href={telHref(hotline)}
@@ -118,9 +122,7 @@ export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProp
                   >
                     {copy.callUs}: {hotline}
                   </a>
-                ) : (
-                  <span />
-                )}
+                ) : null}
                 <LocaleCode
                   href={swapLocaleInPath(pathname, otherLocale)}
                   locale={otherLocale}

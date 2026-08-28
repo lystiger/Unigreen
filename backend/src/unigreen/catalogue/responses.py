@@ -41,6 +41,7 @@ def product_response(product: Product) -> ProductResponse:
         status=product.status,
         oem_available=product.oem_available,
         featured=product.featured,
+        pack_options=product.pack_options or [],
         sort_order=product.sort_order,
         version=product.version,
         category_ids=[item.category_id for item in product.category_links],

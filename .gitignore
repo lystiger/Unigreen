@@ -1,4 +1,7 @@
 .env
+.env.*
+!.env.example
+!.env.production.example
 .venv/
 __pycache__/
 .pytest_cache/
@@ -12,4 +15,25 @@ build/
 *.egg-info/
 .idea/
 .vscode/
-images/*
+# Claude Design import artifacts (reference only, not part of the app)
+Uni-Green Landing.dc.html
+image-slot.js
+support.js
+.thumbnail
+github.md
+
+# JSON files
+*.json
+!contracts/openapi.json
+!backend/examples/catalogue-draft-import.json
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+
+# Local browser/devtools noise
+frontend/debug.log

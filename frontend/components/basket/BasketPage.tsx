@@ -34,7 +34,7 @@ export function BasketPage({ locale }: { readonly locale: Locale }) {
     enabled: hydrated && count > 0,
     queryFn: () =>
       apiRequest<PublicProductPage>(
-        `/api/v1/public/products?${queryString({ locale, page: 1, page_size: 100 })}`,
+        `/api/v1/public/products?${queryString({ locale, page: 1, page_size: 50 })}`,
       ),
   });
 

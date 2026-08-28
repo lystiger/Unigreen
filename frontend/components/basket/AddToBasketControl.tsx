@@ -46,11 +46,16 @@ export function AddToBasketControl({
   const { show } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [unit, setUnit] = useState<QuantityUnit>("cartons");
+  const [packOption, setPackOption] = useState(product.pack_options?.[0] ?? "");
 
   const add = () => {
     const result = dispatch({
       type: "add",
-      item: toBasketItem(product, { quantity, unit }),
+      item: toBasketItem(product, {
+        quantity,
+        unit,
+        packOption: packOption || null,
+      }),
     });
 
     if (result.rejection === "item-cap-reached") {
@@ -75,6 +80,28 @@ export function AddToBasketControl({
 
   return (
     <div className="flex flex-wrap items-end gap-3">
+      {product.pack_options?.length ? (
+        <fieldset className="w-full">
+          <legend className="text-data text-ink-muted">{copy.packSize}</legend>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {product.pack_options.map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={packOption === option}
+                onClick={() => setPackOption(option)}
+                className={`min-h-11 rounded-control border px-4 py-2 text-body transition-colors ${
+                  packOption === option
+                    ? "border-brand-green bg-brand-green text-white"
+                    : "border-line-strong bg-paper hover:border-brand-green"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
       <label className="text-data text-ink-muted">
         {copy.quantity}
         <input

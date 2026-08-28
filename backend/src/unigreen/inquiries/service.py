@@ -41,6 +41,7 @@ def inquiry_response(inquiry: Inquiry) -> PublicInquiryResponse:
                 product_id=line.product_id,
                 product_sku=line.product_sku,
                 product_name=line.product_name,
+                pack_option=line.pack_option,
                 quantity=line.quantity,
                 unit=line.unit,
                 requirements=line.requirements,
@@ -91,24 +92,33 @@ class PublicInquiryService:
                     field_errors={f"lines.{idx}.unit": ["Unit cannot be blank."]},
                 )
 
-        product_ids = [line.product_id for line in payload.lines]
+        product_ids = [line.product_id for line in payload.lines if line.product_id is not None]
+        product_slugs = [line.product_slug for line in payload.lines if line.product_slug]
         products = await self.repository.get_products_by_ids(product_ids)
+        if product_slugs:
+            products.extend(await self.repository.get_products_by_slugs(product_slugs))
         product_map: dict[UUID, Product] = {p.id: p for p in products}
+        product_by_slug: dict[str, Product] = {p.slug: p for p in products}
 
         # Check all products exist
-        missing_ids = [pid for pid in product_ids if pid not in product_map]
-        if missing_ids:
+        missing_lines = [
+            line
+            for line in payload.lines
+            if (line.product_id is not None and line.product_id not in product_map)
+            or (line.product_slug is not None and line.product_slug not in product_by_slug)
+        ]
+        if missing_lines:
+            missing_label = str(missing_lines[0].product_id or missing_lines[0].product_slug)
             raise ApiError(
                 status_code=404,
                 code="PRODUCT_NOT_FOUND",
-                message=f"Product with id '{missing_ids[0]}' was not found.",
-                field_errors={"lines": [f"Product with id '{missing_ids[0]}' was not found."]},
+                message=f"Product '{missing_label}' was not found.",
+                field_errors={"lines": [f"Product '{missing_label}' was not found."]},
             )
 
         # Check all products are published
         unpublished_skus: list[str] = []
-        for pid in product_ids:
-            p = product_map[pid]
+        for p in products:
             if p.status != PublicationStatus.PUBLISHED:
                 unpublished_skus.append(p.sku)
 
@@ -140,15 +150,36 @@ class PublicInquiryService:
         )
 
         for sort_order, line_payload in enumerate(payload.lines):
-            product = product_map[line_payload.product_id]
+            product = (
+                product_map[line_payload.product_id]
+                if line_payload.product_id is not None
+                else product_by_slug[line_payload.product_slug or ""]
+            )
             product_name = self._resolve_product_name(product, payload.locale)
             snapshot = build_product_snapshot(product, self.public_media_base_url)
+
+            pack_options = product.pack_options or []
+            pack_option = (
+                line_payload.pack_option.strip()
+                if line_payload.pack_option
+                else (pack_options[0] if pack_options else None)
+            )
+            if pack_option is not None and pack_options and pack_option not in pack_options:
+                raise ApiError(
+                    status_code=422,
+                    code="INVALID_PACK_OPTION",
+                    message=f"Pack option '{pack_option}' is not available for {product.sku}.",
+                    field_errors={
+                        f"lines.{sort_order}.pack_option": ["Choose an available pack option."]
+                    },
+                )
 
             req = line_payload.requirements.strip() if line_payload.requirements else None
             inquiry_line = InquiryLine(
                 product_id=product.id,
                 product_sku=product.sku,
                 product_name=product_name,
+                pack_option=pack_option,
                 product_snapshot=snapshot,
                 quantity=line_payload.quantity,
                 unit=line_payload.unit.strip(),

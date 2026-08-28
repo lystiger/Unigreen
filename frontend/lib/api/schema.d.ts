@@ -676,6 +676,8 @@ export interface components {
              * @default false
              */
             featured: boolean;
+            /** Pack Options */
+            pack_options?: string[];
             /**
              * Sort Order
              * @default 0
@@ -704,6 +706,8 @@ export interface components {
             oem_available: boolean;
             /** Featured */
             featured: boolean;
+            /** Pack Options */
+            pack_options: string[];
             /** Sort Order */
             sort_order: number;
             /** Version */
@@ -743,6 +747,8 @@ export interface components {
             oem_available?: boolean | null;
             /** Featured */
             featured?: boolean | null;
+            /** Pack Options */
+            pack_options?: string[] | null;
             /** Sort Order */
             sort_order?: number | null;
             /** Category Ids */
@@ -790,11 +796,12 @@ export interface components {
         };
         /** PublicInquiryLineCreate */
         PublicInquiryLineCreate: {
-            /**
-             * Product Id
-             * Format: uuid
-             */
-            product_id: string;
+            /** Product Id */
+            product_id?: string | null;
+            /** Product Slug */
+            product_slug?: string | null;
+            /** Pack Option */
+            pack_option?: string | null;
             /** Quantity */
             quantity: number | string;
             /** Unit */
@@ -818,6 +825,8 @@ export interface components {
             product_sku: string;
             /** Product Name */
             product_name: string;
+            /** Pack Option */
+            pack_option: string | null;
             /** Quantity */
             quantity: string;
             /** Unit */
@@ -896,6 +905,8 @@ export interface components {
             oem_available: boolean;
             /** Featured */
             featured: boolean;
+            /** Pack Options */
+            pack_options: string[];
             /** Categories */
             categories: components["schemas"]["PublicCategoryResponse"][];
             primary_media: components["schemas"]["PublicMediaResponse"] | null;
@@ -935,6 +946,8 @@ export interface components {
             oem_available: boolean;
             /** Featured */
             featured: boolean;
+            /** Pack Options */
+            pack_options: string[];
             /** Categories */
             categories: components["schemas"]["PublicCategoryResponse"][];
             primary_media: components["schemas"]["PublicMediaResponse"] | null;

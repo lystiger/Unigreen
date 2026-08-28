@@ -29,6 +29,7 @@ export function swapLocaleInPath(pathname: string, target: Locale): string {
 export interface Dictionary {
   readonly nav: {
     readonly products: string;
+    readonly manufacturing: string;
     readonly oem: string;
     readonly capability: string;
     readonly contact: string;
@@ -113,13 +114,20 @@ export interface Dictionary {
     readonly noResults: string;
   };
   readonly productDetail: {
+    readonly home: string;
+    readonly products: string;
     readonly back: string;
     readonly specifications: string;
     readonly oem: string;
+    readonly oemTag: string;
     readonly inquiry: string;
     readonly gallery: string;
     readonly unavailable: string;
     readonly retry: string;
+    readonly standardNote: string;
+    readonly relatedTitle: string;
+    readonly viewDetail: string;
+    readonly requestSpecSheet: string;
   };
   readonly basket: {
     readonly title: string;
@@ -132,6 +140,7 @@ export interface Dictionary {
     readonly emptyBody: string;
     readonly emptyCta: string;
     readonly quantity: string;
+    readonly packSize: string;
     readonly unit: string;
     readonly unitCartons: string;
     readonly unitContainers: string;
@@ -157,6 +166,14 @@ export interface Dictionary {
     readonly body: string;
     readonly cta: string;
     readonly orCall: string;
+    readonly contactName: string;
+    readonly email: string;
+    readonly company: string;
+    readonly phone: string;
+    readonly notes: string;
+    readonly sending: string;
+    readonly error: string;
+    readonly success: string;
   };
   readonly footer: {
     readonly company: string;
@@ -170,10 +187,11 @@ export interface Dictionary {
 const vi: Dictionary = {
   nav: {
     products: "Sản phẩm",
-    oem: "Gia công OEM",
+    manufacturing: "Sản xuất",
+    oem: "OEM",
     capability: "Năng lực",
     contact: "Liên hệ",
-    inquiry: "Liên hệ — sắp ra mắt",
+    inquiry: "Yêu cầu báo giá",
     openMenu: "Mở menu",
     closeMenu: "Đóng menu",
     switchLocale: "Chuyển sang tiếng Anh",
@@ -268,13 +286,21 @@ const vi: Dictionary = {
     noResults: "Không có sản phẩm phù hợp với bộ lọc",
   },
   productDetail: {
+    home: "Trang chủ",
+    products: "Sản phẩm",
     back: "Trở lại danh mục",
-    specifications: "Thông số kỹ thuật",
-    oem: "Có thể gia công OEM",
-    inquiry: "Yêu cầu báo giá — sắp ra mắt",
-    gallery: "Hình ảnh sản phẩm",
+    specifications: "Thông số kỹ thuật chi tiết",
+    oem: "Hỗ trợ gia công OEM / Thương hiệu riêng",
+    oemTag: "Gia công OEM",
+    inquiry: "Yêu cầu báo giá sản phẩm này",
+    gallery: "Hình ảnh sản phẩm & chuyền may",
     unavailable: "Không thể tải sản phẩm",
     retry: "Thử lại",
+    standardNote:
+      "Sản phẩm được sản xuất trực tiếp tại xưởng Hưng Yên theo tiêu chuẩn chất lượng Nhật Bản.",
+    relatedTitle: "Các dòng sản phẩm khác",
+    viewDetail: "Xem chi tiết",
+    requestSpecSheet: "Tải bảng thông số quy cách",
   },
   basket: {
     title: "Giỏ yêu cầu",
@@ -287,6 +313,7 @@ const vi: Dictionary = {
       "Thêm sản phẩm từ danh mục để yêu cầu báo giá cho cả đơn hàng, thay vì từng mã một.",
     emptyCta: "Xem danh mục",
     quantity: "Số lượng",
+    packSize: "Quy cách",
     unit: "Đơn vị",
     unitCartons: "Thùng",
     unitContainers: "Container 40HC",
@@ -308,10 +335,18 @@ const vi: Dictionary = {
     continueShopping: "Tiếp tục xem sản phẩm",
   },
   inquiry: {
-    title: "Cần trao đổi về sản phẩm?",
-    body: "Luồng yêu cầu báo giá sẽ được bổ sung trong Sprint 2.",
-    cta: "Xem thông tin sắp ra mắt",
+    title: "Gửi yêu cầu báo giá",
+    body: "Kiểm tra sản phẩm và quy cách đóng gói, sau đó gửi thông tin để Uni-Green phản hồi bằng báo giá.",
+    cta: "Gửi yêu cầu báo giá",
     orCall: "",
+    contactName: "Họ và tên *",
+    email: "Email *",
+    company: "Công ty",
+    phone: "Điện thoại",
+    notes: "Ghi chú",
+    sending: "Đang gửi…",
+    error: "Không thể gửi yêu cầu. Vui lòng thử lại.",
+    success: "Đã gửi yêu cầu {reference}",
   },
   footer: {
     company: "Danh mục sản phẩm Uni-Green",
@@ -325,10 +360,11 @@ const vi: Dictionary = {
 const en: Dictionary = {
   nav: {
     products: "Products",
+    manufacturing: "Manufacturing",
     oem: "OEM",
     capability: "Capability",
     contact: "Contact",
-    inquiry: "Contact — coming soon",
+    inquiry: "Request quotation",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     switchLocale: "Switch to Vietnamese",
@@ -423,13 +459,21 @@ const en: Dictionary = {
     noResults: "No products match your filters",
   },
   productDetail: {
+    home: "Home",
+    products: "Products",
     back: "Back to catalogue",
-    specifications: "Technical specifications",
-    oem: "OEM manufacturing available",
-    inquiry: "Request quotation — coming soon",
-    gallery: "Product images",
+    specifications: "Detailed technical specifications",
+    oem: "OEM / Private label manufacturing available",
+    oemTag: "OEM Available",
+    inquiry: "Request quotation for this product",
+    gallery: "Product & line photography",
     unavailable: "Product unavailable",
     retry: "Retry",
+    standardNote:
+      "Manufactured on our production line in Hưng Yên, Vietnam under Japanese quality standards.",
+    relatedTitle: "Other product families",
+    viewDetail: "View details",
+    requestSpecSheet: "Download specification sheet",
   },
   basket: {
     title: "Inquiry basket",
@@ -442,6 +486,7 @@ const en: Dictionary = {
       "Add products from the catalogue to request pricing on a full order rather than one SKU at a time.",
     emptyCta: "Browse the catalogue",
     quantity: "Quantity",
+    packSize: "Pack size",
     unit: "Unit",
     unitCartons: "Cartons",
     unitContainers: "40HC containers",
@@ -465,10 +510,18 @@ const en: Dictionary = {
     continueShopping: "Continue browsing",
   },
   inquiry: {
-    title: "Want to discuss a product?",
-    body: "The quotation-request workflow is planned for Sprint 2.",
-    cta: "View what is coming",
+    title: "Send a quotation request",
+    body: "Review the products and pack formats, then send your details for a written quotation from Uni-Green.",
+    cta: "Send quotation request",
     orCall: "",
+    contactName: "Contact name *",
+    email: "Email *",
+    company: "Company",
+    phone: "Phone",
+    notes: "Notes",
+    sending: "Sending…",
+    error: "The request could not be sent. Please try again.",
+    success: "Request {reference} sent",
   },
   footer: {
     company: "Uni-Green product catalogue",

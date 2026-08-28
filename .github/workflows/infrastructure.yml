@@ -9,7 +9,10 @@ on:
       - "frontend/**"
       - "contracts/**"
       - "compose.yaml"
+      - "compose.production.yaml"
       - ".env.example"
+      - ".env.production.example"
+      - "deploy/**"
       - ".github/workflows/**"
 
 permissions:
@@ -23,6 +26,18 @@ jobs:
       - uses: actions/checkout@v4
       - run: cp .env.example .env
       - run: docker compose config --quiet
+      - name: Validate production configuration
+        env:
+          UNIGREEN_ENV_FILE: .env.production.example
+        run: >-
+          docker compose --env-file .env.production.example
+          -f compose.yaml -f compose.production.yaml config --quiet
+      - name: Validate Caddy configuration
+        run: >-
+          docker run --rm
+          -v "$PWD/deploy/Caddyfile:/etc/caddy/Caddyfile:ro"
+          -e UNIGREEN_DOMAIN=example.com
+          caddy:2-alpine caddy validate --config /etc/caddy/Caddyfile
       - run: docker compose build backend worker storage-init web
       - run: docker compose up -d db redis
       - run: docker compose run --rm migrate

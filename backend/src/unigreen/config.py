@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,6 +31,49 @@ class Settings(BaseSettings):
     staff_session_hours: int = Field(default=12, ge=1, le=168)
     login_attempt_limit: int = Field(default=5, ge=1, le=100)
     login_attempt_window_seconds: int = Field(default=900, ge=60, le=86400)
+    quotation_recipient_email: str = ""
+    smtp_host: str = ""
+    smtp_port: int = Field(default=587, ge=1, le=65535)
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+    smtp_from_email: str = ""
+
+    @model_validator(mode="after")
+    def validate_production_settings(self) -> Self:
+        if self.environment != "production":
+            return self
+
+        missing = [
+            name
+            for name in (
+                "database_url",
+                "redis_url",
+                "public_media_base_url",
+                "quotation_recipient_email",
+                "smtp_host",
+                "smtp_username",
+                "smtp_password",
+                "smtp_from_email",
+            )
+            if not getattr(self, name)
+        ]
+        insecure_urls = [
+            value
+            for value in [*self.allowed_origins, self.public_media_base_url]
+            if not value.startswith("https://")
+        ]
+        if missing or insecure_urls or not self.smtp_use_tls:
+            problems = []
+            if missing:
+                problems.append(f"missing: {', '.join(missing)}")
+            if insecure_urls:
+                problems.append("public URLs must use HTTPS")
+            if not self.smtp_use_tls:
+                problems.append("SMTP TLS must be enabled")
+            raise ValueError(f"invalid production settings ({'; '.join(problems)})")
+
+        return self
 
 
 @lru_cache

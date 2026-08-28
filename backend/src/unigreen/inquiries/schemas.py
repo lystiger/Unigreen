@@ -10,7 +10,9 @@ from unigreen.domain.enums import InquiryStatus, Locale
 
 
 class PublicInquiryLineCreate(BaseModel):
-    product_id: UUID
+    product_id: UUID | None = None
+    product_slug: str | None = Field(default=None, min_length=1, max_length=160)
+    pack_option: str | None = Field(default=None, min_length=1, max_length=100)
     quantity: Decimal = Field(gt=Decimal("0"), decimal_places=2, max_digits=12)
     unit: str = Field(min_length=1, max_length=50)
     requirements: str | None = Field(default=None, max_length=2000)
@@ -22,6 +24,10 @@ class PublicInquiryLineCreate(BaseModel):
         if not trimmed:
             raise ValueError("Unit cannot be blank.")
         return trimmed
+
+    def model_post_init(self, __context: object) -> None:
+        if self.product_id is None and not self.product_slug:
+            raise ValueError("Either product_id or product_slug is required.")
 
 
 class PublicInquiryCreate(BaseModel):
@@ -59,6 +65,7 @@ class PublicInquiryLineResponse(BaseModel):
     product_id: UUID
     product_sku: str
     product_name: str
+    pack_option: str | None
     quantity: Decimal
     unit: str
     requirements: str | None

@@ -22,13 +22,14 @@ import type { NewBasketItem, PublishedProduct } from "./reducer";
 /** Public catalogue product → the fields the basket caches for display. */
 export function toBasketItem(
   product: PublicProduct | PublicProductDetail,
-  overrides: Pick<NewBasketItem, "quantity" | "unit" | "note"> = {},
+  overrides: Pick<NewBasketItem, "quantity" | "unit" | "packOption" | "note"> = {},
 ): NewBasketItem {
   return {
     productSlug: product.slug,
     sku: product.sku,
     name: product.name,
     imageUrl: primaryImageUrl(product),
+    packOption: product.pack_options?.[0] ?? null,
     ...overrides,
   };
 }
@@ -42,6 +43,7 @@ export function toPublishedProduct(
     sku: product.sku,
     name: product.name,
     imageUrl: primaryImageUrl(product),
+    packOptions: product.pack_options ?? [],
   };
 }
 

@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from unigreen.api.errors import openapi_error_responses
 from unigreen.config import Settings, get_settings
 from unigreen.db import get_session
+from unigreen.inquiries.mailer import send_inquiry_email
 from unigreen.inquiries.repository import InquiryRepository
 from unigreen.inquiries.schemas import PublicInquiryCreate, PublicInquiryResponse
 from unigreen.inquiries.service import PublicInquiryService
@@ -33,6 +34,7 @@ def get_public_inquiry_service(
 )
 async def create_inquiry(
     payload: PublicInquiryCreate,
+    background_tasks: BackgroundTasks,
     service: Annotated[PublicInquiryService, Depends(get_public_inquiry_service)],
     idempotency_key: Annotated[
         str | None,
@@ -43,4 +45,6 @@ async def create_inquiry(
         ),
     ] = None,
 ) -> PublicInquiryResponse:
-    return await service.create_inquiry(payload, idempotency_key=idempotency_key)
+    response = await service.create_inquiry(payload, idempotency_key=idempotency_key)
+    background_tasks.add_task(send_inquiry_email, response, get_settings())
+    return response

@@ -50,6 +50,7 @@ export interface NewBasketItem {
   readonly imageUrl?: string | null;
   readonly quantity?: number;
   readonly unit?: QuantityUnit;
+  readonly packOption?: string | null;
   readonly note?: string | null;
 }
 
@@ -59,6 +60,7 @@ export interface PublishedProduct {
   readonly sku: string;
   readonly name: string;
   readonly imageUrl: string | null;
+  readonly packOptions?: readonly string[];
 }
 
 export type RejectionReason = "item-cap-reached" | "unknown-item";
@@ -108,7 +110,11 @@ export function basketReducer(
         const current = state.items[existing]!;
         const items = state.items.map((line, index) =>
           index === existing
-            ? { ...line, quantity: clampQuantity(current.quantity + quantity) }
+            ? {
+                ...line,
+                quantity: clampQuantity(current.quantity + quantity),
+                packOption: item.packOption ?? current.packOption,
+              }
             : line,
         );
         return { state: touched(items), incremented: true };
@@ -125,6 +131,7 @@ export function basketReducer(
         imageUrl: item.imageUrl ?? null,
         quantity,
         unit: item.unit ?? "cartons",
+        packOption: item.packOption ?? null,
         note: item.note ?? null,
         // Freshly added from a live response, so it is known good until the
         // next reconcile says otherwise.
@@ -175,6 +182,11 @@ export function basketReducer(
           sku: fresh.sku,
           name: fresh.name,
           imageUrl: fresh.imageUrl,
+          packOption:
+            line.packOption != null &&
+            (fresh.packOptions ?? []).includes(line.packOption)
+              ? line.packOption
+              : (fresh.packOptions?.[0] ?? null),
           availability: "available",
         };
       });

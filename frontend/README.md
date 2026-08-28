@@ -45,8 +45,8 @@ artifacts and fails if either changes.
   are never stored in browser storage.
 - Catalogue write and publication controls follow backend permissions.
 - Pending media is previewed only through authenticated staff routes.
-- Contact and quotation submission remain Sprint 2 work and are labelled as
-  unavailable rather than simulated.
+- Quotation requests use the basket-backed public inquiry endpoint and return a
+  persisted reference number before email notification is attempted.
 
 Product images must be uploaded in the staff workspace. The backend validates,
 normalizes and stores controlled variants on the mounted media volume. Source

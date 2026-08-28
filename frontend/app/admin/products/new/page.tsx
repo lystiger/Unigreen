@@ -31,6 +31,10 @@ export default function NewProductPage() {
       barcode: String(data.get("barcode") ?? "") || null,
       oem_available: data.get("oem_available") === "on",
       featured: data.get("featured") === "on",
+      pack_options: String(data.get("pack_options") ?? "")
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean),
       sort_order: 0,
       category_ids: categoryIds,
       translations: [
@@ -69,6 +73,14 @@ export default function NewProductPage() {
         <Field label="SKU" name="sku" required />
         <Field label="Slug" name="slug" required />
         <Field label="Barcode (optional)" name="barcode" />
+        <label className="font-medium sm:col-span-2">
+          Pack options (one per line, first is the default)
+          <textarea
+            name="pack_options"
+            placeholder={"6 rolls\n10 rolls\n12 rolls"}
+            className="mt-2 min-h-28 w-full rounded-control border border-line-strong px-3 py-2"
+          />
+        </label>
         <div className="flex items-end gap-6 pb-2">
           <label>
             <input name="oem_available" type="checkbox" /> OEM available

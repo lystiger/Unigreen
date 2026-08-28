@@ -64,12 +64,22 @@ class ProductTranslationInput(BaseModel):
     meta_description: str | None = Field(default=None, max_length=500)
 
 
+def normalize_pack_options(value: list[str]) -> list[str]:
+    normalized = [item.strip() for item in value]
+    if any(not item for item in normalized):
+        raise ValueError("Pack options cannot be blank.")
+    if len({item.casefold() for item in normalized}) != len(normalized):
+        raise ValueError("Pack options must be unique.")
+    return normalized
+
+
 class ProductCreate(BaseModel):
     sku: str = Field(min_length=1, max_length=100)
     slug: str = Field(min_length=1, max_length=160)
     barcode: str | None = Field(default=None, max_length=100)
     oem_available: bool = False
     featured: bool = False
+    pack_options: list[str] = Field(default_factory=list, max_length=20)
     sort_order: int = Field(default=0, ge=0)
     category_ids: list[UUID] = Field(default_factory=list)
     translations: list[ProductTranslationInput] = Field(min_length=1, max_length=2)
@@ -90,6 +100,11 @@ class ProductCreate(BaseModel):
             raise ValueError("Translation locales must be unique.")
         return value
 
+    @field_validator("pack_options")
+    @classmethod
+    def valid_pack_options(cls, value: list[str]) -> list[str]:
+        return normalize_pack_options(value)
+
 
 class ProductUpdate(BaseModel):
     version: int = Field(ge=1)
@@ -98,9 +113,15 @@ class ProductUpdate(BaseModel):
     barcode: str | None = Field(default=None, max_length=100)
     oem_available: bool | None = None
     featured: bool | None = None
+    pack_options: list[str] | None = Field(default=None, max_length=20)
     sort_order: int | None = Field(default=None, ge=0)
     category_ids: list[UUID] | None = None
     translations: list[ProductTranslationInput] | None = None
+
+    @field_validator("pack_options")
+    @classmethod
+    def valid_pack_options(cls, value: list[str] | None) -> list[str] | None:
+        return normalize_pack_options(value) if value is not None else None
 
 
 class SpecificationTranslationInput(BaseModel):
@@ -138,6 +159,7 @@ class ProductResponse(BaseModel):
     status: PublicationStatus
     oem_available: bool
     featured: bool
+    pack_options: list[str]
     sort_order: int
     version: int
     category_ids: list[UUID]
