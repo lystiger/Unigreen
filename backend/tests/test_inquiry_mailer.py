@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
@@ -36,16 +37,18 @@ def inquiry() -> PublicInquiryResponse:
                 pack_option="12 rolls",
                 quantity=Decimal("50"),
                 unit="cartons",
-                requirements=None,
+                requirements="Width: 2 m; 2-ply; White virgin pulp",
                 sort_order=0,
             )
         ],
     )
 
 
-def test_mailer_sends_configured_notification_with_pack_option() -> None:
+def test_mailer_sends_configured_notification_with_pack_option(tmp_path: Path) -> None:
     smtp = MagicMock()
     smtp.__enter__.return_value = smtp
+    image_path = tmp_path / "jumbo-roll.webp"
+    image_path.write_bytes(b"fake-webp-image")
     settings = Settings(
         smtp_host="smtp.example.com",
         smtp_port=587,
@@ -53,6 +56,7 @@ def test_mailer_sends_configured_notification_with_pack_option() -> None:
         smtp_password="app-password",
         smtp_from_email="sales@example.com",
         quotation_recipient_email="dohunganh5002@gmail.com",
+        smtp_image_path=image_path,
     )
 
     with patch("unigreen.inquiries.mailer.smtplib.SMTP", return_value=smtp):
@@ -63,7 +67,22 @@ def test_mailer_sends_configured_notification_with_pack_option() -> None:
     message = smtp.send_message.call_args.args[0]
     assert message["To"] == "dohunganh5002@gmail.com"
     assert message["Reply-To"] == "buyer@example.com"
-    assert "pack: 12 rolls" in message.get_content()
+    assert message["Importance"] == "high"
+    assert message["Priority"] == "urgent"
+    assert message["X-Priority"] == "1 (Highest)"
+    assert message["X-MSMail-Priority"] == "High"
+    plain_body = message.get_body("plain").get_content()
+    html_body = message.get_body("html").get_content()
+    assert "- UG-TP-01 / Bathroom tissue" in plain_body
+    assert "  Quantity: 50 cartons" in plain_body
+    assert "  Pack: 12 rolls" in plain_body
+    assert "    - Width: 2 m" in plain_body
+    assert "    - 2-ply" in plain_body
+    assert "    - White virgin pulp" in plain_body
+    assert "cid:unigreen-product-image" in html_body
+    assert "<strong>Specifications:</strong>" in html_body
+    assert "<li>Width: 2 m</li>" in html_body
+    assert any(part.get_content_type() == "image/webp" for part in message.walk())
 
 
 def test_mailer_is_a_noop_without_smtp_host() -> None:

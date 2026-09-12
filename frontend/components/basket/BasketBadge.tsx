@@ -22,7 +22,7 @@ export function BasketBadge({ copy }: BasketBadgeProps) {
       onClick={openDrawer}
       aria-label={copy.open}
       data-testid="basket-badge"
-      className="inline-flex min-h-11 items-center gap-2 rounded-control border border-line px-3 py-2 text-body text-ink transition-colors hover:bg-paper-sunk"
+      className="inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-control border border-line px-2 py-2 text-[14px] text-ink transition-colors hover:bg-paper-sunk sm:gap-2 sm:px-3 sm:text-body"
     >
       <span aria-hidden="true">☰</span>
       <span>{copy.badgeLabel}</span>
