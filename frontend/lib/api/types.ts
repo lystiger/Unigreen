@@ -20,3 +20,10 @@ export type PublicProductDetail = Omit<
 };
 export type PublicProductPage = components["schemas"]["PublicProductPage"];
 export type StaffIdentity = components["schemas"]["StaffIdentityResponse"];
+export type InquiryStatus = components["schemas"]["InquiryStatus"];
+export type StaffInquirySummary = components["schemas"]["StaffInquirySummaryResponse"];
+export type StaffInquiryPage = components["schemas"]["StaffInquiryPage"];
+export type StaffInquiryDetail = components["schemas"]["StaffInquiryDetailResponse"];
+export type StaffInquiryLine = components["schemas"]["StaffInquiryLineResponse"];
+export type InquiryInternalNote = components["schemas"]["InquiryInternalNoteResponse"];
+export type StaffSummary = components["schemas"]["StaffSummaryResponse"];
