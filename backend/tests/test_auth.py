@@ -104,9 +104,18 @@ def test_tokens_are_opaque_hashed_and_constant_time_comparable() -> None:
 
 
 def test_permission_matrix_matches_sprint_rules() -> None:
-    assert permissions_for(StaffRole.SALES_STAFF) == {Permission.CATALOGUE_READ}
+    assert permissions_for(StaffRole.SALES_STAFF) == {
+        Permission.CATALOGUE_READ,
+        Permission.INQUIRY_READ,
+        Permission.INQUIRY_WRITE,
+    }
     assert has_permission(StaffRole.CONTENT_EDITOR, Permission.CATALOGUE_WRITE)
     assert has_permission(StaffRole.ADMINISTRATOR, Permission.CATALOGUE_PUBLISH)
+    assert has_permission(StaffRole.SALES_STAFF, Permission.INQUIRY_READ)
+    assert has_permission(StaffRole.SALES_STAFF, Permission.INQUIRY_WRITE)
+    assert has_permission(StaffRole.SALES_MANAGER, Permission.INQUIRY_WRITE)
+    assert not has_permission(StaffRole.CONTENT_EDITOR, Permission.INQUIRY_READ)
+    assert not has_permission(StaffRole.CONTENT_EDITOR, Permission.INQUIRY_WRITE)
     assert not has_permission(StaffRole.SALES_MANAGER, Permission.CATALOGUE_WRITE)
 
 

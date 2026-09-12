@@ -316,6 +316,109 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/staff/inquiries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Inquiries */
+        get: operations["list_inquiries_api_v1_staff_inquiries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staff/inquiries/assignees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Assignees */
+        get: operations["list_assignees_api_v1_staff_inquiries_assignees_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staff/inquiries/{inquiry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Inquiry */
+        get: operations["get_inquiry_api_v1_staff_inquiries__inquiry_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Inquiry */
+        patch: operations["update_inquiry_api_v1_staff_inquiries__inquiry_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/staff/inquiries/{inquiry_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Inquiry Status */
+        patch: operations["update_inquiry_status_api_v1_staff_inquiries__inquiry_id__status_patch"];
+        trace?: never;
+    };
+    "/api/v1/staff/inquiries/{inquiry_id}/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Assign Inquiry */
+        patch: operations["assign_inquiry_api_v1_staff_inquiries__inquiry_id__assign_patch"];
+        trace?: never;
+    };
+    "/api/v1/staff/inquiries/{inquiry_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Internal Note */
+        post: operations["add_internal_note_api_v1_staff_inquiries__inquiry_id__notes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/staff/products/{product_id}/media": {
         parameters: {
             query?: never;
@@ -540,11 +643,61 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** InquiryAssignUpdate */
+        InquiryAssignUpdate: {
+            /** Assigned Staff Id */
+            assigned_staff_id?: string | null;
+            /** Version */
+            version?: number | null;
+        };
+        /** InquiryInternalNoteCreate */
+        InquiryInternalNoteCreate: {
+            /** Content */
+            content: string;
+        };
+        /** InquiryInternalNoteResponse */
+        InquiryInternalNoteResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Inquiry Id
+             * Format: uuid
+             */
+            inquiry_id: string;
+            /**
+             * Author Staff Id
+             * Format: uuid
+             */
+            author_staff_id: string;
+            /** Author Email */
+            author_email: string;
+            /** Content */
+            content: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /**
          * InquiryStatus
          * @enum {string}
          */
         InquiryStatus: "new" | "qualified" | "quoted" | "won" | "lost" | "spam" | "duplicate";
+        /** InquiryStatusUpdate */
+        InquiryStatusUpdate: {
+            status: components["schemas"]["InquiryStatus"];
+            /** Version */
+            version?: number | null;
+        };
         /** LiveResponse */
         LiveResponse: {
             /**
@@ -642,22 +795,11 @@ export interface components {
             /** Url */
             url: string;
         };
-        /** PaginationMetadata */
-        PaginationMetadata: {
-            /** Page */
-            page: number;
-            /** Page Size */
-            page_size: number;
-            /** Total */
-            total: number;
-            /** Total Pages */
-            total_pages: number;
-        };
         /**
          * Permission
          * @enum {string}
          */
-        Permission: "catalogue:read" | "catalogue:write" | "catalogue:publish";
+        Permission: "catalogue:read" | "catalogue:write" | "catalogue:publish" | "inquiry:read" | "inquiry:write";
         /** ProductCreate */
         ProductCreate: {
             /** Sku */
@@ -925,7 +1067,7 @@ export interface components {
         PublicProductPage: {
             /** Items */
             items: components["schemas"]["PublicProductSummary"][];
-            pagination: components["schemas"]["PaginationMetadata"];
+            pagination: components["schemas"]["unigreen__catalogue__public_schemas__PaginationMetadata"];
         };
         /**
          * PublicProductSort
@@ -1028,11 +1170,173 @@ export interface components {
             /** Permissions */
             permissions: components["schemas"]["Permission"][];
         };
+        /** StaffInquiryDetailResponse */
+        StaffInquiryDetailResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reference */
+            reference: string;
+            status: components["schemas"]["InquiryStatus"];
+            /** Contact Name */
+            contact_name: string;
+            /** Email */
+            email: string;
+            /** Phone */
+            phone: string | null;
+            /** Company Name */
+            company_name: string | null;
+            /** Tax Code */
+            tax_code: string | null;
+            /** Address */
+            address: string | null;
+            /** Destination */
+            destination: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Oem Requirements */
+            oem_requirements: string | null;
+            locale: components["schemas"]["Locale"];
+            /** Source */
+            source: string;
+            /** Assigned Staff Id */
+            assigned_staff_id: string | null;
+            assigned_staff: components["schemas"]["StaffSummaryResponse"] | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+            /** Lines */
+            lines: components["schemas"]["StaffInquiryLineResponse"][];
+            /** Internal Notes */
+            internal_notes: components["schemas"]["InquiryInternalNoteResponse"][];
+        };
+        /** StaffInquiryLineResponse */
+        StaffInquiryLineResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Product Sku */
+            product_sku: string;
+            /** Product Name */
+            product_name: string;
+            /** Pack Option */
+            pack_option: string | null;
+            /** Product Snapshot */
+            product_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Quantity */
+            quantity: string;
+            /** Unit */
+            unit: string;
+            /** Requirements */
+            requirements: string | null;
+            /** Sort Order */
+            sort_order: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** StaffInquiryPage */
+        StaffInquiryPage: {
+            /** Items */
+            items: components["schemas"]["StaffInquirySummaryResponse"][];
+            pagination: components["schemas"]["unigreen__inquiries__staff_schemas__PaginationMetadata"];
+        };
+        /** StaffInquirySummaryResponse */
+        StaffInquirySummaryResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Reference */
+            reference: string;
+            status: components["schemas"]["InquiryStatus"];
+            /** Contact Name */
+            contact_name: string;
+            /** Email */
+            email: string;
+            /** Phone */
+            phone: string | null;
+            /** Company Name */
+            company_name: string | null;
+            /** Destination */
+            destination: string | null;
+            locale: components["schemas"]["Locale"];
+            /** Assigned Staff Id */
+            assigned_staff_id: string | null;
+            assigned_staff: components["schemas"]["StaffSummaryResponse"] | null;
+            /** Lines Count */
+            lines_count: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Version */
+            version: number;
+        };
+        /** StaffInquiryUpdate */
+        StaffInquiryUpdate: {
+            status?: components["schemas"]["InquiryStatus"] | null;
+            /** Assigned Staff Id */
+            assigned_staff_id?: string | null;
+            /**
+             * Clear Assigned Staff
+             * @default false
+             */
+            clear_assigned_staff: boolean;
+            /** Version */
+            version?: number | null;
+        };
         /**
          * StaffRole
          * @enum {string}
          */
         StaffRole: "sales_staff" | "sales_manager" | "content_editor" | "administrator";
+        /**
+         * StaffStatus
+         * @enum {string}
+         */
+        StaffStatus: "active" | "disabled";
+        /** StaffSummaryResponse */
+        StaffSummaryResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            role: components["schemas"]["StaffRole"];
+            status: components["schemas"]["StaffStatus"];
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -1045,6 +1349,28 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** PaginationMetadata */
+        unigreen__catalogue__public_schemas__PaginationMetadata: {
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+            /** Total Pages */
+            total_pages: number;
+        };
+        /** PaginationMetadata */
+        unigreen__inquiries__staff_schemas__PaginationMetadata: {
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+            /** Total */
+            total: number;
+            /** Total Pages */
+            total_pages: number;
         };
     };
     responses: never;
@@ -2213,6 +2539,435 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicInquiryResponse"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_inquiries_api_v1_staff_inquiries_get: {
+        parameters: {
+            query?: {
+                /** @description Filter by inquiry status */
+                status?: components["schemas"]["InquiryStatus"] | null;
+                /** @description Search reference, customer name, company, email, phone */
+                search?: string | null;
+                /** @description Filter by assigned staff user ID */
+                assigned_staff_id?: string | null;
+                /** @description Page number */
+                page?: number;
+                /** @description Items per page */
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffInquiryPage"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_assignees_api_v1_staff_inquiries_assignees_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffSummaryResponse"][];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_inquiry_api_v1_staff_inquiries__inquiry_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inquiry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffInquiryDetailResponse"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_inquiry_api_v1_staff_inquiries__inquiry_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inquiry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffInquiryUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffInquiryDetailResponse"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    update_inquiry_status_api_v1_staff_inquiries__inquiry_id__status_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inquiry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InquiryStatusUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffInquiryDetailResponse"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    assign_inquiry_api_v1_staff_inquiries__inquiry_id__assign_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inquiry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InquiryAssignUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffInquiryDetailResponse"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    add_internal_note_api_v1_staff_inquiries__inquiry_id__notes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                inquiry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InquiryInternalNoteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InquiryInternalNoteResponse"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
             /** @description Request failed */

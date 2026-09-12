@@ -46,6 +46,9 @@ export function AdminShell({ children }: { readonly children: ReactNode }) {
               <li>
                 <Link href="/admin/categories">Categories</Link>
               </li>
+              <li>
+                <Link href="/admin/inquiries">Inquiries</Link>
+              </li>
             </ul>
           </nav>
           <div className="flex items-center gap-3">
