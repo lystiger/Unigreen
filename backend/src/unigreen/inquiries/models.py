@@ -81,6 +81,8 @@ class Inquiry(Base):
     )
     version: Mapped[int] = mapped_column(Integer, default=1)
 
+    __mapper_args__ = {"version_id_col": version}
+
     lines: Mapped[list[InquiryLine]] = relationship(
         back_populates="inquiry",
         cascade="all, delete-orphan",
@@ -88,6 +90,12 @@ class Inquiry(Base):
         order_by="InquiryLine.sort_order",
     )
     assigned_staff: Mapped[StaffUser | None] = relationship(lazy="selectin")
+    internal_notes: Mapped[list[InquiryInternalNote]] = relationship(
+        back_populates="inquiry",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+        order_by="InquiryInternalNote.created_at",
+    )
 
 
 class InquiryLine(Base):
@@ -119,3 +127,31 @@ class InquiryLine(Base):
 
     inquiry: Mapped[Inquiry] = relationship(back_populates="lines")
     product: Mapped[Product] = relationship(lazy="selectin")
+
+
+class InquiryInternalNote(Base):
+    __tablename__ = "inquiry_internal_notes"
+    __table_args__ = (
+        CheckConstraint(
+            "length(trim(content)) > 0",
+            name="ck_inquiry_internal_notes_content_non_empty",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    inquiry_id: Mapped[UUID] = mapped_column(
+        ForeignKey("inquiries.id", ondelete="CASCADE"), index=True
+    )
+    author_staff_id: Mapped[UUID] = mapped_column(
+        ForeignKey("staff_users.id", ondelete="RESTRICT"), index=True
+    )
+    content: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    inquiry: Mapped[Inquiry] = relationship(back_populates="internal_notes")
+    author: Mapped[StaffUser] = relationship(lazy="selectin")
