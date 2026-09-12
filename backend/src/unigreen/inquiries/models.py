@@ -81,6 +81,8 @@ class Inquiry(Base):
     )
     version: Mapped[int] = mapped_column(Integer, default=1)
 
+    __mapper_args__ = {"version_id_col": version}
+
     lines: Mapped[list[InquiryLine]] = relationship(
         back_populates="inquiry",
         cascade="all, delete-orphan",

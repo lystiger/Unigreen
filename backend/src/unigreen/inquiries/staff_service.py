@@ -4,6 +4,8 @@ from datetime import UTC, datetime
 from math import ceil
 from uuid import UUID, uuid4
 
+from sqlalchemy.orm.exc import StaleDataError
+
 from unigreen.api.errors import ApiError
 from unigreen.audit.models import AuditEvent
 from unigreen.domain.enums import InquiryStatus, StaffStatus
@@ -116,6 +118,24 @@ class StaffInquiryService:
                 message="The inquiry was modified by another staff member. Please reload.",
             )
 
+    async def _commit(self) -> None:
+        # Inquiry.version is a SQLAlchemy version_id_col: the flush appends
+        # "AND version = :old_version" to the UPDATE and bumps it atomically
+        # at the database level. `_check_version` above only rejects a
+        # request against the version it read at the start of the call; two
+        # requests can both pass that check against the same stale value and
+        # race to commit. StaleDataError is the DB-level backstop that turns
+        # the loser of that race into a clean 409 instead of a lost update.
+        try:
+            await self.repository.commit()
+        except StaleDataError:
+            await self.repository.rollback()
+            raise ApiError(
+                status_code=409,
+                code="CONCURRENCY_CONFLICT",
+                message="The inquiry was modified by another staff member. Please reload.",
+            ) from None
+
     async def list_inquiries(
         self,
         *,
@@ -186,7 +206,7 @@ class StaffInquiryService:
                     },
                 )
             )
-            await self.repository.commit()
+            await self._commit()
             await self.repository.refresh(inquiry)
         return self._detail_response(inquiry)
 
@@ -240,7 +260,7 @@ class StaffInquiryService:
                     },
                 )
             )
-            await self.repository.commit()
+            await self._commit()
             await self.repository.refresh(inquiry)
         return self._detail_response(inquiry)
 
@@ -318,7 +338,7 @@ class StaffInquiryService:
 
         if mutated:
             inquiry.version += 1
-            await self.repository.commit()
+            await self._commit()
             await self.repository.refresh(inquiry)
 
         return self._detail_response(inquiry)
