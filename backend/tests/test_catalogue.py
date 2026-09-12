@@ -53,11 +53,22 @@ class FakeCatalogueRepository:
     async def get_category(self, category_id: UUID) -> ProductCategory | None:
         return self.categories.get(category_id)
 
-    async def list_products(self) -> list[Product]:
-        return list(self.products.values())
+    async def list_products(self, mapping_status: str | None = None) -> list[Product]:
+        items = list(self.products.values())
+        if mapping_status == "mapped":
+            return [p for p in items if p.canonical_product_id is not None]
+        if mapping_status == "unmapped":
+            return [p for p in items if p.canonical_product_id is None]
+        return items
 
     async def get_product(self, product_id: UUID) -> Product | None:
         return self.products.get(product_id)
+
+    async def get_product_by_canonical_id(self, canonical_product_id: str) -> Product | None:
+        for p in self.products.values():
+            if p.canonical_product_id == canonical_product_id:
+                return p
+        return None
 
     async def categories_exist(self, category_ids: list[UUID]) -> bool:
         return all(item in self.categories for item in category_ids)

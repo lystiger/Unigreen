@@ -248,6 +248,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/staff/products/{product_id}/map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Map Product */
+        post: operations["map_product_api_v1_staff_products__product_id__map_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staff/products/{product_id}/unmap": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unmap Product */
+        post: operations["unmap_product_api_v1_staff_products__product_id__unmap_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/staff/canonical-products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Canonical Products */
+        get: operations["list_canonical_products_api_v1_staff_canonical_products_get"];
+        put?: never;
+        /** Create Canonical Product */
+        post: operations["create_canonical_product_api_v1_staff_canonical_products_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/categories": {
         parameters: {
             query?: never;
@@ -544,6 +596,59 @@ export interface components {
             /** Source Reference */
             source_reference?: string | null;
         };
+        /** CanonicalProductCreate */
+        CanonicalProductCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Unit
+             * @default cái
+             */
+            unit: string;
+            /** Sku */
+            sku?: string | null;
+            /** Category */
+            category?: string | null;
+            /** Specifications */
+            specifications?: {
+                [key: string]: unknown;
+            };
+            /** Easybooks Code */
+            easybooks_code?: string | null;
+        };
+        /** CanonicalProductRead */
+        CanonicalProductRead: {
+            /** Id */
+            id: string;
+            /**
+             * Code
+             * @default
+             */
+            code: string;
+            /** Sku */
+            sku: string;
+            /** Name */
+            name: string;
+            /** Unit */
+            unit: string;
+            /** Category */
+            category?: string | null;
+            /**
+             * Status
+             * @default active
+             */
+            status: string;
+            /** Specifications */
+            specifications?: {
+                [key: string]: unknown;
+            };
+            /** Easybooks Code */
+            easybooks_code?: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+        };
         /** CategoryCreate */
         CategoryCreate: {
             /** Slug */
@@ -803,7 +908,9 @@ export interface components {
         /** ProductCreate */
         ProductCreate: {
             /** Sku */
-            sku: string;
+            sku?: string | null;
+            /** Canonical Product Id */
+            canonical_product_id?: string | null;
             /** Slug */
             slug: string;
             /** Barcode */
@@ -830,6 +937,11 @@ export interface components {
             /** Translations */
             translations: components["schemas"]["ProductTranslationInput"][];
         };
+        /** ProductMapRequest */
+        ProductMapRequest: {
+            /** Canonical Product Id */
+            canonical_product_id: string;
+        };
         /** ProductResponse */
         ProductResponse: {
             /**
@@ -837,6 +949,13 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Canonical Product Id */
+            canonical_product_id?: string | null;
+            /**
+             * Is Mapped
+             * @default false
+             */
+            is_mapped: boolean;
             /** Sku */
             sku: string;
             /** Slug */
@@ -879,6 +998,8 @@ export interface components {
         ProductUpdate: {
             /** Version */
             version: number;
+            /** Canonical Product Id */
+            canonical_product_id?: string | null;
             /** Sku */
             sku?: string | null;
             /** Slug */
@@ -1947,7 +2068,9 @@ export interface operations {
     };
     list_products_api_v1_staff_products_get: {
         parameters: {
-            query?: never;
+            query?: {
+                mapping_status?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1961,6 +2084,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProductResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -1998,6 +2130,15 @@ export interface operations {
             };
             /** @description Request failed */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2402,6 +2543,219 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    map_product_api_v1_staff_products__product_id__map_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductMapRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponse"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unmap_product_api_v1_staff_products__product_id__unmap_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductResponse"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_canonical_products_api_v1_staff_canonical_products_get: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                category?: string | null;
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CanonicalProductRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_canonical_product_api_v1_staff_canonical_products_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CanonicalProductCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CanonicalProductRead"];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };

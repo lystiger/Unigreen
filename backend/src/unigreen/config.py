@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = True
     smtp_from_email: str = ""
     smtp_image_path: Path = Path("/app/jumbo-roll.webp")
+    uniops_base_url: str = "http://localhost:8000"
+    uniops_api_key: str = ""
 
     @model_validator(mode="after")
     def validate_production_settings(self) -> Self:

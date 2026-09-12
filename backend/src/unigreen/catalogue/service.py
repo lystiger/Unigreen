@@ -32,6 +32,7 @@ from unigreen.catalogue.schemas import (
     SpecificationReplace,
 )
 from unigreen.domain.enums import PublicationStatus
+from unigreen.integrations.uniops import FakeUniOpsClient, UniOpsClient
 
 
 class CatalogueService:
@@ -128,10 +129,41 @@ class CatalogueService:
         await self.repository.delete(category)
         await self._commit_with_conflict_mapping()
 
-    async def create_product(self, payload: ProductCreate) -> Product:
+    async def create_product(
+        self, payload: ProductCreate, client: UniOpsClient | FakeUniOpsClient | None = None
+    ) -> Product:
         await self._require_categories(payload.category_ids)
+        sku = payload.sku
+        if payload.canonical_product_id:
+            existing = await self.repository.get_product_by_canonical_id(
+                payload.canonical_product_id
+            )
+            if existing:
+                raise ApiError(
+                    status_code=409,
+                    code="CANONICAL_PRODUCT_ALREADY_MAPPED",
+                    message=(
+                        "This canonical product is already mapped to another catalogue product."
+                    ),
+                )
+            if client is not None:
+                canonical = await client.get_product(payload.canonical_product_id)
+                if canonical is None:
+                    raise ApiError(
+                        status_code=404,
+                        code="CANONICAL_PRODUCT_NOT_FOUND",
+                        message="Canonical product was not found in UniOps.",
+                    )
+                sku = canonical.sku
+        if not sku:
+            raise ApiError(
+                status_code=422,
+                code="VALIDATION_ERROR",
+                message="SKU could not be resolved from canonical product.",
+            )
         product = Product(
-            sku=normalize_sku(payload.sku),
+            canonical_product_id=payload.canonical_product_id,
+            sku=normalize_sku(sku),
             slug=self._valid_slug(payload.slug),
             barcode=self._normalize_optional(payload.barcode),
             oem_available=payload.oem_available,
@@ -155,6 +187,20 @@ class CatalogueService:
         product = await self._product_or_404(product_id)
         self._check_version(product.version, payload.version)
         fields = payload.model_fields_set
+        if "canonical_product_id" in fields:
+            if payload.canonical_product_id is not None:
+                existing = await self.repository.get_product_by_canonical_id(
+                    payload.canonical_product_id
+                )
+                if existing and existing.id != product.id:
+                    raise ApiError(
+                        status_code=409,
+                        code="CANONICAL_PRODUCT_ALREADY_MAPPED",
+                        message=(
+                            "This canonical product is already mapped to another catalogue product."
+                        ),
+                    )
+            product.canonical_product_id = payload.canonical_product_id
         if payload.sku is not None:
             product.sku = normalize_sku(payload.sku)
         if payload.slug is not None:
@@ -188,6 +234,54 @@ class CatalogueService:
             ]
         product.version += 1
         await self._commit_with_conflict_mapping()
+        return product
+
+    async def map_canonical_product(
+        self,
+        product_id: UUID,
+        canonical_product_id: str,
+        client: UniOpsClient | FakeUniOpsClient,
+        *,
+        actor_id: UUID,
+        request_id: str,
+    ) -> Product:
+        product = await self._product_or_404(product_id)
+        existing = await self.repository.get_product_by_canonical_id(canonical_product_id)
+        if existing and existing.id != product.id:
+            raise ApiError(
+                status_code=409,
+                code="CANONICAL_PRODUCT_ALREADY_MAPPED",
+                message=(
+                    "This canonical product is already mapped to another catalogue product."
+                ),
+            )
+        canonical = await client.get_product(canonical_product_id)
+        if canonical is None:
+            raise ApiError(
+                status_code=404,
+                code="CANONICAL_PRODUCT_NOT_FOUND",
+                message="Canonical product was not found in UniOps.",
+            )
+        product.canonical_product_id = canonical_product_id
+        product.sku = normalize_sku(canonical.sku)
+        product.version += 1
+        self._audit(actor_id, "product.mapped", product.id, request_id)
+        await self._commit_with_conflict_mapping()
+        return product
+
+    async def unmap_canonical_product(
+        self,
+        product_id: UUID,
+        *,
+        actor_id: UUID,
+        request_id: str,
+    ) -> Product:
+        product = await self._product_or_404(product_id)
+        if product.canonical_product_id is not None:
+            product.canonical_product_id = None
+            product.version += 1
+            self._audit(actor_id, "product.unmapped", product.id, request_id)
+            await self.repository.commit()
         return product
 
     async def replace_specifications(
@@ -310,6 +404,8 @@ class CatalogueService:
                 code = "SKU_ALREADY_EXISTS"
             elif "barcode" in message:
                 code = "BARCODE_ALREADY_EXISTS"
+            elif "canonical" in message:
+                code = "CANONICAL_PRODUCT_ALREADY_MAPPED"
             raise ApiError(
                 status_code=409,
                 code=code,

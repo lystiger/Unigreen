@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import Any, Self
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from unigreen.domain.enums import Locale, PublicationStatus
 
@@ -74,7 +75,8 @@ def normalize_pack_options(value: list[str]) -> list[str]:
 
 
 class ProductCreate(BaseModel):
-    sku: str = Field(min_length=1, max_length=100)
+    sku: str | None = Field(default=None, max_length=100)
+    canonical_product_id: str | None = Field(default=None, max_length=36)
     slug: str = Field(min_length=1, max_length=160)
     barcode: str | None = Field(default=None, max_length=100)
     oem_available: bool = False
@@ -83,6 +85,12 @@ class ProductCreate(BaseModel):
     sort_order: int = Field(default=0, ge=0)
     category_ids: list[UUID] = Field(default_factory=list)
     translations: list[ProductTranslationInput] = Field(min_length=1, max_length=2)
+
+    @model_validator(mode="after")
+    def validate_sku_or_canonical(self) -> Self:
+        if not self.sku and not self.canonical_product_id:
+            raise ValueError("Either sku or canonical_product_id must be provided.")
+        return self
 
     @field_validator("category_ids")
     @classmethod
@@ -108,6 +116,7 @@ class ProductCreate(BaseModel):
 
 class ProductUpdate(BaseModel):
     version: int = Field(ge=1)
+    canonical_product_id: str | None = Field(default=None, max_length=36)
     sku: str | None = Field(default=None, min_length=1, max_length=100)
     slug: str | None = Field(default=None, min_length=1, max_length=160)
     barcode: str | None = Field(default=None, max_length=100)
@@ -153,6 +162,8 @@ class SpecificationReplace(BaseModel):
 
 class ProductResponse(BaseModel):
     id: UUID
+    canonical_product_id: str | None = None
+    is_mapped: bool = False
     sku: str
     slug: str
     barcode: str | None
@@ -165,3 +176,30 @@ class ProductResponse(BaseModel):
     category_ids: list[UUID]
     translations: list[ProductTranslationInput]
     specifications: list[SpecificationInput]
+
+
+class ProductMapRequest(BaseModel):
+    canonical_product_id: str = Field(min_length=1, max_length=36)
+
+
+class CanonicalProductRead(BaseModel):
+    id: str
+    code: str = ""
+    sku: str
+    name: str
+    unit: str
+    category: str | None = None
+    status: str = "active"
+    specifications: dict[str, Any] = Field(default_factory=dict)
+    easybooks_code: str | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
+
+
+class CanonicalProductCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    unit: str = Field(default="cái", min_length=1, max_length=50)
+    sku: str | None = Field(default=None, max_length=50)
+    category: str | None = Field(default=None, max_length=100)
+    specifications: dict[str, Any] = Field(default_factory=dict)
+    easybooks_code: str | None = None

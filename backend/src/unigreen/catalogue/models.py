@@ -83,6 +83,10 @@ class Product(Base):
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    canonical_product_id: Mapped[str | None] = mapped_column(
+        String(36), unique=True, index=True, nullable=True, default=None
+    )
+    # sku is a shadow field synced from UniOps canonical product identity (e.g. UG000001)
     sku: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     slug: Mapped[str] = mapped_column(String(160), unique=True, index=True)
     barcode: Mapped[str | None] = mapped_column(String(100), unique=True, index=True)
