@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from uniops_stub import StubCanonicalProducts, canonical_product
 
 from unigreen.api.errors import ApiError
 from unigreen.audit.models import AuditEvent
@@ -69,6 +70,12 @@ class InMemoryCatalogueAndInquiryStore:
 
     async def get_product(self, product_id: UUID) -> Product | None:
         return self.products.get(product_id)
+
+    async def get_product_by_canonical_id(self, canonical_product_id: str) -> Product | None:
+        for p in self.products.values():
+            if p.canonical_product_id == canonical_product_id:
+                return p
+        return None
 
     async def get_product_by_slug(self, slug: str, locale: str) -> Product | None:
         for p in self.products.values():
@@ -186,9 +193,12 @@ async def test_full_live_backend_staff_flow_and_inquiry_lifecycle() -> None:
     vietnamese_name = "Khăn giấy lụa cao cấp hộp rút 3 lớp Uni-Green thân thiện môi trường"
     english_name = "Uni-Green Premium 3-Ply Eco-Friendly Facial Box Tissue"
 
+    # The product identity comes from the UniOps product master; the catalogue
+    # entry references it and presents it.
+    canonical = canonical_product("UG000001", "Khăn giấy lụa hộp rút 3 lớp", code="TP.KGL3")
     product = await catalogue_service.create_product(
         ProductCreate(
-            sku="UG-TEST-001",
+            canonical_product_id=canonical.id,
             slug="khan-giay-lua-hop-rut",
             category_ids=[category.id],
             pack_options=["Hộp 100 tờ", "Hộp 150 tờ"],
@@ -208,9 +218,11 @@ async def test_full_live_backend_staff_flow_and_inquiry_lifecycle() -> None:
                     ),
                 ),
             ],
-        )
+        ),
+        StubCanonicalProducts(canonical),
     )
-    assert product.sku == "UG-TEST-001"
+    assert product.canonical_product_id == str(canonical.id)
+    assert product.sku == canonical.sku == "UG000001"
     assert product.slug == "khan-giay-lua-hop-rut"
     assert product.status == PublicationStatus.DRAFT
 
@@ -311,7 +323,7 @@ async def test_full_live_backend_staff_flow_and_inquiry_lifecycle() -> None:
             assert res_vi.status_code == 200
             data_vi = res_vi.json()
             assert data_vi["name"] == vietnamese_name
-            assert data_vi["sku"] == "UG-TEST-001"
+            assert data_vi["sku"] == "UG000001"
             assert data_vi["primary_media"] is not None
 
             # Check English public detail
@@ -319,7 +331,7 @@ async def test_full_live_backend_staff_flow_and_inquiry_lifecycle() -> None:
             assert res_en.status_code == 200
             data_en = res_en.json()
             assert data_en["name"] == english_name
-            assert data_en["sku"] == "UG-TEST-001"
+            assert data_en["sku"] == "UG000001"
 
             # Step 7: Submit exactly ONE inquiry with Idempotency-Key
             idempotency_key = f"live-test-key-{uuid4()}"
@@ -357,7 +369,7 @@ async def test_full_live_backend_staff_flow_and_inquiry_lifecycle() -> None:
             assert inq_data["contact_name"] == "Trần Doanh Nghiệp"
             assert inq_data["status"] == "new"
             assert len(inq_data["lines"]) == 1
-            assert inq_data["lines"][0]["product_sku"] == "UG-TEST-001"
+            assert inq_data["lines"][0]["product_sku"] == "UG000001"
             assert inq_data["lines"][0]["product_name"] == vietnamese_name
 
             # Step 8: Verify Database Record directly in storage
@@ -369,7 +381,7 @@ async def test_full_live_backend_staff_flow_and_inquiry_lifecycle() -> None:
             line_db = inquiry_db.lines[0]
             assert line_db.pack_option == "Hộp 150 tờ"
             assert line_db.quantity == Decimal("500")
-            assert line_db.product_snapshot["sku"] == "UG-TEST-001"
+            assert line_db.product_snapshot["sku"] == "UG000001"
 
             # Step 9: Verify Test Email generation
             smtp_mock = MagicMock()
@@ -399,7 +411,7 @@ async def test_full_live_backend_staff_flow_and_inquiry_lifecycle() -> None:
             email_body = sent_msg.get_content()
             assert reference in email_body
             assert "Trần Doanh Nghiệp" in email_body
-            assert "UG-TEST-001" in email_body
+            assert "UG000001" in email_body
             assert "  Pack: Hộp 150 tờ" in email_body
             assert "  Specifications:" in email_body
             assert "    - Đóng 40 hộp/thùng" in email_body

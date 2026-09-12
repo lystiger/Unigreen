@@ -18,12 +18,13 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     op.add_column("products", sa.Column("canonical_product_id", sa.String(36), nullable=True))
+    # A plain unique index: PostgreSQL treats NULLs as distinct, so any number of
+    # unmapped entries coexist while a canonical product maps to at most one.
     op.create_index(
         "ix_products_canonical_product_id",
         "products",
         ["canonical_product_id"],
         unique=True,
-        postgresql_where=sa.text("canonical_product_id IS NOT NULL"),
     )
 
 

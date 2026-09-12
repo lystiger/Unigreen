@@ -292,7 +292,13 @@ export interface paths {
         /** List Canonical Products */
         get: operations["list_canonical_products_api_v1_staff_canonical_products_get"];
         put?: never;
-        /** Create Canonical Product */
+        /**
+         * Create Canonical Product
+         * @description Ask UniOps for a new canonical product when no existing one matches.
+         *
+         *     UniOps assigns the SKU. The new product is not mapped by this call; staff
+         *     map it explicitly afterwards.
+         */
         post: operations["create_canonical_product_api_v1_staff_canonical_products_post"];
         delete?: never;
         options?: never;
@@ -596,35 +602,37 @@ export interface components {
             /** Source Reference */
             source_reference?: string | null;
         };
-        /** CanonicalProductCreate */
-        CanonicalProductCreate: {
+        /**
+         * CanonicalProductDraft
+         * @description A request to UniOps for a new canonical product. UniOps assigns the SKU.
+         */
+        CanonicalProductDraft: {
             /** Name */
             name: string;
-            /**
-             * Unit
-             * @default cái
-             */
+            /** Unit */
             unit: string;
-            /** Sku */
-            sku?: string | null;
-            /** Category */
-            category?: string | null;
+            /**
+             * Category
+             * @default general
+             */
+            category: string;
+            /** Code */
+            code?: string | null;
             /** Specifications */
             specifications?: {
                 [key: string]: unknown;
             };
-            /** Easybooks Code */
-            easybooks_code?: string | null;
         };
-        /** CanonicalProductRead */
-        CanonicalProductRead: {
-            /** Id */
-            id: string;
+        /**
+         * CanonicalProductResponse
+         * @description A UniOps canonical product as shown to catalogue staff while mapping.
+         */
+        CanonicalProductResponse: {
             /**
-             * Code
-             * @default
+             * Id
+             * Format: uuid
              */
-            code: string;
+            id: string;
             /** Sku */
             sku: string;
             /** Name */
@@ -632,22 +640,22 @@ export interface components {
             /** Unit */
             unit: string;
             /** Category */
-            category?: string | null;
+            category: string;
             /**
              * Status
-             * @default active
+             * @enum {string}
              */
-            status: string;
+            status: "active" | "discontinued";
             /** Specifications */
-            specifications?: {
+            specifications: {
                 [key: string]: unknown;
             };
             /** Easybooks Code */
-            easybooks_code?: string | null;
-            /** Created At */
-            created_at?: string | null;
-            /** Updated At */
-            updated_at?: string | null;
+            easybooks_code: string | null;
+            /** Easybooks Material Goods Id */
+            easybooks_material_goods_id: string | null;
+            /** Mapped Catalogue Product Id */
+            mapped_catalogue_product_id: string | null;
         };
         /** CategoryCreate */
         CategoryCreate: {
@@ -905,12 +913,19 @@ export interface components {
          * @enum {string}
          */
         Permission: "catalogue:read" | "catalogue:write" | "catalogue:publish" | "inquiry:read" | "inquiry:write";
-        /** ProductCreate */
+        /**
+         * ProductCreate
+         * @description A new catalogue entry presenting one UniOps canonical product.
+         *
+         *     There is no `sku`: the SKU is copied from the canonical product. Unknown
+         *     fields are rejected so a client still sending one is told immediately.
+         */
         ProductCreate: {
-            /** Sku */
-            sku?: string | null;
-            /** Canonical Product Id */
-            canonical_product_id?: string | null;
+            /**
+             * Canonical Product Id
+             * Format: uuid
+             */
+            canonical_product_id: string;
             /** Slug */
             slug: string;
             /** Barcode */
@@ -939,7 +954,10 @@ export interface components {
         };
         /** ProductMapRequest */
         ProductMapRequest: {
-            /** Canonical Product Id */
+            /**
+             * Canonical Product Id
+             * Format: uuid
+             */
             canonical_product_id: string;
         };
         /** ProductResponse */
@@ -998,8 +1016,6 @@ export interface components {
         ProductUpdate: {
             /** Version */
             version: number;
-            /** Canonical Product Id */
-            canonical_product_id?: string | null;
             /** Sku */
             sku?: string | null;
             /** Slug */
@@ -2069,7 +2085,7 @@ export interface operations {
     list_products_api_v1_staff_products_get: {
         parameters: {
             query?: {
-                mapping_status?: string | null;
+                mapping_status?: ("mapped" | "unmapped") | null;
             };
             header?: never;
             path?: never;
@@ -2138,15 +2154,6 @@ export interface operations {
                 };
             };
             /** @description Request failed */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorEnvelope"];
-                };
-            };
-            /** @description Request failed */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -2157,6 +2164,24 @@ export interface operations {
             };
             /** @description Request failed */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2607,13 +2632,31 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
-            /** @description Validation Error */
+            /** @description Request failed */
             422: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
@@ -2680,8 +2723,7 @@ export interface operations {
         parameters: {
             query?: {
                 search?: string | null;
-                category?: string | null;
-                status?: string | null;
+                status?: ("active" | "discontinued") | null;
             };
             header?: never;
             path?: never;
@@ -2695,7 +2737,25 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CanonicalProductRead"][];
+                    "application/json": components["schemas"]["CanonicalProductResponse"][];
+                };
+            };
+            /** @description Request failed */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
             /** @description Validation Error */
@@ -2705,6 +2765,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Request failed */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
@@ -2718,7 +2796,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CanonicalProductCreate"];
+                "application/json": components["schemas"]["CanonicalProductDraft"];
             };
         };
         responses: {
@@ -2728,7 +2806,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CanonicalProductRead"];
+                    "application/json": components["schemas"]["CanonicalProductResponse"];
                 };
             };
             /** @description Request failed */
@@ -2750,7 +2828,34 @@ export interface operations {
                 };
             };
             /** @description Request failed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request failed */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

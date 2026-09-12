@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from sqlalchemy.exc import IntegrityError
+from uniops_stub import StubCanonicalProducts, canonical_product
 
 from unigreen.api.errors import ApiError
 from unigreen.audit.models import AuditEvent
@@ -318,15 +319,18 @@ async def test_product_lifecycle_specifications_and_response() -> None:
     )
     repository.categories[category.id] = category
 
+    canonical = canonical_product("ug000001")
     product = await service.create_product(
         ProductCreate(
-            sku=" ug  001 ",
+            canonical_product_id=canonical.id,
             slug="Bathroom Tissue",
             category_ids=[category.id],
             translations=product_translations(),
-        )
+        ),
+        StubCanonicalProducts(canonical),
     )
-    assert product.sku == "UG-001"
+    assert product.sku == "UG000001"
+    assert product.canonical_product_id == str(canonical.id)
     assert product.slug == "bathroom-tissue"
 
     product = await service.replace_specifications(
@@ -414,11 +418,12 @@ async def test_product_validation_errors_are_specific() -> None:
     with pytest.raises(ApiError) as missing_category:
         await service.create_product(
             ProductCreate(
-                sku="UG-001",
+                canonical_product_id=uuid4(),
                 slug="product",
                 category_ids=[category_id],
                 translations=product_translations(),
-            )
+            ),
+            StubCanonicalProducts(),
         )
     assert missing_category.value.code == "CATEGORY_NOT_FOUND"
 

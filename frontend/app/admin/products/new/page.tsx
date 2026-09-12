@@ -4,19 +4,20 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ApiClientError, apiRequest } from "@/lib/api/client";
-import type { CanonicalProduct, Category, Product, ProductCreate } from "@/lib/api/types";
+import { CanonicalProductPicker } from "@/components/admin/CanonicalProductPicker";
+import type {
+  CanonicalProduct,
+  Category,
+  Product,
+  ProductCreate,
+} from "@/lib/api/types";
 
 export default function NewProductPage() {
   const router = useRouter();
-  const [canonicalProductId, setCanonicalProductId] = useState<string>("");
-  const [sku, setSku] = useState<string>("");
+  const [canonical, setCanonical] = useState<CanonicalProduct | null>(null);
   const categories = useQuery({
     queryKey: ["staff-categories"],
     queryFn: () => apiRequest<Category[]>("/api/v1/staff/categories"),
-  });
-  const canonicalProducts = useQuery({
-    queryKey: ["staff-canonical-products"],
-    queryFn: () => apiRequest<CanonicalProduct[]>("/api/v1/staff/canonical-products"),
   });
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const create = useMutation({
@@ -28,22 +29,12 @@ export default function NewProductPage() {
     onSuccess: (product) => router.replace(`/admin/products/${product.id}`),
   });
 
-  const onSelectCanonical = (id: string) => {
-    setCanonicalProductId(id);
-    const cp = canonicalProducts.data?.find((item) => item.id === id);
-    if (cp) {
-      setSku(cp.sku);
-    } else {
-      setSku("");
-    }
-  };
-
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!canonical) return;
     const data = new FormData(event.currentTarget);
     create.mutate({
-      canonical_product_id: canonicalProductId || null,
-      sku: canonicalProductId ? sku : String(data.get("sku") ?? ""),
+      canonical_product_id: canonical.id,
       slug: String(data.get("slug") ?? ""),
       barcode: String(data.get("barcode") ?? "") || null,
       oem_available: data.get("oem_available") === "on",
@@ -87,57 +78,18 @@ export default function NewProductPage() {
         </div>
       ) : null}
 
-      <div className="mt-6 rounded-card border border-line bg-paper-raised p-6">
-        <h2 className="text-h2 font-semibold">Canonical Product Identity (UniOps)</h2>
+      <section className="mt-6 rounded-card border border-line bg-paper-raised p-6">
+        <h2 className="text-h2 font-semibold">UniOps product</h2>
         <p className="mt-1 text-data text-ink-muted">
-          Connect this presentation catalogue item to an authoritative UniOps product (recommended).
+          Every catalogue product presents one UniOps product. Its SKU comes from UniOps
+          and cannot be edited here.
         </p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <select
-            value={canonicalProductId}
-            onChange={(e) => onSelectCanonical(e.target.value)}
-            className="rounded-control border border-line-strong px-3 py-2 text-data"
-          >
-            <option value="">— Create without mapping (Legacy / Manual SKU) —</option>
-            {canonicalProducts.data?.map((cp) => (
-              <option key={cp.id} value={cp.id}>
-                {cp.sku} - {cp.name} ({cp.unit})
-              </option>
-            ))}
-          </select>
-          {canonicalProductId ? (
-            <button
-              type="button"
-              onClick={() => onSelectCanonical("")}
-              className="min-h-11 inline-flex items-center rounded-control border border-line px-3 py-2 text-data text-ink-muted hover:bg-paper-sunk"
-            >
-              Clear
-            </button>
-          ) : null}
+        <div className="mt-4">
+          <CanonicalProductPicker value={canonical?.id ?? ""} onChange={setCanonical} />
         </div>
-      </div>
+      </section>
 
       <div className="mt-8 grid gap-5 rounded-card border border-line bg-paper-raised p-6 sm:grid-cols-2">
-        <label className="font-medium">
-          <div className="flex items-center justify-between">
-            <span>SKU</span>
-            {canonicalProductId ? (
-              <span className="text-xs font-normal text-brand-green">
-                Authoritative from UniOps
-              </span>
-            ) : null}
-          </div>
-          <input
-            required
-            name="sku"
-            value={canonicalProductId ? sku : undefined}
-            defaultValue={!canonicalProductId ? "" : undefined}
-            readOnly={Boolean(canonicalProductId)}
-            className={`mt-2 w-full rounded-control border border-line-strong px-3 py-2 ${
-              canonicalProductId ? "cursor-not-allowed bg-paper-sunk text-ink-muted" : ""
-            }`}
-          />
-        </label>
         <Field label="Slug" name="slug" required />
         <Field label="Barcode (optional)" name="barcode" />
         <label className="font-medium sm:col-span-2">
@@ -185,7 +137,7 @@ export default function NewProductPage() {
       </fieldset>
       <button
         type="submit"
-        disabled={create.isPending}
+        disabled={create.isPending || !canonical}
         className="min-h-11 mt-6 rounded-control bg-brand-green px-5 py-3 font-medium text-white disabled:opacity-50"
       >
         {create.isPending ? "Creating…" : "Create draft"}

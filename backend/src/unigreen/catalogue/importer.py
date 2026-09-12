@@ -38,7 +38,6 @@ class DraftCategoryImport(BaseModel):
 
 class DraftProductImport(BaseModel):
     sku: str = Field(min_length=1, max_length=100)
-    canonical_product_id: str | None = Field(default=None, max_length=36)
     slug: str = Field(min_length=1, max_length=160)
     barcode: str | None = Field(default=None, max_length=100)
     oem_available: bool = False
@@ -182,7 +181,6 @@ def build_draft_entities(
         products.append(
             Product(
                 id=uuid4(),
-                canonical_product_id=product_item.canonical_product_id,
                 sku=normalize_sku(product_item.sku),
                 slug=normalize_slug(product_item.slug),
                 barcode=product_item.barcode.strip() if product_item.barcode else None,

@@ -1,161 +1,171 @@
+"""The UniOps canonical product master, as the catalogue reads it.
+
+UniOps owns product identity: the canonical id, the SKU, the official name and
+the EasyBooks mapping. Unigreen stores only the canonical id of the product a
+catalogue entry presents, plus a read-only copy of its SKU. Authority flows one
+way, UniOps to Unigreen; nothing here edits a canonical product, and nothing
+synchronises in the background.
+
+Every failure to reach or understand UniOps becomes an explicit `ApiError`, so
+staff see why a mapping could not be made instead of a generic server error.
+"""
+
 from __future__ import annotations
 
-from typing import Any
+from datetime import datetime
+from typing import Any, Literal, Protocol
+from uuid import UUID
 
 import httpx
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
+
+from unigreen.api.errors import ApiError
+
+PRODUCTS_PATH = "/api/products"
+CATALOG_KEY_HEADER = "X-UniOps-Catalog-Key"
 
 
 class CanonicalProduct(BaseModel):
-    id: str
-    code: str = ""
+    """A UniOps product as `GET /api/products` returns it."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    id: UUID
     sku: str
     name: str
     unit: str
-    category: str | None = None
-    status: str = "active"
+    category: str
+    status: Literal["active", "discontinued"]
     specifications: dict[str, Any] = Field(default_factory=dict)
-    easybooks_code: str | None = None
-    created_at: str | None = None
-    updated_at: str | None = None
+    # EasyBooks material goods code and id. References into the accounting
+    # system, shown to staff to identify the product; never stored here.
+    code: str | None = None
+    easybooks_material_goods_id: str | None = None
+    created_at: datetime
+    updated_at: datetime
 
 
-class CanonicalProductCreatePayload(BaseModel):
+class CanonicalProductDraft(BaseModel):
+    """A request to UniOps for a new canonical product. UniOps assigns the SKU."""
+
+    model_config = ConfigDict(extra="forbid")
+
     name: str = Field(min_length=1, max_length=255)
     unit: str = Field(min_length=1, max_length=50)
-    sku: str | None = Field(default=None, max_length=50)
+    category: str = Field(default="general", min_length=1, max_length=100)
     code: str | None = Field(default=None, max_length=100)
-    category: str | None = Field(default=None, max_length=100)
-    status: str = "active"
     specifications: dict[str, Any] = Field(default_factory=dict)
-    easybooks_code: str | None = None
+
+
+class CanonicalProductSource(Protocol):
+    async def list_products(
+        self, *, search: str | None = None, status: str | None = None
+    ) -> list[CanonicalProduct]: ...
+
+    async def get_product(self, product_id: UUID) -> CanonicalProduct | None: ...
+
+    async def create_product(self, draft: CanonicalProductDraft) -> CanonicalProduct: ...
+
+
+def _unavailable() -> ApiError:
+    return ApiError(
+        status_code=502,
+        code="UNIOPS_UNAVAILABLE",
+        message="The UniOps product master could not be reached. Try again shortly.",
+    )
 
 
 class UniOpsClient:
-    """Client for communicating with UniOps canonical product master."""
-
-    def __init__(self, base_url: str, api_key: str = "", timeout: float = 10.0) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        catalog_key: str,
+        *,
+        timeout: float = 10.0,
+        transport: httpx.AsyncBaseTransport | None = None,
+    ) -> None:
         self.base_url = base_url.rstrip("/")
-        self.api_key = api_key
+        self.catalog_key = catalog_key
         self.timeout = timeout
+        self.transport = transport
 
-    def _headers(self) -> dict[str, str]:
-        headers = {"Accept": "application/json"}
-        if self.api_key:
-            headers["X-UniOps-Key"] = self.api_key
-        return headers
-
-    async def list_products(
-        self,
-        search: str | None = None,
-        category: str | None = None,
-        status: str | None = None,
-    ) -> list[CanonicalProduct]:
-        params: dict[str, str] = {}
-        if search:
-            params["search"] = search
-        if category:
-            params["category"] = category
-        if status:
-            params["status"] = status
-
-        async with httpx.AsyncClient(
-            base_url=self.base_url,
-            timeout=self.timeout,
-            headers=self._headers(),
-        ) as client:
-            resp = await client.get("/api/v1/products", params=params)
-            resp.raise_for_status()
-            data = resp.json()
-            return [CanonicalProduct.model_validate(item) for item in data]
-
-    async def get_product(self, product_id: str) -> CanonicalProduct | None:
-        async with httpx.AsyncClient(
-            base_url=self.base_url,
-            timeout=self.timeout,
-            headers=self._headers(),
-        ) as client:
-            resp = await client.get(f"/api/v1/products/{product_id}")
-            if resp.status_code == 404:
-                return None
-            resp.raise_for_status()
-            return CanonicalProduct.model_validate(resp.json())
-
-    async def get_product_by_sku(self, sku: str) -> CanonicalProduct | None:
-        products = await self.list_products(search=sku)
-        for p in products:
-            if p.sku == sku:
-                return p
-        return None
-
-    async def create_product(self, payload: CanonicalProductCreatePayload) -> CanonicalProduct:
-        async with httpx.AsyncClient(
-            base_url=self.base_url,
-            timeout=self.timeout,
-            headers=self._headers(),
-        ) as client:
-            resp = await client.post(
-                "/api/v1/products",
-                json=payload.model_dump(exclude_none=True),
+    async def _request(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
+        try:
+            async with httpx.AsyncClient(
+                base_url=self.base_url,
+                timeout=self.timeout,
+                transport=self.transport,
+                headers={"Accept": "application/json", CATALOG_KEY_HEADER: self.catalog_key},
+            ) as client:
+                response = await client.request(method, path, **kwargs)
+        except httpx.HTTPError as exc:
+            raise _unavailable() from exc
+        if response.status_code in (401, 403):
+            raise ApiError(
+                status_code=502,
+                code="UNIOPS_CREDENTIALS_REJECTED",
+                message="UniOps refused the catalogue service key. Check the configuration.",
             )
-            resp.raise_for_status()
-            return CanonicalProduct.model_validate(resp.json())
+        if response.status_code >= 500:
+            raise _unavailable()
+        return response
 
-
-class FakeUniOpsClient:
-    """In-memory client for testing canonical product flows."""
-
-    def __init__(self, products: list[CanonicalProduct] | None = None) -> None:
-        self.products: dict[str, CanonicalProduct] = {
-            p.id: p for p in (products or [])
-        }
-        self.next_sku_num = len(self.products) + 1
+    @staticmethod
+    def _parse_one(payload: Any) -> CanonicalProduct:
+        try:
+            return CanonicalProduct.model_validate(payload)
+        except ValidationError as exc:
+            raise _contract_mismatch() from exc
 
     async def list_products(
-        self,
-        search: str | None = None,
-        category: str | None = None,
-        status: str | None = None,
+        self, *, search: str | None = None, status: str | None = None
     ) -> list[CanonicalProduct]:
-        items = list(self.products.values())
-        if search:
-            q = search.lower()
-            items = [
-                p
-                for p in items
-                if q in p.name.lower()
-                or q in p.sku.lower()
-                or (p.category and q in p.category.lower())
-            ]
-        if category:
-            items = [p for p in items if p.category == category]
-        if status:
-            items = [p for p in items if p.status == status]
-        return items
+        params = {key: value for key, value in (("search", search), ("status", status)) if value}
+        response = await self._request("GET", PRODUCTS_PATH, params=params)
+        _raise_unexpected(response)
+        payload = response.json()
+        if not isinstance(payload, list):
+            raise _contract_mismatch()
+        return [self._parse_one(item) for item in payload]
 
-    async def get_product(self, product_id: str) -> CanonicalProduct | None:
-        return self.products.get(product_id)
+    async def get_product(self, product_id: UUID) -> CanonicalProduct | None:
+        response = await self._request("GET", f"{PRODUCTS_PATH}/{product_id}")
+        if response.status_code == 404:
+            return None
+        _raise_unexpected(response)
+        return self._parse_one(response.json())
 
-    async def get_product_by_sku(self, sku: str) -> CanonicalProduct | None:
-        for p in self.products.values():
-            if p.sku == sku:
-                return p
-        return None
+    async def create_product(self, draft: CanonicalProductDraft) -> CanonicalProduct:
+        response = await self._request("POST", PRODUCTS_PATH, json=draft.model_dump())
+        if response.status_code == 409:
+            raise ApiError(
+                status_code=409,
+                code="CANONICAL_PRODUCT_CONFLICT",
+                message="UniOps already has a product with this EasyBooks code.",
+            )
+        if response.status_code == 422:
+            raise ApiError(
+                status_code=422,
+                code="CANONICAL_PRODUCT_INVALID",
+                message="UniOps did not accept the product details.",
+            )
+        _raise_unexpected(response)
+        return self._parse_one(response.json())
 
-    async def create_product(self, payload: CanonicalProductCreatePayload) -> CanonicalProduct:
-        product_id = f"prod-{len(self.products) + 1:04d}"
-        sku = payload.sku or f"UG{self.next_sku_num:06d}"
-        self.next_sku_num += 1
-        prod = CanonicalProduct(
-            id=product_id,
-            sku=sku,
-            name=payload.name,
-            unit=payload.unit,
-            category=payload.category,
-            status=payload.status,
-            specifications=payload.specifications,
-            easybooks_code=payload.easybooks_code or payload.code,
-            code=payload.code or payload.easybooks_code or sku,
-        )
-        self.products[product_id] = prod
-        return prod
+
+def _contract_mismatch() -> ApiError:
+    return ApiError(
+        status_code=502,
+        code="UNIOPS_CONTRACT_MISMATCH",
+        message="UniOps returned a product in a shape the catalogue does not understand.",
+    )
+
+
+def _raise_unexpected(response: httpx.Response) -> None:
+    if response.is_success:
+        return
+    raise ApiError(
+        status_code=502,
+        code="UNIOPS_REQUEST_FAILED",
+        message=f"UniOps answered the product request with status {response.status_code}.",
+    )

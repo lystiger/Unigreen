@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from uuid import UUID
+
 from unigreen.catalogue.models import Product, ProductCategory
 from unigreen.catalogue.schemas import (
     CategoryResponse,
@@ -35,7 +37,9 @@ def category_response(category: ProductCategory) -> CategoryResponse:
 def product_response(product: Product) -> ProductResponse:
     return ProductResponse(
         id=product.id,
-        canonical_product_id=product.canonical_product_id,
+        canonical_product_id=(
+            UUID(product.canonical_product_id) if product.canonical_product_id else None
+        ),
         is_mapped=product.canonical_product_id is not None,
         sku=product.sku,
         slug=product.slug,

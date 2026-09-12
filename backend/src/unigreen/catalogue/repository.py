@@ -40,15 +40,10 @@ class CatalogueRepository:
         )
 
     async def list_products(self, mapping_status: str | None = None) -> list[Product]:
-        query = (
-            select(Product)
-            .options(
-                selectinload(Product.translations),
-                selectinload(Product.category_links),
-                selectinload(Product.specifications).selectinload(
-                    ProductSpecification.translations
-                ),
-            )
+        query = select(Product).options(
+            selectinload(Product.translations),
+            selectinload(Product.category_links),
+            selectinload(Product.specifications).selectinload(ProductSpecification.translations),
         )
         if mapping_status == "mapped":
             query = query.where(Product.canonical_product_id.is_not(None))

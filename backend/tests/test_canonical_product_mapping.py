@@ -1,12 +1,18 @@
+"""Catalogue entries reference UniOps canonical products; UniOps owns identity."""
+
 from __future__ import annotations
 
+import json
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Any, cast
 from uuid import UUID, uuid4
 
 import httpx
 import pytest
-from httpx import AsyncClient, Response
+from httpx import AsyncClient
+from pydantic import ValidationError
+from uniops_stub import StubCanonicalProducts, canonical_product
 
 from unigreen.api.errors import ApiError
 from unigreen.audit.models import AuditEvent
@@ -14,66 +20,150 @@ from unigreen.auth.dependencies import get_auth_context, require_csrf
 from unigreen.auth.models import StaffSession
 from unigreen.auth.service import AuthContext
 from unigreen.auth.tokens import hash_token
-from unigreen.catalogue.models import (
-    Product,
-    ProductCategory,
-    ProductTranslation,
-)
+from unigreen.catalogue.models import Product, ProductCategory, ProductTranslation
 from unigreen.catalogue.repository import CatalogueRepository
-from unigreen.catalogue.router import get_catalogue_service, get_uniops_client
+from unigreen.catalogue.router import get_canonical_products, get_catalogue_service
 from unigreen.catalogue.schemas import (
     ProductCreate,
     ProductTranslationInput,
     ProductUpdate,
 )
 from unigreen.catalogue.service import CatalogueService
+from unigreen.config import Settings
 from unigreen.domain.enums import Locale, PublicationStatus, StaffRole, StaffStatus
 from unigreen.integrations.uniops import (
-    CanonicalProduct,
-    CanonicalProductCreatePayload,
-    FakeUniOpsClient,
+    CATALOG_KEY_HEADER,
+    CanonicalProductDraft,
     UniOpsClient,
 )
 from unigreen.main import app
 from unigreen.staff.models import StaffUser
 
+# Exactly what UniOps `GET /api/products/{id}` serialises (app.schemas.ProductRead),
+# including a product with no EasyBooks code.
+UNIOPS_PRODUCT: dict[str, Any] = {
+    "id": "e164da3c-9667-421a-a9ec-95598d0f3a11",
+    "sku": "UG000001",
+    "name": "Cuộn giấy vệ sinh CN 700gr -2 Lớp",
+    "unit": "Cuộn",
+    "category": "general",
+    "status": "active",
+    "specifications": {},
+    "code": None,
+    "easybooks_material_goods_id": None,
+    "created_at": "2026-09-12T19:24:30.728532Z",
+    "updated_at": "2026-09-12T19:24:30.728532Z",
+}
+UNIOPS_PRODUCT_ID = UUID(UNIOPS_PRODUCT["id"])
 
-def make_staff(
-    role: StaffRole = StaffRole.ADMINISTRATOR,
-    email: str = "admin@unigreen.example",
-) -> StaffUser:
-    return StaffUser(
-        id=uuid4(),
-        email=email,
-        password_hash="fake-hash",
-        role=role,
-        status=StaffStatus.ACTIVE,
+
+# UniOps HTTP client -------------------------------------------------------------
+
+
+def uniops(handler: Callable[[httpx.Request], httpx.Response]) -> UniOpsClient:
+    return UniOpsClient(
+        "http://uniops.internal/", "catalogue-key", transport=httpx.MockTransport(handler)
     )
 
 
-def make_auth_context(user: StaffUser) -> AuthContext:
-    return AuthContext(
-        user=user,
-        session=StaffSession(
-            staff_user_id=user.id,
-            token_hash=hash_token("test-session"),
-            csrf_token_hash=hash_token("test-csrf"),
-            expires_at=datetime.now(UTC),
+async def test_client_reads_the_uniops_product_routes_with_the_catalogue_key() -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if request.url.path == "/api/products":
+            return httpx.Response(200, json=[UNIOPS_PRODUCT])
+        if request.url.path == f"/api/products/{UNIOPS_PRODUCT_ID}":
+            return httpx.Response(200, json=UNIOPS_PRODUCT)
+        return httpx.Response(404, json={"detail": "Not Found"})
+
+    client = uniops(handler)
+    listed = await client.list_products(search="UG0", status="active")
+    fetched = await client.get_product(UNIOPS_PRODUCT_ID)
+
+    assert [item.sku for item in listed] == ["UG000001"]
+    assert fetched is not None and fetched.code is None
+    assert seen[0].url.params == httpx.QueryParams({"search": "UG0", "status": "active"})
+    assert all(request.headers[CATALOG_KEY_HEADER] == "catalogue-key" for request in seen)
+
+
+async def test_client_reports_a_missing_product_as_none() -> None:
+    client = uniops(lambda _: httpx.Response(404, json={"code": "PRODUCT_NOT_FOUND"}))
+    assert await client.get_product(uuid4()) is None
+
+
+async def test_client_creates_without_a_sku() -> None:
+    sent: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        sent.update(json.loads(request.content))
+        return httpx.Response(201, json={**UNIOPS_PRODUCT, "name": sent["name"]})
+
+    created = await uniops(handler).create_product(
+        CanonicalProductDraft(name="Napkin 2-ply", unit="Gói", specifications={"ply": 2})
+    )
+
+    assert created.sku == "UG000001"
+    assert "sku" not in sent
+    with pytest.raises(ValidationError):
+        CanonicalProductDraft.model_validate({"name": "X", "unit": "Gói", "sku": "UG000009"})
+
+
+@pytest.mark.parametrize(
+    ("respond", "status_code", "code"),
+    [
+        (
+            lambda: httpx.Response(401, json={"code": "CATALOG_SERVICE_KEY_INVALID"}),
+            502,
+            "UNIOPS_CREDENTIALS_REJECTED",
         ),
-    )
+        (lambda: httpx.Response(503), 502, "UNIOPS_UNAVAILABLE"),
+        (
+            lambda: httpx.Response(200, json=[{"id": "not-a-product"}]),
+            502,
+            "UNIOPS_CONTRACT_MISMATCH",
+        ),
+        (lambda: httpx.Response(200, json={"items": []}), 502, "UNIOPS_CONTRACT_MISMATCH"),
+        (lambda: httpx.Response(400), 502, "UNIOPS_REQUEST_FAILED"),
+    ],
+)
+async def test_client_failures_become_explicit_errors(
+    respond: Callable[[], httpx.Response], status_code: int, code: str
+) -> None:
+    with pytest.raises(ApiError) as raised:
+        await uniops(lambda _: respond()).list_products()
+    assert (raised.value.status_code, raised.value.code) == (status_code, code)
 
 
-class InMemCatalogueRepo:
+async def test_an_unreachable_uniops_is_reported_not_raised_raw() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("connection refused", request=request)
+
+    with pytest.raises(ApiError) as raised:
+        await uniops(handler).get_product(uuid4())
+    assert raised.value.code == "UNIOPS_UNAVAILABLE"
+
+
+@pytest.mark.parametrize(
+    ("status_code", "code"),
+    [(409, "CANONICAL_PRODUCT_CONFLICT"), (422, "CANONICAL_PRODUCT_INVALID")],
+)
+async def test_client_create_rejections_keep_their_meaning(status_code: int, code: str) -> None:
+    with pytest.raises(ApiError) as raised:
+        await uniops(lambda _: httpx.Response(status_code, json={})).create_product(
+            CanonicalProductDraft(name="X", unit="Gói")
+        )
+    assert (raised.value.status_code, raised.value.code) == (status_code, code)
+
+
+# Service ------------------------------------------------------------------------
+
+
+class InMemoryCatalogue:
     def __init__(self) -> None:
         self.categories: dict[UUID, ProductCategory] = {}
         self.products: dict[UUID, Product] = {}
         self.audits: list[AuditEvent] = []
-
-    async def list_categories(self) -> list[ProductCategory]:
-        return list(self.categories.values())
-
-    async def get_category(self, category_id: UUID) -> ProductCategory | None:
-        return self.categories.get(category_id)
 
     async def list_products(self, mapping_status: str | None = None) -> list[Product]:
         items = list(self.products.values())
@@ -87,18 +177,17 @@ class InMemCatalogueRepo:
         return self.products.get(product_id)
 
     async def get_product_by_canonical_id(self, canonical_product_id: str) -> Product | None:
-        for p in self.products.values():
-            if p.canonical_product_id == canonical_product_id:
-                return p
-        return None
+        return next(
+            (p for p in self.products.values() if p.canonical_product_id == canonical_product_id),
+            None,
+        )
 
     async def categories_exist(self, category_ids: list[UUID]) -> bool:
-        return all(cid in self.categories for cid in category_ids)
+        return all(item in self.categories for item in category_ids)
 
     def add(self, entity: object) -> None:
-        if isinstance(entity, ProductCategory):
-            self.categories[entity.id] = entity
-        elif isinstance(entity, Product):
+        if isinstance(entity, Product):
+            entity.id = entity.id or uuid4()
             self.products[entity.id] = entity
 
     def add_audit(self, event: AuditEvent) -> None:
@@ -108,474 +197,320 @@ class InMemCatalogueRepo:
         pass
 
 
-@pytest.mark.asyncio
-async def test_fake_uniops_client() -> None:
-    initial = [
-        CanonicalProduct(
-            id="p-001",
-            sku="UG000001",
-            name="Roll Jumbo A",
-            unit="cuộn",
-            category="Túi cuộn",
-            status="active",
-        )
-    ]
-    client = FakeUniOpsClient(products=initial)
-
-    # list
-    prods = await client.list_products()
-    assert len(prods) == 1
-    assert prods[0].sku == "UG000001"
-
-    # search
-    search_res = await client.list_products(search="Jumbo")
-    assert len(search_res) == 1
-    assert len(await client.list_products(search="NonExistent")) == 0
-
-    # filter by category
-    assert len(await client.list_products(category="Túi cuộn")) == 1
-    assert len(await client.list_products(category="Khác")) == 0
-
-    # filter by status
-    assert len(await client.list_products(status="active")) == 1
-    assert len(await client.list_products(status="discontinued")) == 0
-
-    # get by id
-    p = await client.get_product("p-001")
-    assert p is not None
-    assert p.name == "Roll Jumbo A"
-    assert await client.get_product("missing") is None
-
-    # get by sku
-    by_sku = await client.get_product_by_sku("UG000001")
-    assert by_sku is not None
-    assert by_sku.id == "p-001"
-    assert await client.get_product_by_sku("UG999999") is None
-
-    # create
-    created = await client.create_product(
-        CanonicalProductCreatePayload(
-            name="Roll Jumbo B",
-            unit="cuộn",
-            category="Túi cuộn",
-        )
-    )
-    assert created.sku == "UG000002"
-    assert len(await client.list_products()) == 2
-
-
-@pytest.mark.asyncio
-async def test_uniops_client_http() -> None:
-    def handler(request: httpx.Request) -> Response:
-        if request.url.path == "/api/v1/products" and request.method == "GET":
-            return Response(
-                200,
-                json=[
-                    {
-                        "id": "cp-1",
-                        "sku": "UG000001",
-                        "name": "Test Product",
-                        "unit": "cái",
-                        "category": "Cat A",
-                        "status": "active",
-                        "specifications": {},
-                        "easybooks_code": "EB01",
-                        "code": "EB01",
-                    }
-                ],
-            )
-        if request.url.path == "/api/v1/products/cp-1" and request.method == "GET":
-            return Response(
-                200,
-                json={
-                    "id": "cp-1",
-                    "sku": "UG000001",
-                    "name": "Test Product",
-                    "unit": "cái",
-                    "category": "Cat A",
-                    "status": "active",
-                    "specifications": {},
-                    "easybooks_code": "EB01",
-                    "code": "EB01",
-                },
-            )
-        if request.url.path == "/api/v1/products/cp-missing":
-            return Response(404, json={"detail": "Not found"})
-        if request.url.path == "/api/v1/products" and request.method == "POST":
-            return Response(
-                201,
-                json={
-                    "id": "cp-2",
-                    "sku": "UG000002",
-                    "name": "Created Product",
-                    "unit": "cái",
-                    "category": None,
-                    "status": "active",
-                    "specifications": {},
-                    "easybooks_code": None,
-                    "code": "UG000002",
-                },
-            )
-        return Response(404)
-
-    transport = httpx.MockTransport(handler)
-    client = UniOpsClient(base_url="http://uniops.local", api_key="secret-key")
-
-    # Monkey patch httpx.AsyncClient to use MockTransport in tests
-    import unittest.mock as mock
-
-    original_async_client = httpx.AsyncClient
-
-    def mock_async_client(*args: Any, **kwargs: Any) -> httpx.AsyncClient:
-        kwargs["transport"] = transport
-        return original_async_client(*args, **kwargs)
-
-    with mock.patch("httpx.AsyncClient", side_effect=mock_async_client):
-        prods = await client.list_products(search="Test")
-        assert len(prods) == 1
-        assert prods[0].sku == "UG000001"
-
-        p1 = await client.get_product("cp-1")
-        assert p1 is not None
-        assert p1.name == "Test Product"
-
-        p_none = await client.get_product("cp-missing")
-        assert p_none is None
-
-        by_sku = await client.get_product_by_sku("UG000001")
-        assert by_sku is not None
-        assert by_sku.id == "cp-1"
-
-        created = await client.create_product(
-            CanonicalProductCreatePayload(name="Created Product", unit="cái")
-        )
-        assert created.id == "cp-2"
-        assert created.sku == "UG000002"
-
-
-@pytest.mark.asyncio
-async def test_create_product_with_canonical_id() -> None:
-    repo = InMemCatalogueRepo()
-    service = CatalogueService(cast(CatalogueRepository, repo))
-    uniops = FakeUniOpsClient(
-        products=[
-            CanonicalProduct(
-                id="cp-01",
-                sku="UG000001",
-                name="Canonical Roll",
-                unit="cuộn",
-            )
-        ]
-    )
-
-    payload = ProductCreate(
-        canonical_product_id="cp-01",
-        slug="canonical-roll",
-        translations=[
-            ProductTranslationInput(
-                locale=Locale.VI,
-                name="Cuộn Chuẩn",
-                summary="Tóm tắt",
-            )
-        ],
-    )
-
-    # 1. Successful creation resolves SKU from UniOps
-    created = await service.create_product(payload, client=uniops)
-    assert created.canonical_product_id == "cp-01"
-    assert created.sku == "UG000001"
-
-    # 2. Duplicate canonical product mapping rejected with 409
-    with pytest.raises(ApiError) as exc_info:
-        await service.create_product(
-            ProductCreate(
-                canonical_product_id="cp-01",
-                slug="canonical-roll-2",
-                translations=[
-                    ProductTranslationInput(
-                        locale=Locale.VI,
-                        name="Cuộn 2",
-                        summary="Tóm tắt",
-                    )
-                ],
-            ),
-            client=uniops,
-        )
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.code == "CANONICAL_PRODUCT_ALREADY_MAPPED"
-
-    # 3. Non-existent canonical product rejected with 404
-    with pytest.raises(ApiError) as exc_404:
-        await service.create_product(
-            ProductCreate(
-                canonical_product_id="cp-non-existent",
-                slug="non-existent",
-                translations=[
-                    ProductTranslationInput(
-                        locale=Locale.VI,
-                        name="Không tồn tại",
-                        summary="Tóm tắt",
-                    )
-                ],
-            ),
-            client=uniops,
-        )
-    assert exc_404.value.status_code == 404
-    assert exc_404.value.code == "CANONICAL_PRODUCT_NOT_FOUND"
-
-
-@pytest.mark.asyncio
-async def test_map_and_unmap_product() -> None:
-    repo = InMemCatalogueRepo()
-    service = CatalogueService(cast(CatalogueRepository, repo))
-    uniops = FakeUniOpsClient(
-        products=[
-            CanonicalProduct(
-                id="cp-01",
-                sku="UG000001",
-                name="Canonical 1",
-                unit="cái",
-            ),
-            CanonicalProduct(
-                id="cp-02",
-                sku="UG000002",
-                name="Canonical 2",
-                unit="cái",
-            ),
-        ]
-    )
-
-    # Create unmapped product with legacy SKU
-    prod_id = uuid4()
-    p1 = Product(
-        id=prod_id,
-        sku="LEGACY-SKU-1",
-        slug="legacy-prod-1",
-        status=PublicationStatus.DRAFT,
-        version=1,
-    )
-    repo.products[prod_id] = p1
-
-    actor = uuid4()
-
-    # 1. Map to cp-01
-    mapped = await service.map_canonical_product(
-        prod_id, "cp-01", uniops, actor_id=actor, request_id="req-1"
-    )
-    assert mapped.canonical_product_id == "cp-01"
-    assert mapped.sku == "UG000001"  # shadow field synchronized!
-    assert mapped.version == 2
-    assert len(repo.audits) == 1
-    assert repo.audits[0].action == "product.mapped"
-
-    # 2. Cannot map another product to cp-01
-    prod_id_2 = uuid4()
-    p2 = Product(
-        id=prod_id_2,
-        sku="LEGACY-SKU-2",
-        slug="legacy-prod-2",
-        status=PublicationStatus.DRAFT,
-        version=1,
-    )
-    repo.products[prod_id_2] = p2
-
-    with pytest.raises(ApiError) as exc_conflict:
-        await service.map_canonical_product(
-            prod_id_2, "cp-01", uniops, actor_id=actor, request_id="req-2"
-        )
-    assert exc_conflict.value.status_code == 409
-    assert exc_conflict.value.code == "CANONICAL_PRODUCT_ALREADY_MAPPED"
-
-    # 3. Cannot map to missing canonical product
-    with pytest.raises(ApiError) as exc_missing:
-        await service.map_canonical_product(
-            prod_id_2, "cp-999", uniops, actor_id=actor, request_id="req-3"
-        )
-    assert exc_missing.value.status_code == 404
-    assert exc_missing.value.code == "CANONICAL_PRODUCT_NOT_FOUND"
-
-    # 4. Unmap cp-01
-    unmapped = await service.unmap_canonical_product(
-        prod_id, actor_id=actor, request_id="req-4"
-    )
-    assert unmapped.canonical_product_id is None
-    assert unmapped.sku == "UG000001"  # shadow SKU remains intact
-    assert unmapped.version == 3
-    assert len(repo.audits) == 2
-    assert repo.audits[1].action == "product.unmapped"
-
-    # 5. Calling unmap again on already unmapped product is a safe no-op
-    re_unmapped = await service.unmap_canonical_product(
-        prod_id, actor_id=actor, request_id="req-5"
-    )
-    assert re_unmapped.canonical_product_id is None
-    assert re_unmapped.version == 3
-
-
-@pytest.mark.asyncio
-async def test_list_products_mapping_status_filter() -> None:
-    repo = InMemCatalogueRepo()
-    p_mapped = Product(
-        id=uuid4(),
-        sku="UG000001",
-        canonical_product_id="cp-01",
-        slug="mapped",
+def legacy_product(repo: InMemoryCatalogue, sku: str = "LEGACY-01") -> Product:
+    product_id = uuid4()
+    product = Product(
+        id=product_id,
+        sku=sku,
+        slug=f"legacy-{product_id.hex[:6]}",
         status=PublicationStatus.PUBLISHED,
-        version=1,
-    )
-    p_unmapped = Product(
-        id=uuid4(),
-        sku="LEGACY-01",
-        canonical_product_id=None,
-        slug="unmapped",
-        status=PublicationStatus.DRAFT,
-        version=1,
-    )
-    repo.products[p_mapped.id] = p_mapped
-    repo.products[p_unmapped.id] = p_unmapped
-
-    all_prods = await repo.list_products()
-    assert len(all_prods) == 2
-
-    mapped_prods = await repo.list_products(mapping_status="mapped")
-    assert len(mapped_prods) == 1
-    assert mapped_prods[0].id == p_mapped.id
-
-    unmapped_prods = await repo.list_products(mapping_status="unmapped")
-    assert len(unmapped_prods) == 1
-    assert unmapped_prods[0].id == p_unmapped.id
-
-
-@pytest.mark.asyncio
-async def test_update_product_canonical_id_conflict() -> None:
-    repo = InMemCatalogueRepo()
-    service = CatalogueService(cast(CatalogueRepository, repo))
-    p1 = Product(
-        id=uuid4(),
-        sku="UG000001",
-        canonical_product_id="cp-01",
-        slug="p1",
-        status=PublicationStatus.DRAFT,
-        version=1,
-    )
-    p2 = Product(
-        id=uuid4(),
-        sku="UG000002",
-        canonical_product_id=None,
-        slug="p2",
-        status=PublicationStatus.DRAFT,
-        version=1,
-    )
-    repo.products[p1.id] = p1
-    repo.products[p2.id] = p2
-
-    # Attempting to update p2 with p1's canonical_product_id raises 409
-    with pytest.raises(ApiError) as exc_info:
-        await service.update_product(
-            p2.id,
-            ProductUpdate(version=1, canonical_product_id="cp-01"),
-        )
-    assert exc_info.value.status_code == 409
-    assert exc_info.value.code == "CANONICAL_PRODUCT_ALREADY_MAPPED"
-
-
-@pytest.mark.asyncio
-async def test_staff_canonical_product_endpoints(client: AsyncClient) -> None:
-    admin = make_staff(role=StaffRole.ADMINISTRATOR)
-    repo = InMemCatalogueRepo()
-    service = CatalogueService(cast(CatalogueRepository, repo))
-    uniops = FakeUniOpsClient(
-        products=[
-            CanonicalProduct(
-                id="cp-100",
-                sku="UG000100",
-                name="Eco Bag 100",
-                unit="cái",
-                category="Túi sinh học",
-                status="active",
-            )
-        ]
-    )
-
-    # Create unmapped product in repo
-    prod_id = uuid4()
-    p = Product(
-        id=prod_id,
-        sku="UNMAPPED-01",
-        slug="unmapped-bag",
-        status=PublicationStatus.DRAFT,
         version=1,
         oem_available=False,
         featured=False,
         sort_order=0,
+        pack_options=[],
         specifications=[],
         category_links=[],
+        translations=[ProductTranslation(locale=Locale.VI, name="Giấy cũ", summary="Sản phẩm cũ")],
+    )
+    repo.products[product_id] = product
+    return product
+
+
+def create_payload(canonical_id: UUID, slug: str = "khan-giay") -> ProductCreate:
+    return ProductCreate(
+        canonical_product_id=canonical_id,
+        slug=slug,
         translations=[
-            ProductTranslation(
-                product_id=prod_id,
-                locale=Locale.VI,
-                name="Túi chưa map",
-                summary="Tóm tắt",
-            )
+            ProductTranslationInput(locale=Locale.VI, name="Khăn giấy", summary="Tóm tắt")
         ],
     )
-    repo.products[prod_id] = p
 
-    app.dependency_overrides[get_catalogue_service] = lambda: service
-    app.dependency_overrides[get_uniops_client] = lambda: uniops
-    app.dependency_overrides[get_auth_context] = lambda: make_auth_context(admin)
-    app.dependency_overrides[require_csrf] = lambda: make_auth_context(admin)
 
-    try:
-        # 1. GET /canonical-products
-        resp = await client.get("/api/v1/staff/canonical-products")
-        assert resp.status_code == 200
-        canonicals = resp.json()
-        assert len(canonicals) == 1
-        assert canonicals[0]["sku"] == "UG000100"
+def service_for(repo: InMemoryCatalogue) -> CatalogueService:
+    return CatalogueService(cast(CatalogueRepository, repo))
 
-        # 2. POST /canonical-products
-        create_cp_resp = await client.post(
+
+def test_a_catalogue_product_cannot_be_created_with_its_own_sku_or_without_a_reference() -> None:
+    translations = [{"locale": "vi", "name": "X", "summary": "Y"}]
+    with pytest.raises(ValidationError):
+        ProductCreate.model_validate({"slug": "x", "sku": "UG-1", "translations": translations})
+    with pytest.raises(ValidationError):
+        ProductCreate.model_validate(
+            {
+                "canonical_product_id": str(uuid4()),
+                "sku": "UG-1",
+                "slug": "x",
+                "translations": translations,
+            }
+        )
+
+
+async def test_create_copies_the_sku_from_the_canonical_product() -> None:
+    repo = InMemoryCatalogue()
+    canonical = canonical_product("UG000042")
+
+    product = await service_for(repo).create_product(
+        create_payload(canonical.id), StubCanonicalProducts(canonical)
+    )
+
+    assert product.canonical_product_id == str(canonical.id)
+    assert product.sku == "UG000042"
+
+
+async def test_create_refuses_a_canonical_product_uniops_does_not_have() -> None:
+    with pytest.raises(ApiError) as raised:
+        await service_for(InMemoryCatalogue()).create_product(
+            create_payload(uuid4()), StubCanonicalProducts()
+        )
+    assert (raised.value.status_code, raised.value.code) == (422, "CANONICAL_PRODUCT_NOT_FOUND")
+
+
+async def test_one_canonical_product_is_presented_by_at_most_one_entry() -> None:
+    repo = InMemoryCatalogue()
+    canonical = canonical_product()
+    products = StubCanonicalProducts(canonical)
+    await service_for(repo).create_product(create_payload(canonical.id), products)
+
+    with pytest.raises(ApiError) as on_create:
+        await service_for(repo).create_product(create_payload(canonical.id, "again"), products)
+    assert on_create.value.code == "CANONICAL_PRODUCT_ALREADY_MAPPED"
+
+    other = legacy_product(repo)
+    with pytest.raises(ApiError) as on_map:
+        await service_for(repo).map_canonical_product(
+            other.id, canonical.id, products, actor_id=uuid4(), request_id="r"
+        )
+    assert on_map.value.code == "CANONICAL_PRODUCT_ALREADY_MAPPED"
+    assert other.canonical_product_id is None
+    assert other.sku == "LEGACY-01"
+
+
+async def test_mapping_a_legacy_entry_takes_the_uniops_sku_and_is_audited() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+    canonical = canonical_product("UG000007")
+    actor = uuid4()
+
+    mapped = await service_for(repo).map_canonical_product(
+        legacy.id, canonical.id, StubCanonicalProducts(canonical), actor_id=actor, request_id="r1"
+    )
+
+    assert mapped.canonical_product_id == str(canonical.id)
+    assert mapped.sku == "UG000007"
+    assert mapped.version == 2
+    assert repo.audits[-1].action == "product.mapped"
+    assert repo.audits[-1].actor_staff_id == actor
+    assert repo.audits[-1].change_summary == {
+        "canonical_product_id": str(canonical.id),
+        "sku": "UG000007",
+        "previous_sku": "LEGACY-01",
+    }
+
+
+async def test_mapping_again_to_the_same_product_changes_nothing() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+    canonical = canonical_product()
+    products = StubCanonicalProducts(canonical)
+    service = service_for(repo)
+    await service.map_canonical_product(
+        legacy.id, canonical.id, products, actor_id=uuid4(), request_id="r"
+    )
+
+    again = await service.map_canonical_product(
+        legacy.id, canonical.id, products, actor_id=uuid4(), request_id="r"
+    )
+
+    assert again.version == 2
+    assert len(repo.audits) == 1
+
+
+async def test_a_mapped_entry_is_not_silently_remapped() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+    first, second = canonical_product("UG000001"), canonical_product("UG000002")
+    products = StubCanonicalProducts(first, second)
+    service = service_for(repo)
+    await service.map_canonical_product(
+        legacy.id, first.id, products, actor_id=uuid4(), request_id="r"
+    )
+
+    with pytest.raises(ApiError) as raised:
+        await service.map_canonical_product(
+            legacy.id, second.id, products, actor_id=uuid4(), request_id="r"
+        )
+    assert raised.value.code == "PRODUCT_ALREADY_MAPPED"
+    assert legacy.canonical_product_id == str(first.id)
+
+
+async def test_mapping_to_a_missing_canonical_product_fails_clearly() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+
+    with pytest.raises(ApiError) as raised:
+        await service_for(repo).map_canonical_product(
+            legacy.id, uuid4(), StubCanonicalProducts(), actor_id=uuid4(), request_id="r"
+        )
+    assert raised.value.code == "CANONICAL_PRODUCT_NOT_FOUND"
+    assert legacy.canonical_product_id is None
+
+
+async def test_a_mapped_sku_can_only_change_in_uniops() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+    canonical = canonical_product("UG000003")
+    service = service_for(repo)
+    await service.map_canonical_product(
+        legacy.id, canonical.id, StubCanonicalProducts(canonical), actor_id=uuid4(), request_id="r"
+    )
+
+    with pytest.raises(ApiError) as raised:
+        await service.update_product(legacy.id, ProductUpdate(version=2, sku="MY-OWN-SKU"))
+    assert raised.value.code == "SKU_MANAGED_BY_UNIOPS"
+
+    # Resending the same SKU, as the editor form does, is not a change.
+    updated = await service.update_product(legacy.id, ProductUpdate(version=2, sku="UG000003"))
+    assert updated.sku == "UG000003"
+
+
+async def test_an_update_cannot_attach_a_mapping() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+
+    payload = ProductUpdate.model_validate({"version": 1, "canonical_product_id": str(uuid4())})
+    await service_for(repo).update_product(legacy.id, payload)
+
+    assert legacy.canonical_product_id is None
+
+
+async def test_an_unmapped_legacy_entry_still_edits_its_own_sku() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+
+    updated = await service_for(repo).update_product(
+        legacy.id, ProductUpdate(version=1, sku="legacy 02")
+    )
+    assert updated.sku == "LEGACY-02"
+
+
+async def test_unmapping_keeps_the_last_sku_and_is_audited() -> None:
+    repo = InMemoryCatalogue()
+    legacy = legacy_product(repo)
+    canonical = canonical_product("UG000005")
+    service = service_for(repo)
+    await service.map_canonical_product(
+        legacy.id, canonical.id, StubCanonicalProducts(canonical), actor_id=uuid4(), request_id="r"
+    )
+
+    unmapped = await service.unmap_canonical_product(legacy.id, actor_id=uuid4(), request_id="u")
+
+    assert unmapped.canonical_product_id is None
+    assert unmapped.sku == "UG000005"
+    assert repo.audits[-1].action == "product.unmapped"
+    assert repo.audits[-1].change_summary["canonical_product_id"] == str(canonical.id)
+    await service.unmap_canonical_product(legacy.id, actor_id=uuid4(), request_id="u")
+    assert len(repo.audits) == 2
+
+
+# Staff routes -------------------------------------------------------------------
+
+
+def staff_context() -> AuthContext:
+    user = StaffUser(
+        id=uuid4(),
+        email="admin@unigreen.example",
+        password_hash="fake-hash",
+        role=StaffRole.ADMINISTRATOR,
+        status=StaffStatus.ACTIVE,
+    )
+    return AuthContext(
+        user=user,
+        session=StaffSession(
+            staff_user_id=user.id,
+            token_hash=hash_token("session"),
+            csrf_token_hash=hash_token("csrf"),
+            expires_at=datetime.now(UTC),
+        ),
+    )
+
+
+@pytest.fixture
+def staff_app() -> Any:
+    repo = InMemoryCatalogue()
+    context = staff_context()
+    app.dependency_overrides[get_catalogue_service] = lambda: service_for(repo)
+    app.dependency_overrides[get_auth_context] = lambda: context
+    app.dependency_overrides[require_csrf] = lambda: context
+    yield repo
+    app.dependency_overrides.clear()
+
+
+async def test_staff_mapping_workflow(client: AsyncClient, staff_app: InMemoryCatalogue) -> None:
+    repo = staff_app
+    legacy = legacy_product(repo)
+    taken = canonical_product("UG000001", "Already presented")
+    free = canonical_product("UG000002", "Jumbo roll 700g", code="TP.GVS700/2")
+    products = StubCanonicalProducts(taken, free)
+    legacy_product(repo, "OTHER").canonical_product_id = str(taken.id)
+    app.dependency_overrides[get_canonical_products] = lambda: products
+
+    listed = (await client.get("/api/v1/staff/canonical-products")).json()
+    by_sku = {item["sku"]: item for item in listed}
+    assert by_sku["UG000002"]["easybooks_code"] == "TP.GVS700/2"
+    assert by_sku["UG000002"]["mapped_catalogue_product_id"] is None
+    assert by_sku["UG000001"]["mapped_catalogue_product_id"] is not None
+
+    unmapped = (await client.get("/api/v1/staff/products?mapping_status=unmapped")).json()
+    assert [item["sku"] for item in unmapped] == ["LEGACY-01"]
+
+    response = await client.post(
+        f"/api/v1/staff/products/{legacy.id}/map", json={"canonical_product_id": str(free.id)}
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["is_mapped"] is True
+    assert response.json()["canonical_product_id"] == str(free.id)
+    assert response.json()["sku"] == "UG000002"
+
+    mapped = (await client.get("/api/v1/staff/products?mapping_status=mapped")).json()
+    assert {item["sku"] for item in mapped} == {"UG000002", "OTHER"}
+
+    assert (
+        await client.post(
+            f"/api/v1/staff/products/{legacy.id}/map", json={"canonical_product_id": "cp-1"}
+        )
+    ).status_code == 422
+    assert (await client.get("/api/v1/staff/products?mapping_status=maybe")).status_code == 422
+
+    created = await client.post(
+        "/api/v1/staff/canonical-products", json={"name": "Napkin 3-ply", "unit": "Gói"}
+    )
+    assert created.status_code == 201, created.text
+    assert created.json()["sku"] == "UG000003"
+    assert created.json()["mapped_catalogue_product_id"] is None
+    assert (
+        await client.post(
             "/api/v1/staff/canonical-products",
-            json={
-                "name": "Eco Bag 101",
-                "unit": "cái",
-                "category": "Túi sinh học",
-            },
+            json={"name": "Chosen", "unit": "Gói", "sku": "UG000999"},
         )
-        assert create_cp_resp.status_code == 201
-        created_cp = create_cp_resp.json()
-        assert created_cp["name"] == "Eco Bag 101"
-        assert created_cp["sku"] == "UG000002"
+    ).status_code == 422
 
-        # 3. GET /products with mapping_status filter
-        resp_filter = await client.get("/api/v1/staff/products?mapping_status=unmapped")
-        assert resp_filter.status_code == 200
-        assert len(resp_filter.json()) == 1
-        assert resp_filter.json()[0]["is_mapped"] is False
 
-        # 4. POST /products/{id}/map
-        map_resp = await client.post(
-            f"/api/v1/staff/products/{prod_id}/map",
-            json={"canonical_product_id": "cp-100"},
-        )
-        assert map_resp.status_code == 200
-        mapped_data = map_resp.json()
-        assert mapped_data["is_mapped"] is True
-        assert mapped_data["canonical_product_id"] == "cp-100"
-        assert mapped_data["sku"] == "UG000100"
+async def test_without_uniops_configured_mapping_fails_but_the_catalogue_reads(
+    client: AsyncClient, staff_app: InMemoryCatalogue
+) -> None:
+    legacy = legacy_product(staff_app)
 
-        # 5. Verify mapping filter now reflects mapped
-        resp_mapped = await client.get("/api/v1/staff/products?mapping_status=mapped")
-        assert resp_mapped.status_code == 200
-        assert len(resp_mapped.json()) == 1
-        assert resp_mapped.json()[0]["id"] == str(prod_id)
+    listed = await client.get("/api/v1/staff/canonical-products")
+    mapping = await client.post(
+        f"/api/v1/staff/products/{legacy.id}/map", json={"canonical_product_id": str(uuid4())}
+    )
 
-        # 6. POST /products/{id}/unmap
-        unmap_resp = await client.post(f"/api/v1/staff/products/{prod_id}/unmap")
-        assert unmap_resp.status_code == 200
-        unmapped_data = unmap_resp.json()
-        assert unmapped_data["is_mapped"] is False
-        assert unmapped_data["canonical_product_id"] is None
-    finally:
-        app.dependency_overrides.clear()
+    assert (listed.status_code, listed.json()["error"]["code"]) == (503, "UNIOPS_NOT_CONFIGURED")
+    assert mapping.status_code == 503
+    assert (await client.get("/api/v1/staff/products")).status_code == 200
+
+
+def test_configured_settings_build_a_real_client() -> None:
+    settings = Settings(uniops_base_url="http://uniops.internal", uniops_catalog_key="k" * 40)
+    assert isinstance(get_canonical_products(settings), UniOpsClient)
