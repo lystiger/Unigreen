@@ -1,4 +1,5 @@
 import type { PublicProduct, PublicProductDetail } from "@/lib/api/types";
+import { getProductFallbackImage } from "@/lib/product-images";
 import type { NewBasketItem, PublishedProduct } from "./reducer";
 
 /**
@@ -51,5 +52,5 @@ function primaryImageUrl(product: PublicProduct | PublicProductDetail): string |
   const variants = product.primary_media?.variants ?? [];
   // Smallest variant at or above the basket thumbnail's rendered width.
   const chosen = variants.find((variant) => variant.width >= 240) ?? variants.at(-1);
-  return chosen?.url ?? null;
+  return chosen?.url ?? getProductFallbackImage(product).url;
 }

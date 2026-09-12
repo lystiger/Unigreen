@@ -35,5 +35,6 @@ github.md
 *.webp
 *.svg
 
-# Local browser/devtools noise
+# Local browser/devtools noise and test artifacts
 frontend/debug.log
+output/

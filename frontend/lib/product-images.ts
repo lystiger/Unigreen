@@ -1,10 +1,13 @@
-import type { PublicProduct, PublicProductDetail } from "@/lib/api/types";
+export interface ProductImageInput {
+  readonly slug: string;
+  readonly name?: string;
+  readonly categories?: readonly { readonly slug: string; readonly name?: string }[];
+}
 
-export function getProductFallbackImage(
-  product: Pick<PublicProduct | PublicProductDetail, "slug" | "categories"> & {
-    name?: string;
-  },
-): { url: string; alt: string } {
+export function getProductFallbackImage(product: ProductImageInput): {
+  url: string;
+  alt: string;
+} {
   const combinedText = [
     product.slug,
     product.name ?? "",

@@ -34,10 +34,13 @@ export function SiteHeader({ locale, copy, hotline, basketCopy }: SiteHeaderProp
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper/[0.92] backdrop-blur-[8px]">
-      <div className="shell flex h-[68px] items-center justify-between gap-10">
-        <Link href={`/${locale}#top`} className="flex items-center gap-2.5 text-ink">
+      <div className="shell flex h-[68px] items-center justify-between gap-2 sm:gap-4 lg:gap-10">
+        <Link
+          href={`/${locale}#top`}
+          className="flex shrink-0 items-center gap-2.5 text-ink"
+        >
           <Image src="/icon.svg" alt="" width={28} height={28} aria-hidden="true" />
-          <span className="text-[19px] font-semibold tracking-[-0.02em]">
+          <span className="whitespace-nowrap text-[16px] font-semibold tracking-[-0.02em] sm:text-[19px]">
             Uni<span className="text-brand-green">-Green</span>
           </span>
         </Link>

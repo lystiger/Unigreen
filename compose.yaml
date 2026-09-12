@@ -60,6 +60,7 @@ services:
         condition: service_completed_successfully
     volumes:
       - unigreen-storage:/app/storage
+      - ./frontend/public/images/products/jumbo-roll.webp:/app/jumbo-roll.webp:ro
     healthcheck:
       test:
         [
