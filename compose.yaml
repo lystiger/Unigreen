@@ -49,6 +49,11 @@ services:
     build:
       context: ./backend
     env_file: ${UNIGREEN_ENV_FILE:-.env}
+    # Lets the backend reach a UniOps API running on the host
+    # (UNIGREEN_UNIOPS_BASE_URL=http://host.docker.internal:8001). Docker Desktop
+    # resolves this name itself; a plain Linux Docker Engine needs the mapping.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8000:8000"
     depends_on:
