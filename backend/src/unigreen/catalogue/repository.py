@@ -39,19 +39,27 @@ class CatalogueRepository:
             ),
         )
 
-    async def list_products(self) -> list[Product]:
-        result = await self.session.scalars(
-            select(Product)
-            .options(
-                selectinload(Product.translations),
-                selectinload(Product.category_links),
-                selectinload(Product.specifications).selectinload(
-                    ProductSpecification.translations
-                ),
-            )
-            .order_by(Product.sort_order, Product.sku)
+    async def list_products(self, mapping_status: str | None = None) -> list[Product]:
+        query = select(Product).options(
+            selectinload(Product.translations),
+            selectinload(Product.category_links),
+            selectinload(Product.specifications).selectinload(ProductSpecification.translations),
         )
+        if mapping_status == "mapped":
+            query = query.where(Product.canonical_product_id.is_not(None))
+        elif mapping_status == "unmapped":
+            query = query.where(Product.canonical_product_id.is_(None))
+        query = query.order_by(Product.sort_order, Product.sku)
+        result = await self.session.scalars(query)
         return list(result.unique())
+
+    async def get_product_by_canonical_id(self, canonical_product_id: str) -> Product | None:
+        return cast(
+            Product | None,
+            await self.session.scalar(
+                select(Product).where(Product.canonical_product_id == canonical_product_id)
+            ),
+        )
 
     async def get_product(self, product_id: UUID) -> Product | None:
         return cast(

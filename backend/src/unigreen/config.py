@@ -39,6 +39,11 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = True
     smtp_from_email: str = ""
     smtp_image_path: Path = Path("/app/jumbo-roll.webp")
+    # The UniOps product master. Both are required to create or map catalogue
+    # products; without them those actions fail with UNIOPS_NOT_CONFIGURED and the
+    # public catalogue is unaffected.
+    uniops_base_url: str = ""
+    uniops_catalog_key: str = ""
 
     @model_validator(mode="after")
     def validate_production_settings(self) -> Self:

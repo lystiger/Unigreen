@@ -83,6 +83,15 @@ class Product(Base):
     )
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    # The UniOps canonical product this entry presents. UniOps owns the product's
+    # identity; one canonical product is presented by at most one entry. Null only
+    # for a legacy entry not yet mapped.
+    canonical_product_id: Mapped[str | None] = mapped_column(
+        String(36), unique=True, index=True, nullable=True, default=None
+    )
+    # For a mapped entry, a read-only copy of the canonical SKU, written only by
+    # mapping. It is kept so public pages, search and inquiry snapshots need no
+    # call to UniOps. For an unmapped legacy entry it is the old catalogue SKU.
     sku: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     slug: Mapped[str] = mapped_column(String(160), unique=True, index=True)
     barcode: Mapped[str | None] = mapped_column(String(100), unique=True, index=True)

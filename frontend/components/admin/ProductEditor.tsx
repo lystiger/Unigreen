@@ -1,12 +1,13 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { CanonicalProductPicker, canonicalProductsKey } from "./CanonicalProductPicker";
 import { StatusBadge } from "./StatusBadge";
 import { ApiClientError, apiBaseUrl, apiRequest, cookie } from "@/lib/api/client";
 import type { components } from "@/lib/api/schema";
-import type { Category, Media, Product } from "@/lib/api/types";
+import type { CanonicalProduct, Category, Media, Product } from "@/lib/api/types";
 
 type Specification = components["schemas"]["SpecificationInput"];
 
@@ -37,11 +38,16 @@ export function ProductEditor({
   const [error, setError] = useState<ApiClientError | null>(null);
   const [notice, setNotice] = useState("");
   const [saving, setSaving] = useState(false);
+  const [selectedCanonical, setSelectedCanonical] = useState<CanonicalProduct | null>(
+    null,
+  );
+
   const refresh = async () => {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ["staff-product", product.id] }),
       queryClient.invalidateQueries({ queryKey: ["staff-products"] }),
       queryClient.invalidateQueries({ queryKey: ["staff-media", product.id] }),
+      queryClient.invalidateQueries({ queryKey: canonicalProductsKey }),
     ]);
   };
   const execute = async (action: () => Promise<unknown>, success: string) => {
@@ -58,6 +64,34 @@ export function ProductEditor({
     }
   };
 
+  const mapProduct = () => {
+    if (!selectedCanonical) return;
+    void execute(
+      () =>
+        apiRequest<Product>(`/api/v1/staff/products/${product.id}/map`, {
+          method: "POST",
+          body: JSON.stringify({ canonical_product_id: selectedCanonical.id }),
+        }),
+      `Mapped to UniOps product ${selectedCanonical.sku}.`,
+    );
+  };
+
+  const unmapProduct = () => {
+    if (
+      !window.confirm(
+        "Unmap this catalogue product from its UniOps product? It keeps its last SKU but stops being traceable to UniOps.",
+      )
+    )
+      return;
+    void execute(
+      () =>
+        apiRequest<Product>(`/api/v1/staff/products/${product.id}/unmap`, {
+          method: "POST",
+        }),
+      "Product unmapped from UniOps.",
+    );
+  };
+
   const saveProduct = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -67,7 +101,7 @@ export function ProductEditor({
           method: "PATCH",
           body: JSON.stringify({
             version: product.version,
-            sku: String(data.get("sku") ?? ""),
+            sku: product.is_mapped ? product.sku : String(data.get("sku") ?? ""),
             slug: String(data.get("slug") ?? ""),
             barcode: String(data.get("barcode") ?? "") || null,
             oem_available: data.get("oem_available") === "on",
@@ -214,10 +248,82 @@ export function ProductEditor({
         </ul>
       </section>
 
+      <section
+        aria-labelledby="uniops-product"
+        className="mt-8 rounded-card border border-line bg-paper-raised p-6"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="uniops-product" className="text-h2 font-semibold">
+            UniOps product
+          </h2>
+          <span
+            className={`rounded-full px-3 py-1 text-data font-medium ${
+              product.is_mapped
+                ? "bg-brand-green/10 text-brand-green"
+                : "bg-amber-500/10 text-amber-700"
+            }`}
+          >
+            {product.is_mapped ? "Mapped" : "Unmapped"}
+          </span>
+        </div>
+        <p className="mt-1 text-data text-ink-muted">
+          UniOps owns this product&apos;s identity and SKU. This page manages how the
+          catalogue presents it.
+        </p>
+        {product.is_mapped ? (
+          <div className="mt-4">
+            <MappedCanonicalProduct
+              canonicalProductId={product.canonical_product_id ?? ""}
+              sku={product.sku}
+            />
+            {canWrite ? (
+              <button
+                type="button"
+                disabled={saving}
+                onClick={unmapProduct}
+                className="min-h-11 mt-4 rounded-control border border-status-rejected/40 px-3 py-1.5 text-data font-medium text-status-rejected disabled:opacity-50"
+              >
+                Unmap
+              </button>
+            ) : null}
+          </div>
+        ) : canWrite ? (
+          <div className="mt-4">
+            <CanonicalProductPicker
+              value={selectedCanonical?.id ?? ""}
+              onChange={setSelectedCanonical}
+              currentCatalogueProductId={product.id}
+              disabled={saving}
+            />
+            <button
+              type="button"
+              disabled={!selectedCanonical || saving}
+              onClick={mapProduct}
+              className="min-h-11 mt-4 rounded-control bg-brand-green px-4 py-2 text-data font-medium text-white disabled:opacity-50"
+            >
+              Map to this UniOps product
+            </button>
+          </div>
+        ) : (
+          <p className="mt-4 text-data">Not yet mapped to a UniOps product.</p>
+        )}
+      </section>
+
       <form onSubmit={saveProduct} className="mt-8">
         <fieldset disabled={!canWrite || saving}>
           <div className="grid gap-5 rounded-card border border-line bg-paper-raised p-6 sm:grid-cols-2">
-            <Input label="SKU" name="sku" defaultValue={product.sku} required />
+            <Input
+              label="SKU"
+              name="sku"
+              defaultValue={product.sku}
+              readOnly={product.is_mapped}
+              hint={
+                product.is_mapped
+                  ? "Managed in UniOps canonical product master"
+                  : "Legacy SKU"
+              }
+              required={!product.is_mapped}
+            />
             <Input label="Slug" name="slug" defaultValue={product.slug} required />
             <Input
               label="Barcode"
@@ -311,20 +417,32 @@ function Input({
   name,
   defaultValue,
   required = false,
+  readOnly = false,
+  hint,
 }: {
   readonly label: string;
   readonly name: string;
   readonly defaultValue: string;
   readonly required?: boolean;
+  readonly readOnly?: boolean;
+  readonly hint?: string;
 }) {
   return (
     <label className="font-medium">
-      {label}
+      <div className="flex items-center justify-between">
+        <span>{label}</span>
+        {hint ? (
+          <span className="text-xs font-normal text-ink-muted">{hint}</span>
+        ) : null}
+      </div>
       <input
         required={required}
         name={name}
         defaultValue={defaultValue}
-        className="mt-2 w-full rounded-control border border-line-strong px-3 py-2"
+        readOnly={readOnly}
+        className={`mt-2 w-full rounded-control border border-line-strong px-3 py-2 ${
+          readOnly ? "cursor-not-allowed bg-paper-sunk text-ink-muted" : ""
+        }`}
       />
     </label>
   );
@@ -758,5 +876,49 @@ function MediaEditor({
         })}
       </ul>
     </section>
+  );
+}
+
+function MappedCanonicalProduct({
+  canonicalProductId,
+  sku,
+}: {
+  readonly canonicalProductId: string;
+  readonly sku: string;
+}) {
+  // Read-only: shows what UniOps currently says about the mapped product.
+  const products = useQuery({
+    queryKey: canonicalProductsKey,
+    queryFn: () => apiRequest<CanonicalProduct[]>("/api/v1/staff/canonical-products"),
+  });
+  const canonical = products.data?.find((item) => item.id === canonicalProductId);
+  return (
+    <dl className="grid gap-3 text-data sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <dt className="text-caption text-ink-muted">UniOps SKU</dt>
+        <dd className="font-mono font-semibold">{sku}</dd>
+      </div>
+      <div>
+        <dt className="text-caption text-ink-muted">Official name</dt>
+        <dd>{canonical?.name ?? (products.isLoading ? "…" : "—")}</dd>
+      </div>
+      <div>
+        <dt className="text-caption text-ink-muted">EasyBooks code</dt>
+        <dd className="font-mono">{canonical?.easybooks_code ?? "—"}</dd>
+      </div>
+      <div>
+        <dt className="text-caption text-ink-muted">UniOps id</dt>
+        <dd className="break-all font-mono">{canonicalProductId}</dd>
+      </div>
+      {products.isError ? (
+        <p role="alert" className="text-status-rejected sm:col-span-2 lg:col-span-4">
+          UniOps could not be reached; the SKU above is the catalogue&apos;s copy.
+        </p>
+      ) : !products.isLoading && !canonical ? (
+        <p role="alert" className="text-status-rejected sm:col-span-2 lg:col-span-4">
+          UniOps no longer lists this product. Check the mapping.
+        </p>
+      ) : null}
+    </dl>
   );
 }

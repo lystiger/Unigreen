@@ -27,3 +27,6 @@ export type StaffInquiryDetail = components["schemas"]["StaffInquiryDetailRespon
 export type StaffInquiryLine = components["schemas"]["StaffInquiryLineResponse"];
 export type InquiryInternalNote = components["schemas"]["InquiryInternalNoteResponse"];
 export type StaffSummary = components["schemas"]["StaffSummaryResponse"];
+export type CanonicalProduct = components["schemas"]["CanonicalProductResponse"];
+export type CanonicalProductDraft = components["schemas"]["CanonicalProductDraft"];
+export type ProductMapRequest = components["schemas"]["ProductMapRequest"];

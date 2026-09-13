@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from unigreen.domain.enums import Locale, PublicationStatus
 
@@ -74,7 +75,15 @@ def normalize_pack_options(value: list[str]) -> list[str]:
 
 
 class ProductCreate(BaseModel):
-    sku: str = Field(min_length=1, max_length=100)
+    """A new catalogue entry presenting one UniOps canonical product.
+
+    There is no `sku`: the SKU is copied from the canonical product. Unknown
+    fields are rejected so a client still sending one is told immediately.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    canonical_product_id: UUID
     slug: str = Field(min_length=1, max_length=160)
     barcode: str | None = Field(default=None, max_length=100)
     oem_available: bool = False
@@ -108,6 +117,8 @@ class ProductCreate(BaseModel):
 
 class ProductUpdate(BaseModel):
     version: int = Field(ge=1)
+    # Accepted only for an unmapped legacy entry. A mapped entry's SKU belongs to
+    # UniOps; the mapping itself changes only through the map and unmap actions.
     sku: str | None = Field(default=None, min_length=1, max_length=100)
     slug: str | None = Field(default=None, min_length=1, max_length=160)
     barcode: str | None = Field(default=None, max_length=100)
@@ -153,6 +164,9 @@ class SpecificationReplace(BaseModel):
 
 class ProductResponse(BaseModel):
     id: UUID
+    canonical_product_id: UUID | None = None
+    is_mapped: bool = False
+    # For a mapped entry, a read-only copy of the UniOps SKU.
     sku: str
     slug: str
     barcode: str | None
@@ -165,3 +179,23 @@ class ProductResponse(BaseModel):
     category_ids: list[UUID]
     translations: list[ProductTranslationInput]
     specifications: list[SpecificationInput]
+
+
+class ProductMapRequest(BaseModel):
+    canonical_product_id: UUID
+
+
+class CanonicalProductResponse(BaseModel):
+    """A UniOps canonical product as shown to catalogue staff while mapping."""
+
+    id: UUID
+    sku: str
+    name: str
+    unit: str
+    category: str
+    status: Literal["active", "discontinued"]
+    specifications: dict[str, Any]
+    easybooks_code: str | None
+    easybooks_material_goods_id: str | None
+    # The catalogue entry already presenting this product, if any.
+    mapped_catalogue_product_id: UUID | None

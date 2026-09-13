@@ -4,10 +4,17 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ApiClientError, apiRequest } from "@/lib/api/client";
-import type { Category, Product, ProductCreate } from "@/lib/api/types";
+import { CanonicalProductPicker } from "@/components/admin/CanonicalProductPicker";
+import type {
+  CanonicalProduct,
+  Category,
+  Product,
+  ProductCreate,
+} from "@/lib/api/types";
 
 export default function NewProductPage() {
   const router = useRouter();
+  const [canonical, setCanonical] = useState<CanonicalProduct | null>(null);
   const categories = useQuery({
     queryKey: ["staff-categories"],
     queryFn: () => apiRequest<Category[]>("/api/v1/staff/categories"),
@@ -24,9 +31,10 @@ export default function NewProductPage() {
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!canonical) return;
     const data = new FormData(event.currentTarget);
     create.mutate({
-      sku: String(data.get("sku") ?? ""),
+      canonical_product_id: canonical.id,
       slug: String(data.get("slug") ?? ""),
       barcode: String(data.get("barcode") ?? "") || null,
       oem_available: data.get("oem_available") === "on",
@@ -69,8 +77,19 @@ export default function NewProductPage() {
           <p className="font-mono text-data">Request ID: {error.detail.request_id}</p>
         </div>
       ) : null}
+
+      <section className="mt-6 rounded-card border border-line bg-paper-raised p-6">
+        <h2 className="text-h2 font-semibold">UniOps product</h2>
+        <p className="mt-1 text-data text-ink-muted">
+          Every catalogue product presents one UniOps product. Its SKU comes from UniOps
+          and cannot be edited here.
+        </p>
+        <div className="mt-4">
+          <CanonicalProductPicker value={canonical?.id ?? ""} onChange={setCanonical} />
+        </div>
+      </section>
+
       <div className="mt-8 grid gap-5 rounded-card border border-line bg-paper-raised p-6 sm:grid-cols-2">
-        <Field label="SKU" name="sku" required />
         <Field label="Slug" name="slug" required />
         <Field label="Barcode (optional)" name="barcode" />
         <label className="font-medium sm:col-span-2">
@@ -118,7 +137,7 @@ export default function NewProductPage() {
       </fieldset>
       <button
         type="submit"
-        disabled={create.isPending}
+        disabled={create.isPending || !canonical}
         className="min-h-11 mt-6 rounded-control bg-brand-green px-5 py-3 font-medium text-white disabled:opacity-50"
       >
         {create.isPending ? "Creating…" : "Create draft"}

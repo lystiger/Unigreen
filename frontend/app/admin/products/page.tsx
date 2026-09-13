@@ -13,9 +13,13 @@ export default function AdminProductsPage() {
   const staff = useCurrentStaff();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [mappingStatus, setMappingStatus] = useState("");
   const products = useQuery({
-    queryKey: ["staff-products"],
-    queryFn: () => apiRequest<Product[]>("/api/v1/staff/products"),
+    queryKey: ["staff-products", mappingStatus],
+    queryFn: () =>
+      apiRequest<Product[]>(
+        `/api/v1/staff/products${mappingStatus ? `?mapping_status=${mappingStatus}` : ""}`,
+      ),
   });
   const filtered = useMemo(
     () =>
@@ -23,7 +27,7 @@ export default function AdminProductsPage() {
         (product) =>
           (!status || product.status === status) &&
           (!search ||
-            `${product.sku} ${product.slug} ${product.translations.map((item) => item.name).join(" ")}`
+            `${product.sku} ${product.canonical_product_id ?? ""} ${product.slug} ${product.translations.map((item) => item.name).join(" ")}`
               .toLowerCase()
               .includes(search.toLowerCase())),
       ),
@@ -72,6 +76,18 @@ export default function AdminProductsPage() {
             <option value="unpublished">Unpublished</option>
           </select>
         </label>
+        <label>
+          <span className="sr-only">Filter by mapping</span>
+          <select
+            value={mappingStatus}
+            onChange={(event) => setMappingStatus(event.target.value)}
+            className="rounded-control border border-line-strong px-3 py-2"
+          >
+            <option value="">All mapping statuses</option>
+            <option value="mapped">Mapped to UniOps</option>
+            <option value="unmapped">Unmapped</option>
+          </select>
+        </label>
       </div>
       {products.isError ? (
         <div className="mt-8">
@@ -105,7 +121,18 @@ export default function AdminProductsPage() {
           <tbody>
             {filtered.map((product) => (
               <tr key={product.id} className="border-b border-line last:border-0">
-                <td className="p-4 font-mono text-data">{product.sku}</td>
+                <td className="p-4 font-mono text-data">
+                  <div className="font-semibold">{product.sku}</div>
+                  {product.is_mapped ? (
+                    <span className="mt-1 inline-block rounded bg-brand-green/10 px-1.5 py-0.5 font-sans text-xs font-medium text-brand-green">
+                      Canonical
+                    </span>
+                  ) : (
+                    <span className="mt-1 inline-block rounded bg-amber-500/10 px-1.5 py-0.5 font-sans text-xs font-medium text-amber-700">
+                      Unmapped
+                    </span>
+                  )}
+                </td>
                 <td className="p-4">
                   <Link
                     className="font-medium text-brand-dark underline"
